@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Identity\20201105162306_AddUserIdentity.cs" />
+    <Compile Remove="Identity\20201105162306_AddUserIdentity.Designer.cs" />
+    <Compile Remove="Identity\Migrations\20201104170341_AddUserIdentity.cs" />
+    <Compile Remove="Identity\Migrations\20201104170341_AddUserIdentity.Designer.cs" />
+    <Compile Remove="Yvtu.Infra\Identity\20201105155330_AddUserIdentity.cs" />
+    <Compile Remove="Yvtu.Infra\Identity\20201105155330_AddUserIdentity.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.9" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Oracle.EntityFrameworkCore" Version="3.19.80" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Data\Config\" />
+    <Folder Include="Data\Interfaces\" />
+    <Folder Include="Identity\Migrations\" />
+    <Folder Include="Yvtu.Infra\Identity\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Yvtu.Core\Yvtu.Core.csproj" />
+  </ItemGroup>
+
+</Project>
