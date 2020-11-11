@@ -1,6 +1,37 @@
 ﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
 for details on configuring this project to bundle and minify static web assets. */
 
+
+@font-face {
+    font-family: 'Janna-Blod';
+    src: url('../fonts/Janna/Janna_LT_Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Janna-Normal';
+    src: url('../fonts/Janna/Janna LT Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ArefRuqaa-Bold';
+    src: url('../fonts/ArefRuqaa/ArefRuqaa-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'ArefRuqaa-Normal';
+    src: url('../fonts/ArefRuqaa/ArefRuqaa-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'DroidKufi-Bold';
+    src: url('../fonts/DroidKufi/DroidKufi-Bold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'DroidKufi-Normal';
+    src: url('../fonts/DroidKufi/DroidKufi-Regular.ttf') format('truetype');
+}
+
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -59,8 +90,14 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    direction: rtl;
+    text-align: right;
+    font-family: 'DroidKufi-Normal';
+    background: #dcdcdc; /* fallback for old browsers */
+    /*background: -webkit-linear-gradient(to top, #c31432, #240b36);*/ /* Chrome 10-25, Safari 5.1-6 */
+    /*background: linear-gradient(to top, #c31432, #240b36);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
 .footer {
   position: absolute;
@@ -68,4 +105,47 @@ body {
   width: 100%;
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
+}
+
+.FormLabel {
+    font-size: 13px;
+    color: #474747;
+}
+
+
+.field-validation-error {
+    font-size: 11px;
+}
+
+.input-validation-error {
+    border-color: red;
+}
+
+.LoginBox {
+    border: solid 1px #e8e1e1;
+    padding: 30px 30px 70px 30px;
+    height: 100%;
+    /*border-radius: 15px;*/
+    background-color: white;
+}
+.MainLink {
+    background-color: #ffffff;
+    width: 120px;
+    height: 80px;
+    font-size: 11px;
+    line-height: 25px;
+    overflow: hidden;
+    border: 1px solid rebeccapurple;
+    border-radius: 15px;
+}
+    .MainLink:hover {
+        border: 2px solid rebeccapurple;
+        /*background-color: #f7ff95;*/
+        font-size: 11.5px;
+    }
+.RequiredFormLabel {
+    font-size: 13px;
+    background-color: #663399;
+    color: white;
+    padding: 2px 4px 2px 4px;
 }

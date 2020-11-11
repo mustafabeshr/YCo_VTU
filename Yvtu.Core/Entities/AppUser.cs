@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Yvtu.Core.Entities
+﻿namespace Yvtu.Core.Entities
 {
-    public class AppUser : IdentityUser
+    public class AppUser 
     {
-        public string DisplayName { get; set; }
+        public string Id { get; set; }
+        public string Name { get; set; }
     }
 }

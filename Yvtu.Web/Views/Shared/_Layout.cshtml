@@ -1,30 +1,50 @@
-﻿<!DOCTYPE html>
+﻿
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Yvtu.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow" style="min-height:100px;">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Yvtu.Web</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                <a asp-action="Index" asp-controller="Home" class="brand-link" style="text-decoration: none;font-size:18px;">
+                    <img src="~/images/Y-Logo2.png" alt="YCo Logo" class="brand-image" width="70" height="70" style="opacity: .8">
+                    <span class="brand-text font-weight-light" style="font-family: 'ArefRuqaa-Bold'; font-size:1.5em;color:purple;">إدارة الشاحن الفوري</span>
+                </a>
+
+                <div class="float-left" style="font-size:11px;">
+                    @*@if (signInManager.IsSignedIn(User))*@
+                    @* { *@
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
+                               role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;</a>
+                            <div class="dropdown-menu text-right" style="font-size:12px;">
+
+                                <a class="dropdown-item" asp-action="ChangePass" asp-controller="Account">
+                                    <i style="color:gray;" class="fa fa-key"></i>&nbsp;&nbsp;&nbsp;تغيير كلمة المرور
+                                </a>
+
+                                <form method="post" asp-action="Logout" asp-controller="Account" class="nav-link" style="width:100%;">
+                                    <button type="submit" class="dropdown-item" style="width:auto;">
+                                        <i style="color:gray;" class="fa fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;تسجيل خروج
+                                    </button>
+                                </form>
+                            </div>
                         </li>
                     </ul>
+                    @* } *@
+                    @*else
+        {*@
+                    <a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>
+                    @* } *@
                 </div>
             </div>
         </nav>
@@ -35,14 +55,17 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    @*<footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2020 - Yvtu.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    </footer>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    @RenderSection("Scripts", required: false)
+    @if (IsSectionDefined("Scripts"))
+    {
+        @RenderSection("Scripts", required: true)
+    }
 </body>
 </html>
