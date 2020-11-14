@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -27,12 +28,29 @@ namespace Yvtu.Infra.Data
                 foreach (DataRow row in CityDataTable.Rows)
                 {
                     var city = new City();
-                    city.Id = row["cityid"] == null ? 0 : int.Parse(row["cityid"].ToString());
-                    city.Name = row["cityname"] == null ? string.Empty : row["cityname"].ToString();
+                    city.Id = row["cityid"] == DBNull.Value ? 0 : int.Parse(row["cityid"].ToString());
+                    city.Name = row["cityname"] == DBNull.Value ? string.Empty : row["cityname"].ToString();
                     cities.Add(city);
                 }
             }
             return cities;
+        }
+
+        public City GetCity(int id)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "cityId", OracleDbType = OracleDbType.Int32,  Value = id },
+            };
+            var CityDataTable = this.db.GetData("Select * from City where cityid = :cityId", parameters);
+            var city = new City();
+            if (CityDataTable != null)
+            {
+                DataRow row = CityDataTable.Rows[0];
+                city.Id = row["cityid"] == DBNull.Value ? 0 : int.Parse(row["cityid"].ToString());
+                city.Name = row["cityname"] == DBNull.Value ? string.Empty : row["cityname"].ToString();
+                city.Order = row["cityorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["cityorder"].ToString());
+            }
+            return city;
         }
     }
 }

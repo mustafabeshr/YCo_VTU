@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -37,10 +38,12 @@ namespace Yvtu.Infra.Data.Interfaces
 
         OpertionResult ChangePwd(string PartnerId, string newPwd);
         Task<OpertionResult> ChangePwdAsync(string PartnerId, string newPwd);
-
-        int GetCurrentUserId(HttpContext httpContext);
+        IEnumerable<Claim> GetUserClaims(Partner user);
+        string GetCurrentUserId(HttpContext httpContext);
         Partner GetCurrentUser(HttpContext httpContext);
         Task SignIn(HttpContext httpContext, Partner partner, bool isPersistent = false);
         Task SignOut(HttpContext httpContext);
+        bool IncreaseWrongPwdAttempts(string partnerId, bool lockAccount );
+        bool PreSuccessLogin(string partnerId);
     }
 }

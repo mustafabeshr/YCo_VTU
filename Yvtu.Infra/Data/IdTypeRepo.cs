@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Oracle.ManagedDataAccess.Client;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -27,12 +28,28 @@ namespace Yvtu.Infra.Data
                 foreach (DataRow row in idTypeDataTable.Rows)
                 {
                     var idType = new IdType();
-                    idType.Id = row["idtypeid"] == null ? 0 : int.Parse(row["idtypeid"].ToString());
-                    idType.Name = row["idtypename"] == null ? string.Empty : row["idtypename"].ToString();
+                    idType.Id = row["idtypeid"] == DBNull.Value ? 0 : int.Parse(row["idtypeid"].ToString());
+                    idType.Name = row["idtypename"] == DBNull.Value ? string.Empty : row["idtypename"].ToString();
                     idTypes.Add(idType);
                 }
             }
             return idTypes;
+        }
+        public IdType GetIdType(int id)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "idTypeId", OracleDbType = OracleDbType.Int32,  Value = id },
+            };
+            var idTypeDataTable = this.db.GetData("Select * from idtypes where idtypeid = :idTypeId", parameters);
+            var idType = new IdType();
+            if (idTypeDataTable != null)
+            {
+                DataRow row = idTypeDataTable.Rows[0];
+                idType.Id = row["idtypeid"] == DBNull.Value ? 0 : int.Parse(row["idtypeid"].ToString());
+                idType.Name = row["idtypename"] == DBNull.Value ? string.Empty : row["idtypename"].ToString();
+                idType.IsActive = row["isactive"] == DBNull.Value ? false : row["isactive"].ToString() == "1" ? true : false;
+            }
+            return idType;
         }
     }
 }

@@ -15,10 +15,12 @@ namespace Yvtu.Web.Dto
 
         [Required(ErrorMessage = "يجب ادخال كلمة المرور")]
         [MaxLength(4, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
-        [RegularExpression(@"^d*", ErrorMessage = "كلمة المرور غير صحيحة")]
+        //[RegularExpression(@"^d*", ErrorMessage = "كلمة المرور غير صحيحة")]
         [DataType(DataType.Password)]
         public string Pwd { get; set; }
 
         public bool RememberMe { get; set; }
+
+        public string Error { get; set; }
     }
 }

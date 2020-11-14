@@ -35,7 +35,9 @@ namespace Yvtu.Core.Entities
         public DateTime LockTime { get; set; }
         public bool VerificationCodeNext { get; set; }
         public string Pwd { get; set; }
+        public string Extra { get; set; }
         public long Balance { get; set; }
         public long Reserved { get; set; }
+        public int WrongPwdAttempts { get; set; }
     }
 }

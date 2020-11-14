@@ -149,3 +149,32 @@ body {
     color: white;
     padding: 2px 4px 2px 4px;
 }
+.icon-stack {
+    position: relative;
+    display: inline-block;
+    width: 2em;
+    height: 5em;
+    line-height: 4em;
+    vertical-align: middle;
+}
+
+.icon-stack-1x,
+.icon-stack-2x,
+.icon-stack-3x {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: right;
+}
+
+.icon-stack-1x {
+    line-height: inherit;
+}
+
+.icon-stack-2x {
+    font-size: 1.5em;
+}
+
+.icon-stack-3x {
+    font-size: 2em;
+}

@@ -1,0 +1,128 @@
+﻿@model Yvtu.Web.Dto.CreatePartnerActivityDto
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-5 text-center" style="background-color:rebeccapurple;padding:6px;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">منح صلاحية جديدة</p>
+        </div>
+
+        <form method="post">
+
+            @*<div asp-validation-summary="All" class="text-danger"></div>*@
+            <div class="form-row">
+                <div class="form-group col-12">
+
+                    <label asp-for="ActivityId" class="FormLabel">الاجراء :</label>
+                    <select asp-for="ActivityId" class="form-control" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.Activities,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="ActivityId" class="text-danger"></span>
+                </div>
+
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="FromRoleId" class="FormLabel">من النوع :</label>
+                    <select asp-for="FromRoleId" class="form-control" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.FromRoles,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="FromRoleId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="ToRoleId" class="FormLabel">الى النوع :</label>
+                    <select asp-for="ToRoleId" class="form-control" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.ToRoles,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="ToRoleId" class="text-danger"></span>
+                </div>
+
+            </div>
+           
+            <div class="form-row">
+
+
+                <div class="form-group col-6">
+                    <label asp-for="MaxValue" class="FormLabel">أعلى مبلغ في الاجراء الواحد :</label>
+                    <input asp-for="MaxValue" class="form-control" />
+                    <span asp-validation-for="MaxValue" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="MinValue" class="FormLabel">أقل مبلغ في الاجراء الواحد :</label>
+                    <input asp-for="MinValue" class="form-control" />
+                    <span asp-validation-for="MinValue" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="TaxPercent" class="FormLabel">النسبة المئوية للضريبة :</label>
+                    <input asp-for="TaxPercent" class="form-control" />
+                    <span asp-validation-for="TaxPercent" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="BonusPercent" class="FormLabel">النسبة المئوية للبونص او العمولة :</label>
+                    <input asp-for="BonusPercent" class="form-control" />
+                    <span asp-validation-for="BonusPercent" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="BonusTaxPercent" class="FormLabel">النسبة المئوية لضريبة البونص او العمولة :</label>
+                    <input asp-for="BonusTaxPercent" class="form-control" />
+                    <span asp-validation-for="BonusTaxPercent" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="MaxQueryRowsNo" class="FormLabel">اقصى عدد سجلات يتم اظهارها عند الاستعلام :</label>
+                    <input asp-for="MaxQueryRowsNo" class="form-control" />
+                    <span asp-validation-for="MaxQueryRowsNo" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="MaxQueryDurationId" class="FormLabel">اقصى فترة المسموح الاستعلام خلالها :</label>
+                    <select id="citySelect" asp-for="MaxQueryDurationId" class="form-control" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.MaxQueryDuration,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="MaxQueryDurationId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="ScopeId" class="FormLabel">مدى الاستعلام :</label>
+                    <select id="districtSelect" asp-for="ScopeId" class="form-control" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.Scopes,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="ScopeId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <input asp-for="CheckBalanceRequired" type="checkbox" checked />
+                    <label asp-for="CheckBalanceRequired" class="FormLabel">فحص الرصيد قبل اتمام الاجراء</label>
+                    <span asp-validation-for="CheckBalanceRequired" class="text-danger"></span>
+
+                </div>
+                <div class="form-group col-6">
+                    <input asp-for="OnlyPartnerChildren" type="checkbox" value="0" />
+                    <label asp-for="OnlyPartnerChildren" class="FormLabel">يتم الاجراء بين النقاط التابعة لنفس الوكيل</label>
+                    <span asp-validation-for="OnlyPartnerChildren" class="text-danger"></span>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+
+        </form>
+    </div>
+</div>

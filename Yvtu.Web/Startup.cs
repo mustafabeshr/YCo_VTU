@@ -25,10 +25,13 @@ namespace Yvtu.Web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                                          .AddCookie(options =>
                                          {
-                                             options.ExpireTimeSpan = TimeSpan.FromDays(7);
+                                             options.ExpireTimeSpan = TimeSpan.FromHours(2);
+                                             options.LoginPath = "/Account/LogIn";
+                                             options.AccessDeniedPath = "/Account/AccessDenied";
                                          });
-
+            
             services.AddScoped<IPartnerManager, PartnerManager>();
+            services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
             services.AddSingleton<IAppDbContext, AppDbContext>();
 
             services.AddControllersWithViews();

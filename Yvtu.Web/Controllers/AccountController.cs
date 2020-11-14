@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
@@ -32,11 +37,70 @@ namespace Yvtu.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult AppUsersList()
+        public IActionResult AccessDenied()
         {
             return View();
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginDto model)
+        {
+            model.Error = string.Empty;
+            if (ModelState.IsValid)
+            {
+                var partnerResult = this.partner.Validate(model.Id);
+                if (partnerResult.Success)
+                {
+                    
+                    if (partnerResult.Partner.Status.Id > 2)
+                    {
+                        model.Error = "عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا";
+                        return View(model);
+                    }
+                    if (partnerResult.Partner.LockTime > DateTime.Now)
+                    {
+                        model.Error = "عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(partnerResult.Partner.LockTime);
+                        return View(model);
+                    }
+
+                        byte[] salt = Convert.FromBase64String(partnerResult.Partner.Extra);
+                        string hash = Pbkdf2Hasher.ComputeHash(model.Pwd, salt);
+
+
+                        if (partnerResult.Partner.Pwd != hash)
+                        {
+                            bool lockAccount = false;
+                            if (partnerResult.Partner.WrongPwdAttempts >= 2) lockAccount = true;
+                            partner.IncreaseWrongPwdAttempts(partnerResult.Partner.Id, lockAccount);
+                            model.Error = "عذرا ، رمز المستخدم او كلمة المرور غير صحيح" + Environment.NewLine +"(" + partnerResult.Partner.WrongPwdAttempts + ")";
+                            return View(model);
+                        }
+
+                            partner.PreSuccessLogin(partnerResult.Partner.Id);
+
+                            ClaimsIdentity identity = new ClaimsIdentity(partner.GetUserClaims(partnerResult.Partner)
+                                , CookieAuthenticationDefaults.AuthenticationScheme);
+                            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+
+                            await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal
+                                , new AuthenticationProperties() { IsPersistent = model.RememberMe });
+
+                            return RedirectToAction("Index", "Home");
+                    
+                }
+            }
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult AppUsersList()
+        {
+            
+                return View();
+        }
+
+        [Authorize]
         [HttpGet]
         public IActionResult Create()
         {
@@ -104,6 +168,12 @@ namespace Yvtu.Web.Controllers
         public IActionResult GetDistrictsByCity(int id)
         {
             return Json(new DistrictRepo(db).GetDistrictsByCity(id));
+        }
+
+        public async Task<ActionResult> SignOut()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return this.RedirectToAction("Login");
         }
     }
 }

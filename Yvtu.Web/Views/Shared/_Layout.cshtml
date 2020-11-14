@@ -1,4 +1,5 @@
-﻿
+﻿@inject Yvtu.Infra.Data.Interfaces.IPartnerManager UserManager
+@using System.Security.Claims
 
 <!DOCTYPE html>
 <html lang="en">
@@ -20,31 +21,30 @@
                 </a>
 
                 <div class="float-left" style="font-size:11px;">
-                    @*@if (signInManager.IsSignedIn(User))*@
-                    @* { *@
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
-                               role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;</a>
-                            <div class="dropdown-menu text-right" style="font-size:12px;">
+                    @if (this.User.Identity.IsAuthenticated)
+                    {
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
+                                   role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;@User.Identity.Name</a>
+                                <div class="dropdown-menu text-right" style="font-size:12px;">
 
-                                <a class="dropdown-item" asp-action="ChangePass" asp-controller="Account">
-                                    <i style="color:gray;" class="fa fa-key"></i>&nbsp;&nbsp;&nbsp;تغيير كلمة المرور
-                                </a>
+                                    <a class="dropdown-item" asp-action="ChangePass" asp-controller="Account">
+                                        <i style="color:gray;" class="fa fa-key"></i>&nbsp;&nbsp;&nbsp;تغيير كلمة المرور
+                                    </a>
 
-                                <form method="post" asp-action="Logout" asp-controller="Account" class="nav-link" style="width:100%;">
-                                    <button type="submit" class="dropdown-item" style="width:auto;">
-                                        <i style="color:gray;" class="fa fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;تسجيل خروج
-                                    </button>
-                                </form>
-                            </div>
-                        </li>
-                    </ul>
-                    @* } *@
-                    @*else
-        {*@
+                                    <form method="post" asp-action="SignOut" asp-controller="Account" class="nav-link" style="width:100%;">
+                                        <button type="submit" class="dropdown-item" style="width:auto;">
+                                            <i style="color:gray;" class="fa fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;تسجيل خروج
+                                        </button>
+                                    </form>
+                                </div>
+                            </li>
+                        </ul>
+                    }   else
+                    {
                     <a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>
-                    @* } *@
+                     } 
                 </div>
             </div>
         </nav>
@@ -56,10 +56,10 @@
     </div>
 
     @*<footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2020 - Yvtu.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>*@
+            <div class="container">
+                &copy; 2020 - Yvtu.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>*@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

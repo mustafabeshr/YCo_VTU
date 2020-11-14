@@ -8,6 +8,7 @@ namespace Yvtu.Core.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Code { get; set; }
         public bool IsActive { get; set; }
         public int Weight { get; set; }
         public byte Order { get; set; }
