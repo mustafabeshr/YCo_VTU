@@ -4,12 +4,9 @@
     ViewData["Title"] = "Create";
 }
 
-
-
-
 <div class="row">
     <div class="col-md-12 shadow-sm LoginBox">
-        <div class="mb-5 text-center" style="background-color:rebeccapurple;padding:6px;border-radius:8px;color:white;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
             <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تعريف مستخدم جديد</p>
         </div>
 
@@ -19,8 +16,8 @@
             <div class="form-row">
                 <div class="form-group col-12">
                     
-                    <label asp-for="Name" class="RequiredFormLabel">الاسم :</label>
-                    <input asp-for="Name" class="form-control" />
+                    <label asp-for="Name" class="FormLabel">الاسم :</label>
+                    <input asp-for="Name" class="form-control RequiredInput" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
 
@@ -28,13 +25,13 @@
 
             <div class="form-row">
                 <div class="form-group col-6">
-                    <label asp-for="Id" class="RequiredFormLabel">رقم الموبايل :</label>
-                    <input asp-for="Id" class="form-control text-center" />
+                    <label asp-for="Id" class="FormLabel">رقم الموبايل :</label>
+                    <input asp-for="Id" class="form-control text-center RequiredInput" />
                     <span asp-validation-for="Id" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6">
-                    <label asp-for="PairMobile" class="RequiredFormLabel">الرقم الاحتياطي :</label>
-                    <input asp-for="PairMobile" class="form-control text-center" />
+                    <label asp-for="PairMobile" class="FormLabel">الرقم الاحتياطي :</label>
+                    <input asp-for="PairMobile" class="form-control text-center RequiredInput" />
                     <span asp-validation-for="PairMobile" class="text-danger"></span>
                 </div>
 
@@ -43,8 +40,8 @@
 
 
                 <div class="form-group col-6">
-                    <label asp-for="RoleId" class="RequiredFormLabel">النوع :</label>
-                    <select asp-for="RoleId" class="form-control" style="padding:0px;"
+                    <label asp-for="RoleId" class="FormLabel">النوع :</label>
+                    <select asp-for="RoleId" class="form-control RequiredInput" style="padding:0px;"
                             asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
                         <option></option>
                     </select>
@@ -59,43 +56,43 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-6">
-                    <label asp-for="PersonalIdType" class="RequiredFormLabel">نوع الهوية :</label>
-                    <select asp-for="PersonalIdType" class="form-control" style="padding:0px;"
+                    <label asp-for="PersonalIdType" class="FormLabel">نوع الهوية :</label>
+                    <select asp-for="PersonalIdType" class="form-control RequiredInput" style="padding:0px;"
                             asp-items="@(new SelectList(Model.IdTypes,"Id","Name"))">
                         <option></option>
                     </select>
                     <span asp-validation-for="PersonalIdType" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6">
-                    <label asp-for="PersonalIdNo" class="RequiredFormLabel">رقمها :</label>
-                    <input asp-for="PersonalIdNo" class="form-control" />
+                    <label asp-for="PersonalIdNo" class="FormLabel">رقمها :</label>
+                    <input asp-for="PersonalIdNo" class="form-control RequiredInput" />
                     <span asp-validation-for="PersonalIdNo" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-6">
-                    <label asp-for="PersonalIssued" class="RequiredFormLabel">تاريخ صدورها :</label>
-                    <input asp-for="PersonalIssued" class="form-control" />
+                    <label asp-for="PersonalIssued" class="FormLabel">تاريخ صدورها :</label>
+                    <input asp-for="PersonalIssued" class="form-control RequiredInput" />
                     <span asp-validation-for="PersonalIssued" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6">
-                    <label asp-for="PersonalIdPlace" class="RequiredFormLabel">مكان صدورها :</label>
+                    <label asp-for="PersonalIdPlace" class="FormLabel">مكان صدورها :</label>
                     <input asp-for="PersonalIdPlace" class="form-control" />
                     <span asp-validation-for="PersonalIdPlace" class="text-danger"></span>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group col-6">
-                    <label asp-for="CityId" class="RequiredFormLabel">المدينة :</label>
-                    <select id="citySelect" asp-for="CityId" class="form-control" style="padding:0px;"
+                    <label asp-for="CityId" class="FormLabel">المدينة :</label>
+                    <select id="citySelect" asp-for="CityId" class="form-control RequiredInput" style="padding:0px;"
                             asp-items="@(new SelectList(Model.Cities,"Id","Name"))">
                         <option></option>
                     </select>
                     <span asp-validation-for="CityId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6">
-                    <label asp-for="DistrictId" class="RequiredFormLabel">المديرية :</label>
-                    <select id="districtSelect" asp-for="DistrictId" class="form-control" style="padding:0px;"
+                    <label asp-for="DistrictId" class="FormLabel">المديرية :</label>
+                    <select id="districtSelect" asp-for="DistrictId" class="form-control RequiredInput" style="padding:0px;"
                             asp-items="@(new SelectList(Model.Districts,"Id","Name"))">
                         <option></option>
                     </select>
@@ -139,10 +136,15 @@
                 </div>
             </div>
             <div class="form-row">
-                <div class="form-group col-12">
+                <div class="form-group col-6">
                     <label asp-for="ExtraAddressInfo" class="FormLabel">معلومات اضافية :</label>
                     <input asp-for="ExtraAddressInfo" class="form-control" />
                     <span asp-validation-for="ExtraAddressInfo" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="IPAddress" class="FormLabel">عنوان السيرفر :</label>
+                    <input asp-for="IPAddress" class="form-control" />
+                    <span asp-validation-for="IPAddress" class="text-danger"></span>
                 </div>
             </div>
             <button type="submit" class="btn btn-outline-success"

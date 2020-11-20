@@ -47,11 +47,14 @@ namespace Yvtu.Web.Dto
         [Required(ErrorMessage = "يجب تحديد نسبة الضريبة")]
         [Range(0, 100, ErrorMessage = "نسبة الضريبة غير صحيحة")]
         public double TaxPercent { get; set; }
+        [Required(ErrorMessage = "يجب تحديد اقصى مدة يمكن الاستعلام خلالها")]
         public string MaxQueryDurationId { get; set; }
+        [Required(ErrorMessage = "يجب تحديد مدى الاستعلام")]
         public string ScopeId { get; set; }
         [Range(0, 1000, ErrorMessage = "اقصى عدد السجلات غير صحيح")]
         public int MaxQueryRowsNo { get; set; }
         public bool OnlyPartnerChildren { get; set; }
+        public string Error { get; set; }
 
         public virtual List<Role> FromRoles { get; set; }
         public virtual List<Role> ToRoles { get; set; }

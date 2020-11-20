@@ -142,9 +142,10 @@ namespace Yvtu.Web.Controllers
                 createdPartner.ContactInfo.Fax = model.Fax;
                 createdPartner.ContactInfo.Email = model.Email;
                 createdPartner.Pwd = Utility.GenerateNewCode(4);
-                createdPartner.CreatedBy.Id = "777010055";
+                createdPartner.CreatedBy.Id = partner.GetCurrentUserId(this.HttpContext);
                 createdPartner.Status.Id = 1;
-                createdPartner.StatusBy.Id = "777010055";
+                createdPartner.StatusBy.Id = partner.GetCurrentUserId(this.HttpContext);
+                createdPartner.IPAddress = model.IPAddress;
 
 
                 var result = await partner.CreateAsync(createdPartner);

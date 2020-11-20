@@ -40,11 +40,11 @@ namespace Yvtu.Infra.Data
             var insertSql = "insert into partner (partner_id, partner_name, brandname, balance, reserved, verificationcodenext, " +
                 "  locktime, roleid, id_no, id_type, id_place, id_issued, status, statusby, " +
                 "   createdby, cityid, districtid, street, zone, extra_address, pair_mobile, " +
-                "  mobile, fixed, fax, email, pwd, extra) values" +
+                "  mobile, fixed, fax, email, pwd, extra, ip_address) values" +
                 "(:v_partner_id, :v_partner_name, :v_brandname, :v_balance, :v_reserved, :v_verificationcodenext, " +
                 "  :v_locktime, :v_roleid, :v_id_no, :v_id_type, :v_id_place, :v_id_issued, :v_status, :v_statusby, " +
                 "  :v_createdby, :v_cityid, :v_districtid, :v_street, :v_zone, :v_extra_address, :v_pair_mobile, " +
-                "  :v_mobile, :v_fixed, :v_fax, :v_email, :v_pwd, :v_extra)";
+                "  :v_mobile, :v_fixed, :v_fax, :v_email, :v_pwd, :v_extra, :v_ip_address)";
             try
             {
                 #region Parameters
@@ -75,7 +75,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_fax", OracleDbType = OracleDbType.Varchar2, Value = partner.ContactInfo.Fax },
                  new OracleParameter{ ParameterName = "v_email", OracleDbType = OracleDbType.Varchar2, Value = partner.ContactInfo.Email },
                  new OracleParameter{ ParameterName = "v_pwd", OracleDbType = OracleDbType.Varchar2, Value = hash },
-                 new OracleParameter{ ParameterName = "v_extra", OracleDbType = OracleDbType.Varchar2, Value = Convert.ToBase64String(salt)}
+                 new OracleParameter{ ParameterName = "v_extra", OracleDbType = OracleDbType.Varchar2, Value = Convert.ToBase64String(salt) },
+                 new OracleParameter{ ParameterName = "v_ip_address", OracleDbType = OracleDbType.Varchar2, Value = partner.IPAddress}
 
             };
 
@@ -134,6 +135,17 @@ namespace Yvtu.Infra.Data
             throw new NotImplementedException();
         }
 
+        public PartBasicInfo GetPartnerBasicInfo(string partnerId)
+        {
+            var partner = GetPartner(partnerId);
+            if (partner == null) return null;
+            var basicInfo = new PartBasicInfo();
+            basicInfo.Id = partner.Id;
+            basicInfo.Name = partner.Name;
+            basicInfo.Role = partner.Role;
+            basicInfo.Balance = partner.Balance;
+            return basicInfo;
+        }
         public ValidatePartnerResult Validate(string partnerId)
         {
             var partner = GetPartner(partnerId);
@@ -188,6 +200,7 @@ namespace Yvtu.Infra.Data
             partner.ContactInfo.Email = dataRow["email"] == DBNull.Value ? string.Empty : dataRow["email"].ToString();
             partner.Pwd = dataRow["pwd"] == DBNull.Value ? string.Empty : dataRow["pwd"].ToString();
             partner.Extra = dataRow["extra"] == DBNull.Value ? string.Empty : dataRow["extra"].ToString();
+            partner.IPAddress = dataRow["ip_address"] == DBNull.Value ? string.Empty : dataRow["ip_address"].ToString();
             // get sub objects
             // Role
             partner.Role = new RoleRepo(db).GetRole(partner.Role.Id);
@@ -251,6 +264,7 @@ namespace Yvtu.Infra.Data
 
             claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
             claims.Add(new Claim(ClaimTypes.Name, user.Name));
+            claims.Add(new Claim(ClaimTypes.GivenName, user.Role.Id.ToString()));
             claims.AddRange(this.GetUserRoleClaims(user));
             return claims;
         }

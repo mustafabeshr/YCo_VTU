@@ -1,19 +1,18 @@
 ﻿@model Yvtu.Web.Dto.CreatePartnerActivityDto
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "تعديل";
 }
-
 
 
 <div class="row">
     <div class="col-md-12 shadow-sm LoginBox">
         <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
-            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">منح صلاحية جديدة</p>
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تعديل بيانات صلاحية</p>
         </div>
 
         <form method="post">
-
+            <input asp-for="Id" hidden />
             @if (Model != null && !string.IsNullOrEmpty(Model.Error))
             {
                 <div class="form-group">

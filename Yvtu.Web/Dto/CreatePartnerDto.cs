@@ -56,6 +56,7 @@ namespace Yvtu.Web.Dto
         public string Email { get; set; }
         [StringLength(150, ErrorMessage = "يجب ان لا يزيد طول المعلومات الاضافية عن 150 حرف")]
         public string ExtraAddressInfo { get; set; }
+        public string IPAddress { get; set; }
 
         public virtual List<Role> Roles { get; set; }
         public virtual List<IdType> IdTypes { get; set; }

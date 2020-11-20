@@ -32,7 +32,7 @@ namespace Yvtu.Infra.Data.Interfaces
     {
         ValidatePartnerResult Validate(string partnerId);
         Task<ValidatePartnerResult> ValidateAsync(string partnerId);
-
+        PartBasicInfo GetPartnerBasicInfo(string partnerId);
         OpertionResult Create(Partner partner);
         Task<OpertionResult> CreateAsync(Partner partner);
 

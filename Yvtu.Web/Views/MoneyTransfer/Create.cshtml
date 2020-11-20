@@ -1,0 +1,85 @@
+﻿@model Yvtu.Web.Dto.CreateMoneyTransferDto
+
+@{
+    ViewData["Title"] = "Create Money Transfer";
+}
+
+
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <div class="d-inline-flex">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">نقل (تعزيز) رصيد</p>
+            </div>
+        </div>
+
+        <form method="post">
+            <div id="lblError" asp-for="Error" class="alert alert-danger" style="font-size:12px;display:none;"></div>
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label asp-for="PartnerId" class="FormLabel">رقم الجهة :</label>
+                    <input id="txtPartnerId" asp-for="PartnerId" class="form-control RequiredInput text-center" />
+                    <span asp-validation-for="PartnerId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-8">
+                    <label asp-for="PartnerName" class="FormLabel">الاسم :</label>
+                    <label id="lblPartnerName" asp-for="PartnerName" class="form-control" />
+                </div>
+            </div>
+            <div class="form-row justify-content-between">
+                <div class="form-group col-6 row">
+                    <label asp-for="PartnerRoleName" class="FormLabel">النوع :</label>
+                    <div class="col-10">
+                        <label id="lblPartnerRoleName" asp-for="PartnerRoleName" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group col-6 row">
+                    <label asp-for="PartnerBalance" class="FormLabel">الرصيد :</label>
+                    <div class="col-10">
+                        <label id="lblPartnerBalance" asp-for="PartnerBalance" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-row justify-content-between">
+                <div class="form-group col-4 row">
+                    <label asp-for="TaxPercent" class="FormLabel">الضريبة% :</label>
+                    <div class="col-10">
+                        <label id="lblTaxPercent" asp-for="TaxPercent" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group col-4 row">
+                    <label asp-for="BonusPercent" class="FormLabel">العمولة% :</label>
+                    <div class="col-10">
+                        <label id="lblBonusPercent" asp-for="BonusPercent" class="form-control" />
+                    </div>
+                </div>
+                <div class="form-group col-4 row">
+                    <label asp-for="BounsTaxPercent" class="FormLabel">ضريبة العمولة% :</label>
+                    <div class="col-10">
+                        <label id="lblBounsTaxPercent" asp-for="BounsTaxPercent" class="form-control" />
+                    </div>
+                </div>
+            </div>
+            
+
+
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/CustomScript.js"></script>
+}

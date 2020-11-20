@@ -31,7 +31,14 @@ for details on configuring this project to bundle and minify static web assets. 
     font-family: 'DroidKufi-Normal';
     src: url('../fonts/DroidKufi/DroidKufi-Regular.ttf') format('truetype');
 }
-
+@font-face {
+    font-family: 'Amiri-Regular';
+    src: url('../fonts/Amiri/Amiri-Regular.ttf') format('truetype');
+}
+@font-face {
+    font-family: 'Amiri-Bold';
+    src: url('../fonts/Amiri/Amiri-Bold.ttf') format('truetype');
+}
 a.navbar-brand {
   white-space: normal;
   text-align: center;
@@ -95,7 +102,7 @@ body {
     direction: rtl;
     text-align: right;
     font-family: 'DroidKufi-Normal';
-    background: #dcdcdc; /* fallback for old browsers */
+    background: #ece2ff; /* #dcdcdc fallback for old browsers */
     /*background: -webkit-linear-gradient(to top, #c31432, #240b36);*/ /* Chrome 10-25, Safari 5.1-6 */
     /*background: linear-gradient(to top, #c31432, #240b36);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
@@ -149,6 +156,9 @@ body {
     color: white;
     padding: 2px 4px 2px 4px;
 }
+.RequiredInput {
+    background-color: #f3edff;
+}
 .icon-stack {
     position: relative;
     display: inline-block;
@@ -177,4 +187,9 @@ body {
 
 .icon-stack-3x {
     font-size: 2em;
+}
+.DetailLabel {
+    font-size: 12px;
+    color: gray;
+    background-color: #EDF0F2;
 }

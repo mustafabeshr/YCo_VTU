@@ -1,0 +1,98 @@
+﻿@model Yvtu.Web.Dto.ListPartnerActivityDto
+
+@{
+    ViewData["Title"] = "الصلاحيات";
+}
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الصلاحيات</p>
+        </div>
+        <form asp-controller="PartActivity" asp-action="Index" method="post">
+            <div class="form-row">
+                <div class="form-group col-5">
+                    <label asp-for="ActivityId" class="FormLabel">الاجراء :</label>
+                    <select asp-for="ActivityId" asp-items="Model.Activities" class="form-control pb-0 pt-0">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="FromRoleId" class="FormLabel">من  :</label>
+                    <select asp-for="FromRoleId" asp-items="Model.FromRoles" class="form-control pb-0 pt-0">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="ToRoleId" class="FormLabel">الى  :</label>
+                    <select asp-for="ToRoleId" asp-items="Model.ToRoles" class="form-control pb-0 pt-0">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="form-group col-1">
+                    <label asp-for="ToRoleId" class="FormLabel">&nbsp;</label>
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@if (Model.PartnerActivities != null)
+{
+    <div class="row p-0">
+        <div class="col-12 LoginBox  mt-1 p-0 bg-transparent" >
+            <table class="table table-bordered text-center bg-white">
+                <thead>
+                    <tr class="text-center" style="font-size:12px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <th style="font-weight:normal">الاجراء</th>
+                        <th style="font-weight:normal">من</th>
+                        <th style="font-weight:normal">الى</th>
+                        <th style="font-weight:normal">اقل مبلغ</th>
+                        <th style="font-weight:normal">اعلى مبلغ</th>
+                        <th style="font-weight:normal">الضريبة%</th>
+                        <th style="font-weight:normal">العمولة%</th>
+                        <th style="font-weight:normal">ض.العمولة%</th>
+                        <th style="font-weight:normal">مدة الاستعلام</th>
+                        <th style="font-weight:normal">مدى الاستعلام</th>
+                        <th style="font-weight:normal">عدد النتائج</th>
+                        <th style="font-weight:normal">فحص الرصيد</th>
+                        <th style="font-weight:normal">#</th>
+                        <th style="font-weight:normal">تفاصيل</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.PartnerActivities)
+                    {
+
+                    <tr>
+                        <td style="font-family:Amiri-Regular">@item.Activity.Name</td>
+                        <td style="font-family:Amiri-Regular">@item.FromRole.Name</td>
+                        <td style="font-family:Amiri-Regular">@item.ToRole.Name</td>
+                        <td>@item.MinValue.ToString("N0")</td>
+                        <td>@item.MaxValue.ToString("N0")</td>
+                        <td>@item.TaxPercent.ToString("N2")</td>
+                        <td>@item.BonusPercent.ToString("N2")</td>
+                        <td>@item.BonusTaxPercent.ToString("N2")</td>
+                        <td style="font-family:Amiri-Regular">@item.MaxQueryDuration.Name</td>
+                        <td style="font-family:Amiri-Regular">@item.Scope.Name</td>
+                        <td>@item.MaxQueryRows.ToString("N0")</td>
+                        <td style="font-family:Amiri-Regular">
+                            @if (item.CheckBalanceRequired)
+                            {<p class="text-success"><i class="fa fa-check"></i></p> }
+                            else
+                            { <p class="text-danger"><i class="fa fa-times"></i></p>}
+                        </td>
+                        <td>@item.Id</td>
+                        <td><a asp-action="Detail" asp-controller="PartActivity" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

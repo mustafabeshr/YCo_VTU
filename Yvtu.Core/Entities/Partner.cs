@@ -39,5 +39,6 @@ namespace Yvtu.Core.Entities
         public long Balance { get; set; }
         public long Reserved { get; set; }
         public int WrongPwdAttempts { get; set; }
+        public string IPAddress { get; set; }
     }
 }

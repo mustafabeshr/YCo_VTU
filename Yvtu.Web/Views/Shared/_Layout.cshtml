@@ -1,6 +1,12 @@
 ﻿@inject Yvtu.Infra.Data.Interfaces.IPartnerManager UserManager
 @using System.Security.Claims
 
+@{ 
+    long currentPartnerBalance = 0;
+    string currentPartnerId = string.Empty;
+    string currentPartnerRoleName = string.Empty;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,31 +26,63 @@
                     <span class="brand-text font-weight-light" style="font-family: 'ArefRuqaa-Bold'; font-size:1.5em;color:purple;">إدارة الشاحن الفوري</span>
                 </a>
 
-                <div class="float-left" style="font-size:11px;">
-                    @if (this.User.Identity.IsAuthenticated)
-                    {
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
-                                   role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;@User.Identity.Name</a>
-                                <div class="dropdown-menu text-right" style="font-size:12px;">
+                @*<div style="font-size:20px;font-weight:bold;">
+                    @{
+                        var partId = UserManager.GetCurrentUserId(this.Context);
+                        var part = UserManager.Validate(partId).Partner;
+                        var bal = (part.Balance - part.Reserved);
+                        <p>@bal.ToString("N0")</p>
+                        }
 
-                                    <a class="dropdown-item" asp-action="ChangePass" asp-controller="Account">
-                                        <i style="color:gray;" class="fa fa-key"></i>&nbsp;&nbsp;&nbsp;تغيير كلمة المرور
-                                    </a>
+                </div>*@
 
-                                    <form method="post" asp-action="SignOut" asp-controller="Account" class="nav-link" style="width:100%;">
-                                        <button type="submit" class="dropdown-item" style="width:auto;">
-                                            <i style="color:gray;" class="fa fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;تسجيل خروج
-                                        </button>
-                                    </form>
-                                </div>
-                            </li>
-                        </ul>
-                    }   else
-                    {
-                    <a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>
-                     } 
+                <div class="float-left" style="font-size:12px; border-right:solid 1px #a7a7a7;">
+                    <div style="display:block;font-size:20px;font-weight:bold;text-align:center;padding-right:40px;color:gray;">
+                        @if (this.User.Identity.IsAuthenticated)
+                        {
+                            currentPartnerId = UserManager.GetCurrentUserId(this.Context);
+                            var part = UserManager.Validate(currentPartnerId).Partner;
+                            currentPartnerBalance = (part.Balance - part.Reserved);
+                            currentPartnerRoleName = part.Role.Name;
+                        <p><i class="fas fa-dollar-sign" style="font-size:12px;"></i>&nbsp;@currentPartnerBalance.ToString("N0")</p>
+                            }
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        @if (this.User.Identity.IsAuthenticated)
+                        {
+                        <div style="display:inline-flex">
+                            <ul class="navbar-nav flex-grow-1">
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
+                                       role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;@User.Identity.Name</a>
+
+                                    <div class="dropdown-menu text-right" style="font-size:12px;">
+
+                                        <p class="dropdown-item" style="user-select:none;text-align:center;font-size:17px;
+                                            font-weight:bold;color:rebeccapurple;"><i class="fas fa-mobile-alt"></i> @currentPartnerId</p>
+                                        <p class="dropdown-item" style="user-select:none;text-align:center;font-size:17px;
+                                            font-weight:bold;color:rebeccapurple;"><i class="fas fa-crown"></i> @currentPartnerRoleName</p>
+                                        <hr />
+                                        <a class="dropdown-item" asp-action="ChangePass" asp-controller="Account">
+                                            <i style="color:gray;" class="fa fa-key"></i>&nbsp;&nbsp;&nbsp;تغيير كلمة المرور
+                                        </a>
+
+                                        <form method="post" asp-action="SignOut" asp-controller="Account" class="nav-link" style="width:100%;">
+                                            <button type="submit" class="dropdown-item" style="width:auto;">
+                                                <i style="color:gray;" class="fa fa-sign-out-alt"></i>&nbsp;&nbsp;&nbsp;تسجيل خروج
+                                            </button>
+                                        </form>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                        </div>
+                        }
+                        else
+                        {
+                            <a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>
+                        }
+                    </div>
                 </div>
             </div>
         </nav>

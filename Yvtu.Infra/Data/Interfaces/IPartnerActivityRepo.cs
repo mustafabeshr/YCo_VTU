@@ -10,6 +10,11 @@ namespace Yvtu.Infra.Data.Interfaces
     {
         List<PartnerActivity> GetAllList();
         PartnerActivity GetPartAct(string actId, string fromRoleId, string toRoleId);
+        PartnerActivity GetPartAct(int id);
+        List<PartnerActivity> GetListByActivity(string activityId);
+        List<PartnerActivity> GetListByActivityWithFromRole(string activityId, int fromRoleId);
         Task<OpertionResult> CreateAsync(PartnerActivity partnerActivity);
+        Task<OpertionResult> EditAsync(PartnerActivity partnerActivity);
+        bool Delete(int id);
     }
 }
