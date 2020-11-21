@@ -23,53 +23,162 @@
                 </div>
             }
             <div class="form-row">
-                <div class="form-group col-4">
+                <div class="form-group col-4 row">
                     <label asp-for="PartnerId" class="FormLabel">رقم الجهة :</label>
-                    <input id="txtPartnerId" asp-for="PartnerId" class="form-control RequiredInput text-center" />
-                    <span asp-validation-for="PartnerId" class="text-danger"></span>
+                    <div class="col-8">
+                        <input id="txtPartnerId" asp-for="PartnerId" class="form-control RequiredInput text-center" style="font-size:20px;font-weight:bold;" />
+                        <span asp-validation-for="PartnerId" class="text-danger"></span>
+                    </div>
                 </div>
-                <div class="form-group col-8">
-                    <label asp-for="PartnerName" class="FormLabel">الاسم :</label>
-                    <label id="lblPartnerName" asp-for="PartnerName" class="form-control" />
+                <div class="form-group col-8 row">
+                    <label id="lblPartnerName" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                 </div>
             </div>
             <div class="form-row justify-content-between">
-                <div class="form-group col-6 row">
-                    <label asp-for="PartnerRoleName" class="FormLabel">النوع :</label>
-                    <div class="col-10">
-                        <label id="lblPartnerRoleName" asp-for="PartnerRoleName" class="form-control" />
+                <div class="form-group col-4">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="PartnerRoleName" class="FormLabel">النوع</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblPartnerRoleName" asp-for="PartnerRoleName" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                     </div>
                 </div>
-                <div class="form-group col-6 row">
-                    <label asp-for="PartnerBalance" class="FormLabel">الرصيد :</label>
-                    <div class="col-10">
-                        <label id="lblPartnerBalance" asp-for="PartnerBalance" class="form-control" />
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="PartnerBalance" class="FormLabel">الرصيد</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblPartnerBalance" asp-for="PartnerBalance" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                    </div>
+                </div>
+
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="TaxPercent" class="FormLabel">الضريبة%</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <span id="lblTaxPercent" asp-for="TaxPercent" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                    </div>
+
+                </div>
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="BonusPercent" class="FormLabel">العمولة%</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblBonusPercent" asp-for="BonusPercent" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                    </div>
+                </div>
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="BounsTaxPercent" class="FormLabel">ضريبة العمولة%</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblBounsTaxPercent" asp-for="BounsTaxPercent" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                     </div>
                 </div>
             </div>
+            <hr />
+            <div class="form-row">
+                <div class="form-group col-4 row">
+                    <label asp-for="Amount" class="FormLabel">المبلغ :</label>
+                    <div class="col-8">
+                        <input id="txtAmount" asp-for="Amount" class="form-control RequiredInput text-center" style="font-size:20px;font-weight:bold;" />
+                        <span asp-validation-for="Amount" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="form-group col-8 row">
+                    <label id="lblAmountName" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                </div>
+            </div>
+
             <div class="form-row justify-content-between">
-                <div class="form-group col-4 row">
-                    <label asp-for="TaxPercent" class="FormLabel">الضريبة% :</label>
-                    <div class="col-10">
-                        <label id="lblTaxPercent" asp-for="TaxPercent" class="form-control" />
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="TaxAmount" class="FormLabel">الضريبة</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblTaxAmount" asp-for="TaxAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                     </div>
                 </div>
-                <div class="form-group col-4 row">
-                    <label asp-for="BonusPercent" class="FormLabel">العمولة% :</label>
-                    <div class="col-10">
-                        <label id="lblBonusPercent" asp-for="BonusPercent" class="form-control" />
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="BounsAmount" class="FormLabel">العمولة</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblBounsAmount" asp-for="BounsAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                     </div>
                 </div>
-                <div class="form-group col-4 row">
-                    <label asp-for="BounsTaxPercent" class="FormLabel">ضريبة العمولة% :</label>
-                    <div class="col-10">
-                        <label id="lblBounsTaxPercent" asp-for="BounsTaxPercent" class="form-control" />
+                <div class="form-group col-2">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="BounsTaxAmount" class="FormLabel">ض.العمولة</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <span id="lblBounsTaxAmount" asp-for="BounsTaxAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="NetAmount" class="FormLabel">الصافي</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblNetAmount" asp-for="NetAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                    </div>
+                </div>
+                <div class="form-group col-3">
+                    <div style="display:block;text-align:center;">
+                        <label asp-for="ReceivedAmount" class="FormLabel">المستلم</label>
+                    </div>
+                    <div style="display:block;text-align:center;">
+                        <label id="lblReceivedAmount" asp-for="ReceivedAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
                     </div>
                 </div>
             </div>
-            
+            <hr />
 
-
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label asp-for="RequestNo" class="FormLabel">رقم الطلبية :</label>
+                    <input asp-for="RequestNo" class="form-control text-center" />
+                </div>
+                <div class="form-group col-4">
+                    <label asp-for="RequestAmount" class="FormLabel">المبلغ المطلوب :</label>
+                    <input id="txtRequestAmount" asp-for="RequestAmount" class="form-control text-center" />
+                </div>
+                <div class="form-group col-4">
+                    <label asp-for="BillNo" class="FormLabel">رقم الفاتورة :</label>
+                    <input asp-for="BillNo" class="form-control text-center" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-3">
+                    <label asp-for="PayTypeId" class="FormLabel">طريقة الدفع :</label>
+                    <select asp-for="PayTypeId" class="form-control RequiredInput" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.PayType,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    
+                    <span asp-validation-for="PayTypeId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="PayNo" class="FormLabel">رقم السند/الشيك :</label>
+                    <input  asp-for="PayNo" class="form-control text-center" />
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="PayDate" class="FormLabel">التاريخ :</label>
+                    <input asp-for="PayDate" class="form-control text-center" />
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="PayBank" class="FormLabel">البنك :</label>
+                    <input asp-for="PayBank" class="form-control text-center" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label asp-for="Note" class="FormLabel">ملاحظة :</label>
+                    <input asp-for="Note" class="form-control" />
+                </div>
+            </div>
             <button type="submit" class="btn btn-outline-success"
                     style="width:100%;border-radius:10px;">
                 <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
@@ -81,5 +190,6 @@
 
 @section Scripts
 {
-    <script src="~/js/CustomScript.js"></script>
+    <script src="~/js/MoneyTransferScript.js"></script>
+    <script src="~/js/Tafqeet.js"></script>
 }

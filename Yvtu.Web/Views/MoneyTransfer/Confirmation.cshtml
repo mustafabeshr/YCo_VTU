@@ -1,0 +1,159 @@
+﻿@model Yvtu.Web.Dto.CreateMoneyTransferDto
+
+@{
+    ViewData["Title"] = "Confirm Money Transfer";
+}
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <div class="d-inline-flex">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;"> تأكيد نقل (تعزيز) رصيد </p>
+            </div>
+        </div>
+        <form method="post" asp-action="Confirmation" asp-controller="MoneyTransfer">
+            <div class="form-row text-right">
+                <div class="col-12">
+                    <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                        سيتم تحويل رصيد شاحن فوري بمبلغ
+                    </label>
+                    <span class="float-left" style="font-size:16px;color:black;">@DateTime.Now.ToString("yyyy/MM/dd H:mm:ss")</span>
+                </div>
+                <div class="col-12 text-center p-2" style="background-color:#EDF0F2;">
+                    <label style="font-size:22px;font-weight:bold;color:green;">@Model.Amount.ToString("N2")</label>
+                    &nbsp;&nbsp;
+                    <label style="font-size:16px;font-weight:bold;color:darkgreen;">(@Model.AmountName)</label>
+                </div>
+                <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                    الى
+                </label>
+                <div class="col-12 text-center">
+
+                    <table class="table  text-center bg-white">
+
+                        <tbody>
+                            <tr style="color:#adabab;border-top:none;">
+                                <td>#</td>
+                                <td>الاسم</td>
+                                <td>الصفة</td>
+                                <td>الرصيد الحالي</td>
+                            </tr>
+                            <tr style="border-bottom:none;">
+                                <td>@Model.PartnerId</td>
+                                <td>@Model.PartnerName</td>
+                                <td>@Model.PartnerRoleName</td>
+                                <td>@Model.PartnerBalance.ToString("N0")</td>
+                            </tr>
+
+
+                        </tbody>
+
+                    </table>
+
+
+                </div>
+                <div class="col-12 text-center">
+                    <table class="table table-bordered text-center bg-white">
+                        <thead>
+                            <tr class="text-center" style="font-size:12px;font-weight:normal;background-color:#EDF0F2;color:black;">
+                                <th colspan="2" style="font-weight:normal">الضريبة</th>
+                                <th colspan="2" style="font-weight:normal">العمولة</th>
+                                <th colspan="2" style="font-weight:normal">ض العمولة</th>
+                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">الصافي</th>
+                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">المستلم</th>
+                            </tr>
+                            <tr class="text-center" style="font-size:12px;font-weight:normal;background-color:#EDF0F2;color:black;">
+                                <th style="font-weight:normal">%</th>
+                                <th style="font-weight:normal">مبلغ</th>
+                                <th style="font-weight:normal">%</th>
+                                <th style="font-weight:normal">مبلغ</th>
+                                <th style="font-weight:normal">%</th>
+                                <th style="font-weight:normal">مبلغ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>@Model.TaxPercent.ToString("N2")</td>
+                                <td>@Model.TaxAmount.ToString("N2")</td>
+                                <td>@Model.BonusPercent.ToString("N2")</td>
+                                <td>@Model.BounsAmount.ToString("N2")</td>
+                                <td>@Model.BounsTaxPercent.ToString("N2")</td>
+                                <td>@Model.BounsTaxAmount.ToString("N2")</td>
+                                <td>@Model.NetAmount.ToString("N2")</td>
+                                <td>@Model.ReceivedAmount.ToString("N2")</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                    طريقة الدفع :
+                </label>
+                <div class="col-12 text-center">
+                    <table class="table  text-center bg-white">
+                        <tbody>
+                            <tr style="border-bottom:none;">
+                                <td>@Model.PayTypeName</td>
+                                <td>@Model.PayNo</td>
+                                <td>@Model.PayDate.ToString("yyyy/MM/dd")</td>
+                                <td>@Model.PayBank</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                    قام بالتحويل :
+                </label>
+                <div class="col-12 text-center">
+                    <table class="table  text-center bg-white">
+                        <tbody>
+                            <tr style="color:#adabab;border-top:none;">
+                                <td>#</td>
+                                <td>الاسم</td>
+                                <td>الصفة</td>
+                                <td>الرصيد الحالي</td>
+                            </tr>
+                            <tr style="border-bottom:none;">
+                                <td>@Model.CreateorId</td>
+                                <td>@Model.CreateorName</td>
+                                <td>@Model.CreateorRoleName</td>
+                                <td>@Model.CreatorBalance.ToString("N0")</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                    معلومات اخرى :
+                </label>
+                <div class="col-12 text-center">
+                    <table class="table  text-center bg-white">
+                        <tbody>
+                            <tr style="color:#adabab;border-top:none;">
+                                <td>رقم الطلبية</td>
+                                <td>مبلغها</td>
+                                <td>رقم الفاتورة</td>
+                            </tr>
+                            <tr style="border-bottom:none;">
+                                <td>@Model.RequestNo</td>
+                                <td>@Model.RequestAmount</td>
+                                <td>@Model.BillNo</td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" style="text-align:right;">
+                                    @Model.Note
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+
+
+        </form>
+
+    </div>
+</div>

@@ -13,17 +13,22 @@ namespace Yvtu.Web.Dto
         [StringLength(9, ErrorMessage = "يجب ان يكون طول الرقم 9 ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
         public string PartnerId { get; set; }
-        [Required(ErrorMessage = "يجب تحديد طريقة الدفع")]
+        
         public string PartnerName { get; set; }
         public string PartnerRoleName { get; set; }
         public int PartnerRoleId { get; set; }
         public long PartnerBalance { get; set; }
+        [Required(ErrorMessage = "يجب تحديد طريقة الدفع")]
         public string PayTypeId { get; set; }
+        public string PayTypeName { get; set; }
         [StringLength(30, ErrorMessage = "يجب ان يكون طول رقم الدفع بين 1 و 30 حرف", MinimumLength = 1)]
         public string PayNo { get; set; }
+        [DataType(DataType.Date)]
         public DateTime PayDate { get; set; }
+        [StringLength(80, ErrorMessage = "يجب ان يكون طول اسم البنك بين 1 و 80 حرف", MinimumLength = 1)]
         public string PayBank { get; set; }
         public double Amount { get; set; }
+        public string AmountName { get; set; }
         public double TaxPercent { get; set; }
         public double TaxAmount { get; set; }
         public double BonusPercent { get; set; }
@@ -40,5 +45,9 @@ namespace Yvtu.Web.Dto
 
         public virtual List<CommonCode> PayType { get; set; }
         public double CreatorBalance { get; set; }
+        public string CreateorId { get; set; }
+        public string CreateorName { get; set; }
+        public int CreateorRoleId { get; set; }
+        public string CreateorRoleName { get; set; }
     }
 }
