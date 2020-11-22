@@ -12,7 +12,7 @@ $(document).ready(function () {
         $.ajax({
             url: "/MoneyTransfer/GetBasicInfo",
             type: "GET",
-            data: { pId:  id}, //id of the state which is used to extract cities
+            data: { pId:  id}, 
             traditional: true,
             success: function (result) {
                 //console.log(result);
@@ -23,6 +23,7 @@ $(document).ready(function () {
                     document.getElementById('lblTaxPercent').innerHTML = result.taxPercent;
                     document.getElementById('lblBonusPercent').innerHTML = result.bonusPercent;
                     document.getElementById('lblBounsTaxPercent').innerHTML = result.bounsTaxPercent;
+                    //FreeUpAmountControls();
                 }
                 else {
                     document.getElementById('lblError').innerHTML = result.error;
@@ -42,12 +43,7 @@ $(document).ready(function () {
         var oldValue = input.data("lastval");
         if (oldValue != val) {
             input.data("lastval", val);
-            document.getElementById('lblPartnerName').innerHTML = '';
-            document.getElementById('lblPartnerRoleName').innerHTML = '';
-            document.getElementById('lblPartnerBalance').innerHTML = '';
-            document.getElementById('lblTaxPercent').innerHTML = '';
-            document.getElementById('lblBonusPercent').innerHTML = '';
-            document.getElementById('lblBounsTaxPercent').innerHTML = '';
+            FreeUpControls();
             //console.log(oldValue + "- " +val);
         }
     });
@@ -63,6 +59,32 @@ $(document).ready(function () {
 
     if ($("#txtAmount").val() > 0) {
         CalculateAmounts($("#txtAmount").val());
+    }
+
+    function FreeUpControls() {
+        document.getElementById('lblPartnerName').innerHTML = '';
+        document.getElementById('lblPartnerRoleName').innerHTML = '';
+        document.getElementById('lblPartnerBalance').innerHTML = '';
+        document.getElementById('lblTaxPercent').innerHTML = '';
+        document.getElementById('lblBonusPercent').innerHTML = '';
+        document.getElementById('lblBounsTaxPercent').innerHTML = '';
+        //document.getElementById('lblNetAmount').innerHTML = '';
+        //document.getElementById('lblTaxAmount').innerHTML = '';
+        //document.getElementById('lblBounsAmount').innerHTML = '';
+        //document.getElementById('lblBounsTaxAmount').innerHTML = '';
+        //document.getElementById('lblReceivedAmount').innerHTML = '';
+        //document.getElementById('lblAmountName').innerHTML = '';
+    }
+
+    function FreeUpAmountControls() {
+        document.getElementById('lblNetAmount').innerHTML = '';
+        document.getElementById('lblTaxAmount').innerHTML = '';
+        document.getElementById('lblBounsAmount').innerHTML = '';
+        document.getElementById('lblBounsTaxAmount').innerHTML = '';
+        document.getElementById('lblReceivedAmount').innerHTML = '';
+        document.getElementById('txtAmount').value = 0;
+        document.getElementById('lblAmountName').innerHTML = '';
+        document.getElementById('txtRequestAmount').value = 0;
     }
 
     function CalculateAmounts(amount) {
@@ -81,7 +103,7 @@ $(document).ready(function () {
         document.getElementById('lblBounsTaxAmount').innerHTML = numberWithCommas(bounsTaxAmount.toFixed(2));
         document.getElementById('lblReceivedAmount').innerHTML = numberWithCommas(recAmount.toFixed(2));
         document.getElementById('lblAmountName').innerHTML = tafqeet(amount);
-        $('#txtRequestAmount').val() = amount;
+        document.getElementById('txtRequestAmount').value = amount;
     }
 
     function numberWithCommas(x) {

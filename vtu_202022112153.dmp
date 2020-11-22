@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 21/11/2020, 21:49:13 21:49:13  --
+-- Created by mbeshr on 22/11/2020, 21:54:07 21:54:07  --
 ---------------------------------------------------------
 
 set define off
-spool vtu_202021112148.log
+spool vtu_202022112153.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -434,14 +434,28 @@ create table VTU.MONEY_TRANSFER
 tablespace USERS
   pctfree 10
   initrans 1
-  maxtrans 255;
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 alter table VTU.MONEY_TRANSFER
   add constraint PK_MONEY_TRANSFER primary key (TRANS_ID)
   using index 
   tablespace USERS
   pctfree 10
   initrans 2
-  maxtrans 255;
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 alter table VTU.MONEY_TRANSFER
   add constraint FK1_MONEY_TRANSFER foreign key (PART_ROLE_ID)
   references VTU.APPROLE (ROLEID);
@@ -468,14 +482,28 @@ create table VTU.OPERATION_EXCEPTION
 tablespace USERS
   pctfree 10
   initrans 1
-  maxtrans 255;
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 alter table VTU.OPERATION_EXCEPTION
   add constraint PK_OPERATION_EXCEPTION primary key (EXP_ID)
   using index 
   tablespace USERS
   pctfree 10
   initrans 2
-  maxtrans 255;
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
 
 prompt
 prompt Creating table PARTNER_ACTIVITY
@@ -590,7 +618,7 @@ prompt
 create sequence VTU.SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 1
+start with 21
 increment by 1
 cache 20;
 
@@ -601,7 +629,7 @@ prompt
 create sequence VTU.SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 1
+start with 21
 increment by 1
 cache 20;
 
@@ -612,7 +640,7 @@ prompt
 create sequence VTU.SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -794,8 +822,12 @@ function fn_MoneyTransfer (
     v_bonus_tax money_transfer.bonus_tax%TYPE;
     v_bonus_tax_amt money_transfer.bonus_tax_amt%TYPE;
     v_received_amt money_transfer.received_amt%TYPE;
- 
-  partnerActivity partner_activity%ROWTYPE;
+    v_Min_Value partner_activity.min_value%TYPE;
+    v_Max_Value partner_activity.max_value%TYPE;
+    v_check_bal partner_activity.check_bal%TYPE;
+    v_partnerActivityFound number := 0;
+   
+
   
   BEGIN
      --SET AUTOCOMMIT OFF;
@@ -807,9 +839,18 @@ function fn_MoneyTransfer (
      
      
          
-     select * into partnerActivity from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(count(*),0) into v_partnerActivityFound from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
      
-     if (SQL%NOTFOUND) then
+     select nvl(taxper,0) into v_tax_per from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_per,0) into v_bonus_per from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_tax,0) into v_bonus_tax from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Min_Value,0) into v_Min_Value from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Max_Value,0) into v_Max_Value from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(check_bal,0) into v_check_bal from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     
+ 
+     
+     if (v_partnerActivityFound = 0) then
        begin
            --message := 'no setting defined';
           return -500;
@@ -817,30 +858,30 @@ function fn_MoneyTransfer (
       end if;  
        
       -- check creator balance
-     if (partnerActivity.Check_Bal = 1 and v_amount > v_creator_bal) then
+     if (v_check_bal = 1 and v_amount > v_creator_bal) then
        begin
            --message := 'balance not enough';
           return -501;
         end ;
      end if;   
       
-       if (partnerActivity.Min_Value > v_amount) then
+       if (v_Min_Value > v_amount) then
        begin
            --message := 'Amount less than minimum';
            return -502;
        end;
         end if;  
       
-      if (partnerActivity.Max_Value < v_amount) then
+      if (v_Max_Value < v_amount) then
        begin
            --message := 'Amount more than maximum';
            return -503;
        end;
         end if;  
        
-        v_net_amount := v_amount / ((partnerActivity.Taxper / 100) +1);
-        v_tax_amt :=  v_net_amount * (partnerActivity.Taxper / 100);
-        v_bonus_amt := v_net_amount * (partnerActivity.Bonus_Per / 100);
+        v_net_amount := v_amount / ((v_tax_per / 100) +1);
+        v_tax_amt :=  v_net_amount * (v_tax_per / 100);
+        v_bonus_amt := v_net_amount * (v_bonus_per / 100);
         v_bonus_tax_amt := v_bonus_amt * (v_bonus_tax / 100);
         v_received_amt := (v_amount -  v_bonus_amt + v_bonus_tax_amt);
     
@@ -848,15 +889,15 @@ function fn_MoneyTransfer (
     insert into money_transfer
       (trans_id, part_id, part_role_id, part_bal, pay_type, pay_no, pay_date, bank_name, createdby, createdon
       , access_channel, amount, tax_per, tax_amt, bonus_per, bonus_amt, bonus_tax, bonus_tax_amt, received_amt
-      , net_amount, bill_no, request_no, request_amt, note, adjusted, adjust_id, creator_bal)
+      , net_amount, bill_no, request_no, request_amt, note, adjusted, adjust_id, creator_bal, creator_role_id)
     values
       (v_trans_id, v_part_id, v_part_role_id, v_part_bal, v_pay_type, v_pay_no, v_pay_date, v_bank_name, v_createdby
       , sysdate, v_access_channel, v_amount, v_tax_per, v_tax_amt, v_bonus_per, v_bonus_amt, v_bonus_tax, v_bonus_tax_amt
-      , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal);
+      , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal, v_creator_role_id);
     
      update partner set balance = balance + v_amount where partner_id = v_part_id;
      
-     if (partnerActivity.Check_Bal = 1) then
+     if (v_check_bal = 1) then
          update partner set balance = balance - v_amount where partner_id = v_createdby;
      end if;
      commit;

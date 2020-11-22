@@ -92,13 +92,13 @@
                 </div>
             </div>
 
-            <div class="form-row justify-content-between">
+            <div class="form-row justify-content-between" style="color:#584cff">
                 <div class="form-group col-2">
                     <div style="display:block;text-align:center;">
                         <label asp-for="TaxAmount" class="FormLabel">الضريبة</label>
                     </div>
                     <div style="display:block;text-align:center;">
-                        <label id="lblTaxAmount" asp-for="TaxAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                        <label id="lblTaxAmount" asp-for="TaxAmount" style="font-size:22px;font-weight:bold;" />
                     </div>
                 </div>
                 <div class="form-group col-2">
@@ -106,7 +106,7 @@
                         <label asp-for="BounsAmount" class="FormLabel">العمولة</label>
                     </div>
                     <div style="display:block;text-align:center;">
-                        <label id="lblBounsAmount" asp-for="BounsAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                        <label id="lblBounsAmount" asp-for="BounsAmount" style="font-size:22px;font-weight:bold;" />
                     </div>
                 </div>
                 <div class="form-group col-2">
@@ -114,7 +114,7 @@
                         <label asp-for="BounsTaxAmount" class="FormLabel">ض.العمولة</label>
                     </div>
                     <div style="display:block;text-align:center;">
-                        <span id="lblBounsTaxAmount" asp-for="BounsTaxAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                        <span id="lblBounsTaxAmount" asp-for="BounsTaxAmount" style="font-size:22px;font-weight:bold;" />
                     </div>
                 </div>
                 <div class="form-group col-3">
@@ -122,7 +122,7 @@
                         <label asp-for="NetAmount" class="FormLabel">الصافي</label>
                     </div>
                     <div style="display:block;text-align:center;">
-                        <label id="lblNetAmount" asp-for="NetAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                        <label id="lblNetAmount" asp-for="NetAmount" style="font-size:22px;font-weight:bold;" />
                     </div>
                 </div>
                 <div class="form-group col-3">
@@ -130,7 +130,7 @@
                         <label asp-for="ReceivedAmount" class="FormLabel">المستلم</label>
                     </div>
                     <div style="display:block;text-align:center;">
-                        <label id="lblReceivedAmount" asp-for="ReceivedAmount" style="font-size:22px;font-weight:bold;color:darkslateblue;" />
+                        <label id="lblReceivedAmount" asp-for="ReceivedAmount" style="font-size:22px;font-weight:bold;" />
                     </div>
                 </div>
             </div>
@@ -157,7 +157,6 @@
                             asp-items="@(new SelectList(Model.PayType,"Id","Name"))">
                         <option></option>
                     </select>
-                    
                     <span asp-validation-for="PayTypeId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-3">
@@ -181,7 +180,7 @@
             </div>
             <button type="submit" class="btn btn-outline-success"
                     style="width:100%;border-radius:10px;">
-                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                التالي &nbsp;&nbsp;  <i class="fa fa-chevron-left"></i>
             </button>
 
         </form>

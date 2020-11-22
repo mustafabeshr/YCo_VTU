@@ -6,6 +6,13 @@ namespace Yvtu.Core.Entities
 {
     public class MoneyTransfer
     {
+        public MoneyTransfer()
+        {
+            Partner = new Partner();
+            PayType = new CommonCode();
+            AccessChannel = new CommonCode();
+            CreatedBy = new Partner();
+        }
         public int Id { get; set; }
         public Partner Partner { get; set; }
         public CommonCode PayType { get; set; }

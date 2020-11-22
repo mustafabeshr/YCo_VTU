@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
+using Yvtu.Infra.Data.CustomeValidationAttribute;
 
 namespace Yvtu.Web.Dto
 {
     public class CreateMoneyTransferDto
     {
+        public int Id { get; set; }
         [Required(ErrorMessage = "يجب تحديد الجهة المراد نقل الرصيد اليها")]
         [StringLength(9, ErrorMessage = "يجب ان يكون طول الرقم 9 ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
@@ -27,6 +29,7 @@ namespace Yvtu.Web.Dto
         public DateTime PayDate { get; set; }
         [StringLength(80, ErrorMessage = "يجب ان يكون طول اسم البنك بين 1 و 80 حرف", MinimumLength = 1)]
         public string PayBank { get; set; }
+        [RequiredAmountGreaterThanZero (ErrorMessage = "المبلغ غير صحيح او غير مسموح به")]
         public double Amount { get; set; }
         public string AmountName { get; set; }
         public double TaxPercent { get; set; }

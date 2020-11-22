@@ -11,13 +11,21 @@
                 <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;"> تأكيد نقل (تعزيز) رصيد </p>
             </div>
         </div>
-        <form method="post" asp-action="Confirmation" asp-controller="MoneyTransfer">
+        <form asp-action="Confirmation" asp-controller="MoneyTransfer" method="post">
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
             <div class="form-row text-right">
                 <div class="col-12">
                     <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
-                        سيتم تحويل رصيد شاحن فوري بمبلغ
+                        تحويل رصيد شاحن فوري بمبلغ
                     </label>
-                    <span class="float-left" style="font-size:16px;color:black;">@DateTime.Now.ToString("yyyy/MM/dd H:mm:ss")</span>
+                    @*<div class="text-center" style="font-size:24px;color:rebeccapurple;"><span>@Model.Id</span></div>*@
+
+                    <span class="float-left" style="font-size:16px;color:gray;">@DateTime.Now.ToString("yyyy/MM/dd H:mm:ss")</span>
                 </div>
                 <div class="col-12 text-center p-2" style="background-color:#EDF0F2;">
                     <label style="font-size:22px;font-weight:bold;color:green;">@Model.Amount.ToString("N2")</label>
@@ -151,7 +159,36 @@
                     style="width:100%;border-radius:10px;">
                 <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
             </button>
-
+            @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.Amount)
+            @Html.HiddenFor(m => m.AmountName)
+            @Html.HiddenFor(m => m.PartnerId)
+            @Html.HiddenFor(m => m.PartnerName)
+            @Html.HiddenFor(m => m.PartnerRoleName)
+            @Html.HiddenFor(m => m.PartnerBalance)
+            @Html.HiddenFor(m => m.PartnerRoleId)
+            @Html.HiddenFor(m => m.TaxPercent)
+            @Html.HiddenFor(m => m.TaxAmount)
+            @Html.HiddenFor(m => m.BonusPercent)
+            @Html.HiddenFor(m => m.BounsAmount)
+            @Html.HiddenFor(m => m.BounsTaxPercent)
+            @Html.HiddenFor(m => m.BounsTaxAmount)
+            @Html.HiddenFor(m => m.NetAmount)
+            @Html.HiddenFor(m => m.ReceivedAmount)
+            @Html.HiddenFor(m => m.PayTypeName)
+            @Html.HiddenFor(m => m.PayNo)
+            @Html.HiddenFor(m => m.PayDate)
+            @Html.HiddenFor(m => m.PayBank)
+            @Html.HiddenFor(m => m.PayTypeId)
+            @Html.HiddenFor(m => m.CreateorId)
+            @Html.HiddenFor(m => m.CreateorName)
+            @Html.HiddenFor(m => m.CreateorRoleName)
+            @Html.HiddenFor(m => m.CreateorRoleId)
+            @Html.HiddenFor(m => m.CreatorBalance)
+            @Html.HiddenFor(m => m.RequestNo)
+            @Html.HiddenFor(m => m.RequestAmount)
+            @Html.HiddenFor(m => m.BillNo)
+            @Html.HiddenFor(m => m.Note)
 
         </form>
 

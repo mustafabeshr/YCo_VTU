@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -52,17 +53,20 @@ namespace Yvtu.Web.Controllers
                 if (!Utility.ValidYMobileNo(model.PartnerId))
                 {
                     model.Error = "رقم موبايل خاطئ";
+                    model.PayType = new CommonCodeRepo(_db).GetCodesByType("pay.type");
                     return View(model);
                 }
                 if (model.Amount <= 0)
                 {
                     model.Error = "المبلغ غير صحيح";
+                    model.PayType = new CommonCodeRepo(_db).GetCodesByType("pay.type");
                     return View(model);
                 }
                 var result = GetBasicInfo(model.PartnerId, model.Amount);
                 if (result.Error != "N/A")
                 {
                     model.Error =result.Error;
+                    model.PayType = new CommonCodeRepo(_db).GetCodesByType("pay.type");
                     return View(model);
                 }
                 result.AmountName = new MonyToString().NumToStr(result.Amount);
@@ -75,6 +79,7 @@ namespace Yvtu.Web.Controllers
                 result.BillNo = model.BillNo;
                 result.RequestNo = model.RequestNo;
                 result.RequestAmount = model.RequestAmount;
+                result.PayType = new CommonCodeRepo(_db).GetCodesByType("pay.type");
                 return View("Confirmation", result);
             }
             var payTypes = new CommonCodeRepo(_db).GetCodesByType("pay.type");
@@ -85,7 +90,49 @@ namespace Yvtu.Web.Controllers
         [HttpPost]
         public IActionResult Confirmation(CreateMoneyTransferDto model)
         {
-            return null;
+            if (model.Id > 0)
+            {
+                model.Error = "تم التحويل مسبقا";
+                return View(model);
+            }
+            var moneyTransfer = new MoneyTransfer();
+            moneyTransfer.Partner.Id = model.PartnerId;
+            moneyTransfer.PayType.Id = model.PayTypeId;
+            moneyTransfer.PayNo = model.PayNo;
+            moneyTransfer.PayDate = model.PayDate;
+            moneyTransfer.PayBank = model.PayBank;
+            moneyTransfer.CreatedBy.Id = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier).Value;
+            moneyTransfer.AccessChannel.Id = "web";
+            moneyTransfer.Amount = model.Amount;
+            moneyTransfer.BillNo = model.BillNo;
+            moneyTransfer.RequestNo = model.RequestNo;
+            moneyTransfer.RequestAmount = model.RequestAmount;
+            moneyTransfer.Note = model.Note;
+
+            var result = new MoneyTransferRepo(_db).Create(moneyTransfer);
+            if (result.Success)
+            {
+                model.Id = result.AffectedCount;
+            }
+            else
+            {
+                if (result.AffectedCount == -500)
+                {
+                    model.Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية";
+                } else if (result.AffectedCount == -501)
+                {
+                    model.Error =  $"رصيدك غير كافي { model.CreatorBalance.ToString("N0") } ";
+                }
+                else if (result.AffectedCount == -502)
+                {
+                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به";
+                }
+                if (result.AffectedCount == -503)
+                {
+                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به";
+                }
+            }
+            return View(model);
         }
 
         public CreateMoneyTransferDto GetBasicInfo(string pId, double amount = 0)
@@ -114,12 +161,12 @@ namespace Yvtu.Web.Controllers
 
                 if (moneyTransferSettings.MaxValue > 0 && amount > moneyTransferSettings.MaxValue)
                 {
-                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue} " ;
+                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue.ToString("N0")} " ;
                     return model;
                 }
                 if (moneyTransferSettings.MinValue > 0 && amount < moneyTransferSettings.MinValue)
                 {
-                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.MinValue} ";
+                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.MinValue.ToString("N0")} ";
                     return model;
                 }
 
@@ -135,7 +182,7 @@ namespace Yvtu.Web.Controllers
                     
                     if (amount > model.CreatorBalance)
                     {
-                        model.Error = $"رصيدك غير كافي { model.CreatorBalance } ";
+                        model.Error = $"رصيدك غير كافي { model.CreatorBalance.ToString("N0") } ";
                         return model;
                     }
                 }
