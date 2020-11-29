@@ -17,33 +17,15 @@
 
 <div class="row">
     <div class="col-12 p-0">
-        <table class="table table-user-information" style="background-color:White;">
+        <table class="table  mb-0">
             <tbody>
                 <tr>
                     <td class="DetailLabel">الرقم :</td>
-                    <td>@Model.Id</td>
+                    <td style="font-size:20px;font-weight:bold;">@Model.Id</td>
                     <td class="DetailLabel">اسم الاجراء :</td>
-                    <td colspan="3" style="color:blue;">@Model.Activity.Name</td>
-                </tr>
-                <tr>
+                    <td style="color:blue;">@Model.Activity.Name</td>
                     <td class="DetailLabel">من :</td>
-                    <td colspan="1" style="color:darkcyan;">@Model.FromRole.Name</td>
-                    <td class="DetailLabel">الى :</td>
-                    <td colspan="3" style="color:darkcyan;">@Model.ToRole.Name</td>
-                </tr>
-                <tr>
-                    <td class="DetailLabel">إقل مبلغ :</td>
-                    <td style="color:darkmagenta;font-size:18px;">@Model.MinValue.ToString("N0")</td>
-                    <td class="DetailLabel">أعلى مبلغ :</td>
-                    <td style="color:darkmagenta;font-size:18px;">@Model.MaxValue.ToString("N0")</td>
-                </tr>
-                <tr>
-                    <td class="DetailLabel">نسبة الضريبة :</td>
-                    <td style="font-size:18px;">@Model.TaxPercent.ToString("N2")</td>
-                    <td class="DetailLabel">نسبة العمولة :</td>
-                    <td style="font-size:18px;">@Model.BonusPercent.ToString("N2")</td>
-                    <td class="DetailLabel">نسبة ضريبة العمولة :</td>
-                    <td style="font-size:18px;">@Model.BonusTaxPercent.ToString("N2")</td>
+                    <td style="color:darkcyan;">@Model.FromRole.Name</td>
                 </tr>
                 <tr>
                     <td class="DetailLabel">عدد النتائج :</td>
@@ -54,21 +36,6 @@
                     <td>@Model.Scope.Name</td>
                 </tr>
                 <tr>
-                    <td class="DetailLabel">فحص الرصيد :</td>
-                    <td>
-                        @if (Model.CheckBalanceRequired)
-                        {<p class="text-success"><i class="fa fa-check"></i></p> }
-                        else
-                        { <p class="text-danger"><i class="fa fa-times"></i></p>}
-                    </td>
-                    <td class="DetailLabel">بين نقاط نفس الوكيل :</td>
-                    <td colspan="3">
-                        @if (Model.OnlyPartnerChildren)
-                        {<p class="text-success"><i class="fa fa-check"></i></p> }
-                        else
-                        { <p class="text-danger"><i class="fa fa-times"></i></p>}
-                    </td>
-                <tr>
                     <td class="DetailLabel">وقت الانشاء :</td>
                     <td style="color:gray;">@Model.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
                     <td class="DetailLabel">انشئ بواسطة :</td>
@@ -76,21 +43,111 @@
                     <td class="DetailLabel">اخر وقت تعديل :</td>
                     <td style="color:gray;">@Model.LastEditOn.ToString("yyyy/MM/dd H:mm:ss")</td>
                 </tr>
-                <tr class="text-center" style="background-color:#EDF0F2;">
-                    <td colspan="6">
-                        <a asp-action="Edit" asp-controller="PartActivity" asp-route-id="@Model.Id"
-                           data-toggle="tooltip" data-placement="top" title="تعديل البيانات" class="ml-3"> 
-                        <i class="far fa-edit fa-2x text-primary"></i></a>
-                        <span id="deleteConfirmSpan" style="display:none;">
-                            <span style="color:red;">هل انت متاكد من الحذف؟</span>
-                            <a asp-action="Delete" asp-controller="PartActivity" asp-route-id="@Model.Id" class="btn btn-success rounded-circle"  style="width:50px;">نعم</a>
-                            <a href="#" class="btn btn-primary rounded-circle" onclick="confirmDelete(false)"  style="width:50px;">لا</a>
-                        </span>
-                        <span id="deleteSpan">
-                            <a href="#" onclick="confirmDelete(true)" data-toggle="tooltip" data-placement="top" title="حذف"><i class="far fa-trash-alt fa-2x text-danger"></i></a>
-                        </span>
+                <tr>
+                    <td class="DetailLabel">حصري :</td>
+                    <td>
+                        @if (Model.OnlyPartnerChildren)
+                        {
+                            <p class="text-success"><i class="fa fa-check"></i></p>
+                        }
+                        else
+                        {
+                            <p class="text-danger" style="margin:0px;"><i class="fa fa-times"></i></p>
+                        }
+                    </td>
+
+                    <td colspan="2" style="text-align:right;">
+                        
+                       
+                    </td>
+                    <td class="DetailLabel">التفاصيل :</td>
+                    <td>
+                        @Model.Details.Count
                     </td>
                 </tr>
+                <tr style="border-top:2px solid #6407a8;">
+                    <td>
+                        <a class="btn btn-outline-info" asp-action="AddDetail" asp-controller="PartActivity" asp-route-id="@Model.Id" style="font-size:11px;">
+                            <i class="fas fa-plus-circle"></i>
+                             اضافة تفاصيل
+                        </a>
+                    </td>
+                    <td>
+                        
+
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-controller="PartActivity" asp-route-id="@Model.Id"
+                           data-toggle="tooltip" data-placement="top" title="تعديل البيانات" class="ml-3">
+                            <i class="far fa-edit  text-primary"></i>
+                        </a>
+
+                    </td>
+                    <td colspan="3">
+                        <span id="deleteConfirmSpan" style="display:none;">
+                            <span style="color:red;">هل انت متاكد من الحذف؟</span>
+                            <a asp-action="Delete" asp-controller="PartActivity" asp-route-id="@Model.Id" class="btn btn-success rounded-circle" style="width:50px;">نعم</a>
+                            <a href="#" class="btn btn-primary rounded-circle" onclick="confirmDelete(false)" style="width:50px;">لا</a>
+                        </span>
+                        <span id="deleteSpan">
+                            <a href="#" onclick="confirmDelete(true)" data-toggle="tooltip" data-placement="top" title="حذف"><i class="far fa-trash-alt  text-danger"></i></a>
+                        </span>
+                    </td>
+                    <td>
+                        
+                    </td>
+                    
+                </tr>
+
+            </tbody>
+        </table>
+
+
+
+    </div>
+</div>
+
+
+<div class="row p-0">
+    <div class="col-12 LoginBox  mt-1 p-0 bg-transparent">
+        <table class="table table-bordered text-center bg-white">
+            <thead>
+                <tr class="text-center" style="font-size:12px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                    <th style="font-weight:normal">#</th>
+                    <th style="font-weight:normal">المستفيد</th>
+                    <th style="font-weight:normal">فحص الرصيد؟</th>
+                    <th style="font-weight:normal">اقل مبلغ</th>
+                    <th style="font-weight:normal">اعلى مبلغ</th>
+                    <th style="font-weight:normal">الضريبة %</th>
+                    <th style="font-weight:normal">العمولة %</th>
+                    <th style="font-weight:normal">ضريبة العمولة %</th>
+                    <th style="font-weight:normal">تاريخ الانشاء</th>
+                    <th style="font-weight:normal">تفاصيل</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Details)
+                {
+
+                <tr>
+                    <td style="font-size:23px;font-weight:bold;">@item.Id</td>
+                    <td style="font-family:Amiri-Regular">@item.ToRole.Name</td>
+                    <td style="font-family:Amiri-Regular">
+                        @if (item.CheckBalanceRequired)
+                        {<p class="text-success"><i class="fa fa-check"></i></p> }
+                        else
+                        { <p class="text-danger"><i class="fa fa-times"></i></p>}
+                    </td>
+                    <td style="font-family:Amiri-Regular">@item.MinValue.ToString("N0")</td>
+                    <td style="font-family:Amiri-Regular">@item.MaxValue.ToString("N0")</td>
+                    <td style="font-family:Amiri-Regular">@item.TaxPercent.ToString("N2")</td>
+                    <td style="font-family:Amiri-Regular">@item.BonusPercent.ToString("N2")</td>
+                    <td style="font-family:Amiri-Regular">@item.BonusTaxPercent.ToString("N2")</td>
+                    <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+
+                    <td><a asp-action="Detail" asp-controller="PartActivity" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                </tr>
+                }
             </tbody>
         </table>
     </div>

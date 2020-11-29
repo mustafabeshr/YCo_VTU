@@ -15,11 +15,8 @@ namespace Yvtu.Infra.Data.Interfaces
         {
             this.db = db;
         }
-        public async Task<OpertionResult> CreateAsync(DataAudit data)
+        public OpertionResult Create(DataAudit data)
         {
-            var insertSql = "insert into data_audit " +
-                "  (partner_id, createdon, act_id, action_id, note, old_value, new_value, system_note, error, success) values " +
-                "   (:v_partner_id, sysdate, :v_act_id, :v_action_id, :v_note, :v_old_value, :v_new_value, :v_system_note, :v_error, :v_success)";
             try
             {
                 #region Parameters
@@ -35,9 +32,7 @@ namespace Yvtu.Infra.Data.Interfaces
                     new OracleParameter{ ParameterName = "v_success",OracleDbType = OracleDbType.Int32,  Value = data.Success ? 1 : 0 },
                 };
                 #endregion
-
-                var result = await db.ExecuteSqlCommandAsync(insertSql, parameters);
-
+                var result =  db.ExecuteStoredProc("pk_utility.sp_create_audit", parameters);
                 if (result > 0)
                 {
                     return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };

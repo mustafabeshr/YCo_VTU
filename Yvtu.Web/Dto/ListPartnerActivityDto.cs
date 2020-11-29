@@ -14,9 +14,6 @@ namespace Yvtu.Web.Dto
         public SelectList FromRoles { get; set; }
         public int FromRoleId { get; set; }
 
-        public SelectList ToRoles { get; set; }
-        public int ToRoleId { get; set; }
-
         public List<PartnerActivity> PartnerActivities { get; set; }
     }
 }

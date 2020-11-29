@@ -143,8 +143,8 @@ namespace Yvtu.Web.Controllers
             {
                 var partner = validateResult.Partner;
                 var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
-                var moneyTransferSettings = _partnerActivity.GetPartAct("Money.Transfer", roleId, partner.Role.Id.ToString());
-                if (moneyTransferSettings == null) return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
+                var moneyTransferSettings = _partnerActivity.GetPartAct("Money.Transfer", int.Parse(roleId), partner.Role.Id);
+                if (moneyTransferSettings == null || moneyTransferSettings.Details == null || moneyTransferSettings.Details.Count == 0) return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
                 
                 var model = new CreateMoneyTransferDto
                 {
@@ -152,21 +152,21 @@ namespace Yvtu.Web.Controllers
                     PartnerName = partner.Name,
                     PartnerRoleName = partner.Role.Name,
                     PartnerBalance = partner.Balance,
-                    TaxPercent = moneyTransferSettings.TaxPercent,
-                    BonusPercent = moneyTransferSettings.BonusPercent,
-                    BounsTaxPercent = moneyTransferSettings.BonusTaxPercent,
+                    TaxPercent = moneyTransferSettings.Details[0].TaxPercent,
+                    BonusPercent = moneyTransferSettings.Details[0].BonusPercent,
+                    BounsTaxPercent = moneyTransferSettings.Details[0].BonusTaxPercent,
                     Error = "N/A"
                 };
                 if (amount <= 0) return model;
 
-                if (moneyTransferSettings.MaxValue > 0 && amount > moneyTransferSettings.MaxValue)
+                if (moneyTransferSettings.Details[0].MaxValue > 0 && amount > moneyTransferSettings.Details[0].MaxValue)
                 {
-                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue.ToString("N0")} " ;
+                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.Details[0].MaxValue.ToString("N0")} " ;
                     return model;
                 }
-                if (moneyTransferSettings.MinValue > 0 && amount < moneyTransferSettings.MinValue)
+                if (moneyTransferSettings.Details[0].MinValue > 0 && amount < moneyTransferSettings.Details[0].MinValue)
                 {
-                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.MinValue.ToString("N0")} ";
+                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.Details[0].MinValue.ToString("N0")} ";
                     return model;
                 }
 
@@ -177,7 +177,7 @@ namespace Yvtu.Web.Controllers
                 model.CreateorRoleId = currPart.Role.Id;
                 model.CreateorRoleName = currPart.Role.Name;
                 model.CreatorBalance = currPart.Balance - currPart.Reserved;
-                if (moneyTransferSettings.CheckBalanceRequired)
+                if (moneyTransferSettings.Details[0].CheckBalanceRequired)
                 {
                     
                     if (amount > model.CreatorBalance)
@@ -187,10 +187,10 @@ namespace Yvtu.Web.Controllers
                     }
                 }
 
-                var netAmount = amount / ((moneyTransferSettings.TaxPercent / 100) + 1) ;
-                var taxAmount = netAmount * (moneyTransferSettings.TaxPercent / 100);
-                var bounsAmount = netAmount * (moneyTransferSettings.BonusPercent / 100);
-                var bounsTaxAmount = bounsAmount * (moneyTransferSettings.BonusTaxPercent / 100);
+                var netAmount = amount / ((moneyTransferSettings.Details[0].TaxPercent / 100) + 1) ;
+                var taxAmount = netAmount * (moneyTransferSettings.Details[0].TaxPercent / 100);
+                var bounsAmount = netAmount * (moneyTransferSettings.Details[0].BonusPercent / 100);
+                var bounsTaxAmount = bounsAmount * (moneyTransferSettings.Details[0].BonusTaxPercent / 100);
                 var recievedAmount = (amount - bounsAmount + bounsTaxAmount);
 
                 model.Amount = amount;

@@ -12,7 +12,7 @@
             </div>
         </div>
         <form asp-action="Confirmation" asp-controller="MoneyTransfer" method="post">
-            @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error) && Model.Error != "N/A")
             {
                 <div class="form-group">
                     <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
@@ -67,8 +67,8 @@
                                 <th colspan="2" style="font-weight:normal">الضريبة</th>
                                 <th colspan="2" style="font-weight:normal">العمولة</th>
                                 <th colspan="2" style="font-weight:normal">ض العمولة</th>
-                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">الصافي</th>
-                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">المستلم</th>
+                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">صافي الايراد</th>
+                                <th rowspan="2" style="font-weight:normal;vertical-align:middle;">المبلغ المستلم</th>
                             </tr>
                             <tr class="text-center" style="font-size:12px;font-weight:normal;background-color:#EDF0F2;color:black;">
                                 <th style="font-weight:normal">%</th>

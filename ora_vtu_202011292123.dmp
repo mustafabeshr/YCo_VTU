@@ -1,0 +1,1662 @@
+---------------------------------------------------------
+-- Export file for user VTU@ORCL                       --
+-- Created by mbeshr on 29/11/2020, 21:23:38 21:23:38  --
+---------------------------------------------------------
+
+set define off
+spool ora_vtu_202011292123.log
+
+prompt
+prompt Creating table ACTIVITIES
+prompt =========================
+prompt
+create table VTU.ACTIVITIES
+(
+  act_id       VARCHAR2(100) not null,
+  act_name     NVARCHAR2(200) not null,
+  act_type     VARCHAR2(100) not null,
+  act_order    NUMBER(3) default 0 not null,
+  internal_use NUMBER(1) default 0 not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.ACTIVITIES
+  add constraint FK_ACTIVITIES primary key (ACT_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table APPROLE
+prompt ======================
+prompt
+create table VTU.APPROLE
+(
+  roleid    NUMBER not null,
+  rolename  NVARCHAR2(100) not null,
+  isactive  NUMBER(1) default 1 not null,
+  weight    NUMBER(3) default 0 not null,
+  roleorder NUMBER(2) default 0 not null,
+  rolecode  VARCHAR2(100)
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.APPROLE
+  add constraint PK_ROLE primary key (ROLEID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table CITY
+prompt ===================
+prompt
+create table VTU.CITY
+(
+  cityid    NUMBER not null,
+  cityname  NVARCHAR2(100) not null,
+  cityorder NUMBER(2) default 0 not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.CITY
+  add constraint PK_CITY primary key (CITYID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table COMMON_CODE
+prompt ==========================
+prompt
+create table VTU.COMMON_CODE
+(
+  code_id    VARCHAR2(100) not null,
+  code_name  NVARCHAR2(150),
+  code_type  VARCHAR2(100) not null,
+  code_order NUMBER(3)
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.COMMON_CODE
+  add constraint FK_COMMON_CODE primary key (CODE_ID, CODE_TYPE)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table DATA_AUDIT
+prompt =========================
+prompt
+create table VTU.DATA_AUDIT
+(
+  row_id      NUMBER not null,
+  partner_id  VARCHAR2(9) not null,
+  createdon   DATE default sysdate not null,
+  act_id      VARCHAR2(100) not null,
+  action_id   VARCHAR2(100) not null,
+  note        NVARCHAR2(500),
+  old_value   NVARCHAR2(2000),
+  new_value   NVARCHAR2(2000),
+  system_note VARCHAR2(1000),
+  error       NVARCHAR2(2000),
+  success     NUMBER(1) default 1 not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+comment on column VTU.DATA_AUDIT.action_id
+  is 'common_code.code_type = ''audit.action''';
+alter table VTU.DATA_AUDIT
+  add constraint FK_DATA_AUDIT primary key (ROW_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.DATA_AUDIT
+  add constraint FK2_DATA_AUDIT foreign key (ACT_ID)
+  references VTU.ACTIVITIES (ACT_ID);
+
+prompt
+prompt Creating table DISTRICT
+prompt =======================
+prompt
+create table VTU.DISTRICT
+(
+  disid    NUMBER not null,
+  disname  NVARCHAR2(200) not null,
+  disorder NUMBER(2) default 0 not null,
+  cityid   NUMBER not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.DISTRICT
+  add constraint PK_DISTRICT primary key (DISID, CITYID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.DISTRICT
+  add constraint FK_DISTRICT_CITY foreign key (CITYID)
+  references VTU.CITY (CITYID) on delete cascade;
+
+prompt
+prompt Creating table ERROR_LIST
+prompt =========================
+prompt
+create table VTU.ERROR_LIST
+(
+  error_no   NUMBER,
+  error_desc NVARCHAR2(200)
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table EVENT
+prompt ====================
+prompt
+create table VTU.EVENT
+(
+  event_id    VARCHAR2(100) not null,
+  event_name  NVARCHAR2(200) not null,
+  event_order NUMBER default 0 not null,
+  createdon   DATE default sysdate not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+alter table VTU.EVENT
+  add constraint PK_EVENT primary key (EVENT_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+
+prompt
+prompt Creating table IDTYPES
+prompt ======================
+prompt
+create table VTU.IDTYPES
+(
+  idtypeid   NUMBER not null,
+  idtypename NVARCHAR2(200),
+  isactive   NUMBER(1) default 1 not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.IDTYPES
+  add constraint PK_IDTYPE primary key (IDTYPEID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table MONEY_TRANSFER
+prompt =============================
+prompt
+create table VTU.MONEY_TRANSFER
+(
+  trans_id        NUMBER not null,
+  part_id         VARCHAR2(9) not null,
+  part_role_id    NUMBER not null,
+  part_bal        NUMBER(18,2) default 0 not null,
+  pay_type        VARCHAR2(100) not null,
+  pay_no          NVARCHAR2(100),
+  pay_date        DATE,
+  bank_name       NVARCHAR2(100),
+  createdby       VARCHAR2(9) not null,
+  createdon       DATE default sysdate not null,
+  access_channel  VARCHAR2(100) not null,
+  amount          NUMBER(18,2) default 0 not null,
+  tax_per         NUMBER(4,2) default 0 not null,
+  tax_amt         NUMBER(18,2) default 0 not null,
+  bonus_per       NUMBER(4,2) default 0 not null,
+  bonus_amt       NUMBER(18,2) default 0 not null,
+  bonus_tax       NUMBER(4,2) default 0 not null,
+  bonus_tax_amt   NUMBER(18,2) default 0 not null,
+  received_amt    NUMBER(18,2) default 0 not null,
+  net_amount      NUMBER(18,2) default 0 not null,
+  bill_no         NVARCHAR2(100),
+  request_no      NVARCHAR2(100),
+  request_amt     NUMBER(18,2) default 0 not null,
+  note            NVARCHAR2(300),
+  adjusted        NUMBER(1) default 0 not null,
+  adjust_id       NUMBER,
+  creator_bal     NUMBER(18,2) default 0 not null,
+  creator_role_id NUMBER not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.MONEY_TRANSFER
+  add constraint PK_MONEY_TRANSFER primary key (TRANS_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.MONEY_TRANSFER
+  add constraint FK1_MONEY_TRANSFER foreign key (PART_ROLE_ID)
+  references VTU.APPROLE (ROLEID);
+
+prompt
+prompt Creating table OPERATION_EXCEPTION
+prompt ==================================
+prompt
+create table VTU.OPERATION_EXCEPTION
+(
+  exp_id        NUMBER not null,
+  exp_code      NUMBER,
+  exp_message   NVARCHAR2(2000),
+  exp_date      DATE default sysdate not null,
+  exp_operation VARCHAR2(100),
+  exp_object    VARCHAR2(100)
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.OPERATION_EXCEPTION
+  add constraint PK_OPERATION_EXCEPTION primary key (EXP_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table PARTNER_STATUS
+prompt =============================
+prompt
+create table VTU.PARTNER_STATUS
+(
+  statusid   NUMBER not null,
+  statusname NVARCHAR2(200)
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_STATUS
+  add constraint PK_PARTNER_STATUS primary key (STATUSID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+
+prompt
+prompt Creating table PARTNER
+prompt ======================
+prompt
+create table VTU.PARTNER
+(
+  partner_id           VARCHAR2(9) not null,
+  partner_name         NVARCHAR2(200) not null,
+  brandname            NVARCHAR2(200),
+  balance              NUMBER(18,2) default 0 not null,
+  reserved             NUMBER(18,2) default 0 not null,
+  verificationcodenext NUMBER(1) default 1 not null,
+  locktime             DATE,
+  roleid               NUMBER not null,
+  id_no                NVARCHAR2(150) not null,
+  id_type              NUMBER not null,
+  id_place             NVARCHAR2(200) not null,
+  id_issued            DATE,
+  status               NUMBER not null,
+  statuson             DATE default sysdate,
+  statusby             VARCHAR2(9),
+  createdon            DATE default sysdate not null,
+  createdby            VARCHAR2(9) not null,
+  cityid               NUMBER not null,
+  districtid           NUMBER not null,
+  street               NVARCHAR2(150),
+  zone                 NVARCHAR2(150),
+  extra_address        NVARCHAR2(200),
+  pair_mobile          VARCHAR2(9) not null,
+  mobile               VARCHAR2(9),
+  fixed                NVARCHAR2(30),
+  fax                  NVARCHAR2(30),
+  email                VARCHAR2(100),
+  pwd                  VARCHAR2(200) not null,
+  extra                VARCHAR2(200),
+  wrong_pwd_attempts   NUMBER default 0 not null,
+  last_login           DATE,
+  ip_address           VARCHAR2(20),
+  partner_acc          NUMBER not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+create index VTU.IDX_PARTNER_ID on VTU.PARTNER (PARTNER_ID)
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER
+  add constraint PK_PARTNER primary key (PARTNER_ACC)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER
+  add constraint FK_PARTNER_CITY foreign key (CITYID)
+  references VTU.CITY (CITYID) on delete set null;
+alter table VTU.PARTNER
+  add constraint FK_PARTNER_IDTYPE foreign key (ID_TYPE)
+  references VTU.IDTYPES (IDTYPEID) on delete set null;
+alter table VTU.PARTNER
+  add constraint FK_PARTNER_ROLE foreign key (ROLEID)
+  references VTU.APPROLE (ROLEID) on delete set null;
+alter table VTU.PARTNER
+  add constraint FK_PARTNER_STATUS foreign key (STATUS)
+  references VTU.PARTNER_STATUS (STATUSID) on delete set null;
+
+prompt
+prompt Creating table PARTNER_ACTIVITY
+prompt ===============================
+prompt
+create table VTU.PARTNER_ACTIVITY
+(
+  row_id           NUMBER not null,
+  act_id           VARCHAR2(100) not null,
+  fromroleid       NUMBER not null,
+  queryduration    VARCHAR2(50) not null,
+  act_scope        VARCHAR2(50) not null,
+  maxrec           NUMBER default 0 not null,
+  onlypartchildren NUMBER(1) default 0 not null,
+  createdon        DATE default sysdate not null,
+  createdby        VARCHAR2(9) not null,
+  lastediton       DATE default sysdate not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY
+  add constraint PK_PARTNER_ACTIVITY primary key (ROW_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY
+  add constraint UQ_PARTNER_ACTIVITY unique (ACT_ID, FROMROLEID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY
+  add constraint FK1_PARTNER_ACTIVITY foreign key (ACT_ID)
+  references VTU.ACTIVITIES (ACT_ID) on delete cascade;
+alter table VTU.PARTNER_ACTIVITY
+  add constraint FK2_PARTNER_ACTIVITY foreign key (FROMROLEID)
+  references VTU.APPROLE (ROLEID);
+
+prompt
+prompt Creating table PARTNER_ACTIVITY_DETAIL
+prompt ======================================
+prompt
+create table VTU.PARTNER_ACTIVITY_DETAIL
+(
+  row_id       NUMBER not null,
+  master_row   NUMBER not null,
+  dest_role_id NUMBER not null,
+  check_bal    NUMBER(1) default 1 not null,
+  max_value    NUMBER(18,2) default 0 not null,
+  min_value    NUMBER(18,2) default 0 not null,
+  bonus_per    NUMBER(4,2) default 0 not null,
+  taxper       NUMBER(4,2) default 0 not null,
+  bonus_tax    NUMBER(4,2) default 0 not null,
+  createdon    DATE default sysdate not null,
+  createdby    VARCHAR2(9) not null,
+  lastediton   DATE default sysdate not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY_DETAIL
+  add constraint PK_PARTNER_ACTIVITY_DETAIL primary key (ROW_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY_DETAIL
+  add constraint UQ_PARTNER_ACTIVITY_DETAIL unique (MASTER_ROW, DEST_ROLE_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255
+  storage
+  (
+    initial 64K
+    next 1M
+    minextents 1
+    maxextents unlimited
+  );
+alter table VTU.PARTNER_ACTIVITY_DETAIL
+  add constraint FK1_PARTNER_ACTIVITY_DETAIL foreign key (MASTER_ROW)
+  references VTU.PARTNER_ACTIVITY (ROW_ID) on delete cascade;
+alter table VTU.PARTNER_ACTIVITY_DETAIL
+  add constraint FK2_PARTNER_ACTIVITY_DETAIL foreign key (DEST_ROLE_ID)
+  references VTU.APPROLE (ROLEID);
+
+prompt
+prompt Creating table SYS_ITEM
+prompt =======================
+prompt
+create table VTU.SYS_ITEM
+(
+  item_id    VARCHAR2(100) not null,
+  item_name  NVARCHAR2(100) not null,
+  item_order NUMBER default 0 not null,
+  createdon  DATE default sysdate not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+alter table VTU.SYS_ITEM
+  add constraint PK_SYS_ITEM primary key (ITEM_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+
+prompt
+prompt Creating table SYS_SUBITEM
+prompt ==========================
+prompt
+create table VTU.SYS_SUBITEM
+(
+  item_id       VARCHAR2(100) not null,
+  subitem_id    VARCHAR2(100) not null,
+  subitem_name  NVARCHAR2(100) not null,
+  subitem_order NUMBER default 0 not null,
+  createdon     DATE default sysdate not null
+)
+tablespace USERS
+  pctfree 10
+  initrans 1
+  maxtrans 255;
+alter table VTU.SYS_SUBITEM
+  add constraint PK_SYS_SUBITEM primary key (ITEM_ID, SUBITEM_ID)
+  using index 
+  tablespace USERS
+  pctfree 10
+  initrans 2
+  maxtrans 255;
+alter table VTU.SYS_SUBITEM
+  add constraint FK_SYS_SUBITEM foreign key (ITEM_ID)
+  references VTU.SYS_ITEM (ITEM_ID) on delete cascade;
+
+prompt
+prompt Creating sequence SEQ_CITY_ID
+prompt =============================
+prompt
+create sequence VTU.SEQ_CITY_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 41
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_DATA_AUDIT_ID
+prompt ===================================
+prompt
+create sequence VTU.SEQ_DATA_AUDIT_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 61
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_DISTRICT_ID
+prompt =================================
+prompt
+create sequence VTU.SEQ_DISTRICT_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 341
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_EXCEPTION_ID
+prompt ==================================
+prompt
+create sequence VTU.SEQ_EXCEPTION_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 61
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_MONEY_TRANSFER_ID
+prompt =======================================
+prompt
+create sequence VTU.SEQ_MONEY_TRANSFER_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 21
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_PARTNER_ACC
+prompt =================================
+prompt
+create sequence VTU.SEQ_PARTNER_ACC
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_PARTNER_ACIVITY_ROWID
+prompt ===========================================
+prompt
+create sequence VTU.SEQ_PARTNER_ACIVITY_ROWID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 101
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_ROLE_ID
+prompt =============================
+prompt
+create sequence VTU.SEQ_ROLE_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 21
+increment by 1
+cache 20;
+
+prompt
+prompt Creating view V_DATA_AUDIT
+prompt ==========================
+prompt
+create or replace force view vtu.v_data_audit as
+select
+d.row_id,
+d.partner_id,
+p.partner_name,
+d.createdon,
+d.act_id,
+d.action_id,
+d.note,
+d.old_value,
+d.new_value,
+d.system_note,
+d.error,
+d.success ,
+
+act.act_name,
+act.act_type,
+act.act_order,
+act.internal_use,
+
+c.code_name action_name,
+c.code_type ,
+c.code_order
+from data_audit d, partner p, activities act, common_code c
+where d.partner_id = p.partner_id
+and d.act_id = act.act_id
+and d.action_id = c.code_id
+and c.code_type =  'audit.action';
+
+prompt
+prompt Creating view V_PARTNER_ACTIVITY
+prompt ================================
+prompt
+create or replace force view vtu.v_partner_activity as
+Select
+part.row_id,
+part.act_id,
+part.fromroleid,
+
+part.queryduration,
+(select code_name from common_code code1 where code1.code_id = part.queryduration and code_type = 'queryduration') queryduration_name,
+part.act_scope,
+(select code_name from common_code code2 where code2.code_id = part.act_scope and code_type = 'activity.scope') act_scope_name,
+part.maxrec,
+part.onlypartchildren,
+part.createdon,
+part.createdby,
+p.partner_name createdname,
+part.lastediton,
+act.act_name,
+act.act_type,
+act.act_order,
+act.internal_use,
+r1.rolename fromrolename,
+r1.isactive fromroleisactive,
+r1.weight fromroleweight,
+r1.roleorder fromroleorder,
+r1.rolecode fromordercode,
+(select nvl(count(*), 0) from partner_activity_detail partdetail where partdetail.master_row = part.row_id) DetailCount
+ from partner_activity part,
+ activities act,
+ approle r1,
+ partner p
+ where part.act_id = act.act_id
+ and part.fromroleid = r1.roleid
+  and part.createdby = p.partner_id;
+
+prompt
+prompt Creating view V_PARTNER_ACTIVITY_DETAIL
+prompt =======================================
+prompt
+create or replace force view vtu.v_partner_activity_detail as
+Select
+part.row_id,
+part.act_id,
+part.fromroleid,
+partdetail.row_id detail_row_id,
+partdetail.master_row,
+partdetail.dest_role_id toroleid,
+partdetail.check_bal,
+partdetail.max_value,
+partdetail.min_value,
+partdetail.bonus_per,
+partdetail.taxper,
+partdetail.bonus_tax,
+part.queryduration,
+(select code_name from common_code code1 where code1.code_id = part.queryduration and code_type = 'queryduration') queryduration_name,
+part.act_scope,
+(select code_name from common_code code2 where code2.code_id = part.act_scope and code_type = 'activity.scope') act_scope_name,
+part.maxrec,
+part.onlypartchildren,
+part.createdon,
+part.createdby,
+p.partner_name createdname,
+part.lastediton,
+act.act_name,
+act.act_type,
+act.act_order,
+act.internal_use,
+r1.rolename fromrolename,
+r1.isactive fromroleisactive,
+r1.weight fromroleweight,
+r1.roleorder fromroleorder,
+r1.rolecode fromordercode,
+r2.rolename torolename,
+r2.isactive toroleisactive,
+r2.weight toroleweight,
+r2.roleorder toroleorder,
+r2.rolecode torolecode
+ from partner_activity part,
+ partner_activity_detail partdetail,
+ activities act,
+ approle r1,
+ approle r2,
+ partner p
+ where part.row_id = partdetail.master_row
+ and part.act_id = act.act_id
+ and part.fromroleid = r1.roleid
+  and partdetail.dest_role_id = r2.roleid
+  and part.createdby = p.partner_id;
+
+prompt
+prompt Creating package PK_FINANCIAL
+prompt =============================
+prompt
+create or replace package vtu.pk_financial is
+
+  -- Public type declarations
+
+
+  -- Public constant declarations
+  --<ConstantName> constant <Datatype> := <Value>;
+
+  -- Public variable declarations
+  --<VariableName> <Datatype>;
+
+  -- Public function and procedure declarations
+  function fn_MoneyTransfer(
+    v_part_id money_transfer.part_id%type,
+    v_pay_type money_transfer.pay_type%type,
+    v_pay_no money_transfer.pay_no%type,
+    v_pay_date money_transfer.pay_date%type,
+    v_bank_name money_transfer.bank_name%type,
+    v_createdby money_transfer.createdby%type,
+    v_access_channel money_transfer.access_channel%type,
+    v_amount money_transfer.amount%type,
+    v_bill_no money_transfer.bill_no%type,
+    v_request_no money_transfer.request_no%type,
+    v_request_amt money_transfer.request_amt%type,
+    v_note money_transfer.note%type
+    ) return number;
+
+end pk_financial;
+/
+
+prompt
+prompt Creating package PK_INFRA
+prompt =========================
+prompt
+create or replace package vtu.pk_infra is
+
+  -- Author  : MBESHR
+  -- Created : 27/11/2020 20:18:22 20:18:22 
+  -- Purpose : 
+  
+
+function fn_CreatePartner (
+v_partner_id                partner.partner_id%type, 
+v_partner_name              partner.partner_name%type,
+v_brandname                 partner.brandname%type,
+v_roleid                    partner.roleid%type, 
+v_id_no                     partner.id_no%type, 
+v_id_type                   partner.id_type%type, 
+v_id_place                  partner.id_place%type,
+v_id_issued                 partner.id_issued%type, 
+v_createdby                 partner.createdby%type, 
+v_cityid                    partner.cityid%type, 
+v_districtid                partner.districtid%type, 
+v_street                    partner.street%type, 
+v_zone                      partner.zone%type, 
+v_extra_address             partner.extra_address%type, 
+v_pair_mobile               partner.pair_mobile%type, 
+v_mobile                    partner.mobile%type, 
+v_fixed                     partner.fixed%type, 
+v_fax                       partner.fax%type, 
+v_email                     partner.email%type, 
+v_pwd                       partner.pwd%type, 
+v_extra                     partner.extra%type, 
+v_ip_address                partner.ip_address%type
+   
+  ) return number ;
+
+
+function fn_UpdatePartner (
+v_partner_name              partner.partner_name%type,
+v_brandname                 partner.brandname%type,
+v_roleid                    partner.roleid%type, 
+v_id_no                     partner.id_no%type, 
+v_id_type                   partner.id_type%type, 
+v_id_place                  partner.id_place%type,
+v_id_issued                 partner.id_issued%type, 
+v_createdby                 partner.createdby%type, 
+v_cityid                    partner.cityid%type, 
+v_districtid                partner.districtid%type, 
+v_street                    partner.street%type, 
+v_zone                      partner.zone%type, 
+v_extra_address             partner.extra_address%type, 
+v_pair_mobile               partner.pair_mobile%type, 
+v_mobile                    partner.mobile%type, 
+v_fixed                     partner.fixed%type, 
+v_fax                       partner.fax%type, 
+v_email                     partner.email%type, 
+v_ip_address                partner.ip_address%type,
+v_partner_acc               partner.partner_acc%type
+   
+  ) return number;
+end pk_infra;
+/
+
+prompt
+prompt Creating package PK_SETTINGS
+prompt ============================
+prompt
+create or replace package vtu.pk_Settings is
+
+  -- Author  : MBESHR
+  -- Created : 23/11/2020 20:18:31 20:18:31 
+  -- Purpose : 
+  
+ function fn_CreatePartnerActivity (
+
+  v_act_id partner_activity.act_id%type, 
+  v_fromroleid partner_activity.fromroleid%type, 
+  v_queryduration partner_activity.queryduration%type, 
+  v_act_scope partner_activity.act_scope%type, 
+  v_maxrec partner_activity.maxrec%type, 
+  v_onlypartchildren partner_activity.onlypartchildren%type, 
+  v_createdby partner_activity.createdby%type
+  
+  ) return number;
+
+   function fn_UpdatePartnerActivity (
+    v_row_id partner_activity.row_id%type,
+    v_act_id partner_activity.act_id%type, 
+    v_fromroleid partner_activity.fromroleid%type, 
+    v_queryduration partner_activity.queryduration%type, 
+    v_act_scope partner_activity.act_scope%type, 
+    v_maxrec partner_activity.maxrec%type, 
+    v_onlypartchildren partner_activity.onlypartchildren%type
+  ) return number;
+
+function fn_CreatePartnerActivityDetail (
+  v_master_row partner_activity_detail.master_row%type, 
+  v_dest_role_id partner_activity_detail.dest_role_id%type, 
+  v_check_bal partner_activity_detail.check_bal%type, 
+  v_max_value partner_activity_detail.max_value%type, 
+  v_min_value partner_activity_detail.min_value%type, 
+  v_bonus_per partner_activity_detail.bonus_per%type, 
+  v_taxper partner_activity_detail.taxper%type, 
+  v_bonus_tax partner_activity_detail.bonus_tax%type,
+  v_createdby partner_activity.createdby%type
+  ) return number;
+  
+  function fn_UpdatePartnerActivityDetail (
+  v_row_id partner_activity_detail.row_id%type, 
+  v_master_row partner_activity_detail.master_row%type, 
+  v_dest_role_id partner_activity_detail.dest_role_id%type, 
+  v_check_bal partner_activity_detail.check_bal%type, 
+  v_max_value partner_activity_detail.max_value%type, 
+  v_min_value partner_activity_detail.min_value%type, 
+  v_bonus_per partner_activity_detail.bonus_per%type, 
+  v_taxper partner_activity_detail.taxper%type, 
+  v_bonus_tax partner_activity_detail.bonus_tax%type,
+  v_createdby partner_activity.createdby%type
+  ) return number;
+end pk_Settings;
+/
+
+prompt
+prompt Creating package PK_UTILITY
+prompt ===========================
+prompt
+create or replace package vtu.pk_Utility is
+
+  -- Author  : MBESHR
+  -- Created : 28/11/2020 17:16:31 17:16:31 
+  -- Purpose : 
+  
+procedure sp_Create_Audit(
+v_partner_id    data_audit.partner_id%type,
+v_act_id        data_audit.act_id%type,
+v_action_id     data_audit.action_id%type,
+v_note          data_audit.note%type,
+v_old_value     data_audit.old_value%type,
+v_new_value     data_audit.new_value%type,
+v_system_note   data_audit.system_note%type,
+v_error         data_audit.error%type,
+v_success       data_audit.success%type
+) ;
+
+
+end pk_Utility;
+/
+
+prompt
+prompt Creating procedure SP_ADD_EXCEPTION
+prompt ===================================
+prompt
+create or replace procedure vtu.sp_add_exception(
+ v_exp_code operation_exception.exp_code%type,
+ v_exp_message operation_exception.exp_message%type, 
+ v_exp_operation operation_exception.exp_operation%type,
+ v_exp_object operation_exception.exp_object%type
+) is
+begin
+  insert into operation_exception
+  (exp_code, exp_message, exp_date, exp_operation, exp_object)
+ values
+  (v_exp_code, v_exp_message, sysdate, v_exp_operation, v_exp_object);
+end sp_add_exception;
+/
+
+prompt
+prompt Creating package body PK_FINANCIAL
+prompt ==================================
+prompt
+create or replace package body vtu.pk_financial is
+
+function fn_MoneyTransfer (
+  
+  v_part_id money_transfer.part_id%type,
+  v_pay_type money_transfer.pay_type%type,
+  v_pay_no money_transfer.pay_no%type,
+  v_pay_date money_transfer.pay_date%type,
+  v_bank_name money_transfer.bank_name%type,
+  v_createdby money_transfer.createdby%type,
+  v_access_channel money_transfer.access_channel%type,
+  v_amount money_transfer.amount%type,
+  v_bill_no money_transfer.bill_no%type,
+  v_request_no money_transfer.request_no%type,
+  v_request_amt money_transfer.request_amt%type,
+  v_note money_transfer.note%type
+  
+  ) return number is
+  
+    v_trans_id money_transfer.trans_id%TYPE;
+    v_part_bal money_transfer.part_bal%TYPE;
+    v_part_role_id money_transfer.part_role_id%TYPE;
+    v_creator_bal money_transfer.creator_bal%TYPE;
+    v_creator_role_id money_transfer.creator_role_id%TYPE;
+    v_net_amount money_transfer.net_amount%TYPE;
+    v_tax_per money_transfer.tax_per%TYPE;
+    v_tax_amt money_transfer.tax_amt%TYPE;
+    v_bonus_per money_transfer.bonus_per%TYPE;
+    v_bonus_amt money_transfer.bonus_amt%TYPE;
+    v_bonus_tax money_transfer.bonus_tax%TYPE;
+    v_bonus_tax_amt money_transfer.bonus_tax_amt%TYPE;
+    v_received_amt money_transfer.received_amt%TYPE;
+    v_Min_Value partner_activity.min_value%TYPE;
+    v_Max_Value partner_activity.max_value%TYPE;
+    v_check_bal partner_activity.check_bal%TYPE;
+    v_partnerActivityFound number := 0;
+   
+
+  
+  BEGIN
+     --SET AUTOCOMMIT OFF;
+      
+     select  (partner.balance - partner.reserved) into v_part_bal  from partner where partner_id = v_part_id;
+     select  (partner.balance - partner.reserved) into v_creator_bal from partner where partner_id = v_createdby;
+     select partner.roleid into v_part_role_id from partner where partner_id = v_part_id;
+     select partner.roleid into v_creator_role_id from partner where partner_id =v_createdby;
+     
+     
+         
+     select nvl(count(*),0) into v_partnerActivityFound from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     
+     select nvl(taxper,0) into v_tax_per from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_per,0) into v_bonus_per from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_tax,0) into v_bonus_tax from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Min_Value,0) into v_Min_Value from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Max_Value,0) into v_Max_Value from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(check_bal,0) into v_check_bal from partner_activity where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     
+ 
+     
+     if (v_partnerActivityFound = 0) then
+       begin
+           --message := 'no setting defined';
+          return -500;
+       end;
+      end if;  
+       
+      -- check creator balance
+     if (v_check_bal = 1 and v_amount > v_creator_bal) then
+       begin
+           --message := 'balance not enough';
+          return -501;
+        end ;
+     end if;   
+      
+       if (v_Min_Value > v_amount) then
+       begin
+           --message := 'Amount less than minimum';
+           return -502;
+       end;
+        end if;  
+      
+      if (v_Max_Value < v_amount) then
+       begin
+           --message := 'Amount more than maximum';
+           return -503;
+       end;
+        end if;  
+       
+        v_net_amount := v_amount / ((v_tax_per / 100) +1);
+        v_tax_amt :=  v_net_amount * (v_tax_per / 100);
+        v_bonus_amt := v_net_amount * (v_bonus_per / 100);
+        v_bonus_tax_amt := v_bonus_amt * (v_bonus_tax / 100);
+        v_received_amt := (v_amount -  v_bonus_amt + v_bonus_tax_amt);
+    
+    v_trans_id := seq_money_transfer_id.nextval();
+    insert into money_transfer
+      (trans_id, part_id, part_role_id, part_bal, pay_type, pay_no, pay_date, bank_name, createdby, createdon
+      , access_channel, amount, tax_per, tax_amt, bonus_per, bonus_amt, bonus_tax, bonus_tax_amt, received_amt
+      , net_amount, bill_no, request_no, request_amt, note, adjusted, adjust_id, creator_bal, creator_role_id)
+    values
+      (v_trans_id, v_part_id, v_part_role_id, v_part_bal, v_pay_type, v_pay_no, v_pay_date, v_bank_name, v_createdby
+      , sysdate, v_access_channel, v_amount, v_tax_per, v_tax_amt, v_bonus_per, v_bonus_amt, v_bonus_tax, v_bonus_tax_amt
+      , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal, v_creator_role_id);
+    
+     update partner set balance = balance + v_amount where partner_id = v_part_id;
+     
+     if (v_check_bal = 1) then
+         update partner set balance = balance - v_amount where partner_id = v_createdby;
+     end if;
+     commit;
+     --message := 'success';
+     return v_trans_id;
+  
+  EXCEPTION
+
+      WHEN OTHERS THEN
+         Rollback;
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Money-Transfer',
+                 v_exp_object => 'Money-Transfer');
+
+         return SQLCODE;
+  END;
+
+
+
+END pk_financial;
+/
+
+prompt
+prompt Creating package body PK_INFRA
+prompt ==============================
+prompt
+create or replace package body vtu.pk_infra is
+
+  
+function fn_CreatePartner (
+v_partner_id                partner.partner_id%type, 
+v_partner_name              partner.partner_name%type,
+v_brandname                 partner.brandname%type,
+v_roleid                    partner.roleid%type, 
+v_id_no                     partner.id_no%type, 
+v_id_type                   partner.id_type%type, 
+v_id_place                  partner.id_place%type,
+v_id_issued                 partner.id_issued%type, 
+v_createdby                 partner.createdby%type, 
+v_cityid                    partner.cityid%type, 
+v_districtid                partner.districtid%type, 
+v_street                    partner.street%type, 
+v_zone                      partner.zone%type, 
+v_extra_address             partner.extra_address%type, 
+v_pair_mobile               partner.pair_mobile%type, 
+v_mobile                    partner.mobile%type, 
+v_fixed                     partner.fixed%type, 
+v_fax                       partner.fax%type, 
+v_email                     partner.email%type, 
+v_pwd                       partner.pwd%type, 
+v_extra                     partner.extra%type, 
+v_ip_address                partner.ip_address%type
+   
+  ) return number is
+  
+    v_partner_acc               partner.partner_acc%type;
+    v_Id_exists   number := 0;
+  BEGIN
+    
+     select nvl(count(*),0) into v_Id_exists from partner where partner_id = v_partner_id and status = 1;
+     
+     if (v_Id_exists > 0) then
+       begin
+           --message := 'Duplicated';
+          return -504;
+       end;
+      end if;  
+  
+     v_partner_acc := seq_partner_acc.nextval() + 1000;
+     
+    insert into partner
+       (partner_id, partner_name, brandname, balance, reserved, verificationcodenext, locktime, roleid, id_no, id_type, id_place
+       , id_issued, status, statuson, statusby, createdon, createdby, cityid, districtid, street, zone, extra_address, pair_mobile, mobile
+       , fixed, fax, email, pwd, extra, wrong_pwd_attempts, last_login, ip_address, partner_acc)
+   values
+      (v_partner_id, v_partner_name, v_brandname, 0, 0, 1, null, v_roleid, v_id_no, v_id_type, v_id_place
+       , v_id_issued, 1, sysdate, v_createdby, sysdate, v_createdby, v_cityid, v_districtid, v_street, v_zone, v_extra_address, v_pair_mobile, v_mobile
+       , v_fixed, v_fax, v_email, v_pwd, v_extra, 0, null, v_ip_address, v_partner_acc);
+       
+       return v_partner_acc;
+       
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Partner');
+         return SQLCODE;
+  END;
+
+function fn_UpdatePartner (
+v_partner_name              partner.partner_name%type,
+v_brandname                 partner.brandname%type,
+v_roleid                    partner.roleid%type, 
+v_id_no                     partner.id_no%type, 
+v_id_type                   partner.id_type%type, 
+v_id_place                  partner.id_place%type,
+v_id_issued                 partner.id_issued%type, 
+v_createdby                 partner.createdby%type, 
+v_cityid                    partner.cityid%type, 
+v_districtid                partner.districtid%type, 
+v_street                    partner.street%type, 
+v_zone                      partner.zone%type, 
+v_extra_address             partner.extra_address%type, 
+v_pair_mobile               partner.pair_mobile%type, 
+v_mobile                    partner.mobile%type, 
+v_fixed                     partner.fixed%type, 
+v_fax                       partner.fax%type, 
+v_email                     partner.email%type, 
+v_ip_address                partner.ip_address%type,
+v_partner_acc               partner.partner_acc%type
+   
+  ) return number is
+  
+    v_Id_exists   number := 0;
+    v_old_role_id partner.roleid%type;
+  BEGIN
+    
+     select nvl(count(*),0) into v_Id_exists from partner where partner_acc = v_partner_acc and status = 1;
+     select roleid into v_old_role_id from partner where partner_acc = v_partner_acc and status = 1;
+     
+     if (v_Id_exists = 0 or v_old_role_id = 0 or v_old_role_id is null) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+    if (v_old_role_id <>  v_roleid) then
+      begin
+         --message := 'Not All';
+          return -505;
+       end;
+       end if;
+ 
+
+update partner
+   set  partner_name = v_partner_name,
+       brandname = v_brandname,
+       roleid = v_roleid,
+       id_no = v_id_no,
+       id_type = v_id_type,
+       id_place = v_id_place,
+       id_issued = v_id_issued,
+       cityid = v_cityid,
+       districtid = v_districtid,
+       street = v_street,
+       zone = v_zone,
+       extra_address = v_extra_address,
+       pair_mobile = v_pair_mobile,
+       mobile = v_mobile,
+       fixed = v_fixed,
+       fax = v_fax,
+       email = v_email,
+       ip_address = v_ip_address
+ where partner_acc = v_partner_acc;     
+       return 1;
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Partner');
+         return SQLCODE;
+  END;
+
+
+end pk_infra;
+/
+
+prompt
+prompt Creating package body PK_SETTINGS
+prompt =================================
+prompt
+create or replace package body vtu.pk_Settings is
+
+function fn_CreatePartnerActivity (
+  v_act_id partner_activity.act_id%type, 
+  v_fromroleid partner_activity.fromroleid%type, 
+  v_queryduration partner_activity.queryduration%type, 
+  v_act_scope partner_activity.act_scope%type, 
+  v_maxrec partner_activity.maxrec%type, 
+  v_onlypartchildren partner_activity.onlypartchildren%type, 
+  v_createdby partner_activity.createdby%type
+  ) return number is
+  v_row_id partner_activity.row_id%type;
+  BEGIN
+     v_row_id := seq_partner_acivity_rowid.nextval();
+     insert into partner_activity
+       (row_id, act_id, fromroleid, queryduration, act_scope, maxrec, onlypartchildren, createdon, createdby, lastediton)
+    values
+       (v_row_id, v_act_id, v_fromroleid, v_queryduration, v_act_scope, v_maxrec, v_onlypartchildren, sysdate, v_createdby, sysdate);
+       return v_row_id;
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Partner Activity');
+         return SQLCODE;
+  END;
+  
+  function fn_UpdatePartnerActivity (
+    v_row_id partner_activity.row_id%type,
+    v_act_id partner_activity.act_id%type, 
+    v_fromroleid partner_activity.fromroleid%type, 
+    v_queryduration partner_activity.queryduration%type, 
+    v_act_scope partner_activity.act_scope%type, 
+    v_maxrec partner_activity.maxrec%type, 
+    v_onlypartchildren partner_activity.onlypartchildren%type
+  ) return number is
+
+  BEGIN
+     update partner_activity
+   set   act_id = v_act_id,
+       fromroleid = v_fromroleid,
+       queryduration = v_queryduration,
+       act_scope = v_act_scope,
+       maxrec = v_maxrec,
+       onlypartchildren = v_onlypartchildren,
+       lastediton = sysdate
+ where row_id = v_row_id;
+       return 1;
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Update',
+                 v_exp_object => 'Partner Activity');
+         return SQLCODE;
+  END;
+  
+function fn_CreatePartnerActivityDetail (
+  v_master_row partner_activity_detail.master_row%type, 
+  v_dest_role_id partner_activity_detail.dest_role_id%type, 
+  v_check_bal partner_activity_detail.check_bal%type, 
+  v_max_value partner_activity_detail.max_value%type, 
+  v_min_value partner_activity_detail.min_value%type, 
+  v_bonus_per partner_activity_detail.bonus_per%type, 
+  v_taxper partner_activity_detail.taxper%type, 
+  v_bonus_tax partner_activity_detail.bonus_tax%type,
+  v_createdby partner_activity.createdby%type
+  ) return number is
+  v_row_id partner_activity.row_id%type;
+  BEGIN
+     select nvl(max(row_id),0) + 1 into v_row_id from partner_activity_detail where master_row = v_master_row;
+     insert into partner_activity_detail
+  (row_id, master_row, dest_role_id, check_bal, max_value, min_value, bonus_per, taxper, bonus_tax, createdon, createdby, lastediton)
+values
+  (v_row_id, v_master_row, v_dest_role_id, v_check_bal, v_max_value, v_min_value, v_bonus_per, v_taxper, v_bonus_tax, sysdate, v_createdby, sysdate);
+
+       return v_row_id;
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Partner Activity Detail');
+         return SQLCODE;
+  END;  
+
+function fn_UpdatePartnerActivityDetail (
+  v_row_id partner_activity_detail.row_id%type, 
+  v_master_row partner_activity_detail.master_row%type, 
+  v_dest_role_id partner_activity_detail.dest_role_id%type, 
+  v_check_bal partner_activity_detail.check_bal%type, 
+  v_max_value partner_activity_detail.max_value%type, 
+  v_min_value partner_activity_detail.min_value%type, 
+  v_bonus_per partner_activity_detail.bonus_per%type, 
+  v_taxper partner_activity_detail.taxper%type, 
+  v_bonus_tax partner_activity_detail.bonus_tax%type,
+  v_createdby partner_activity.createdby%type
+  ) return number is
+  BEGIN  
+       update partner_activity_detail
+          set
+            check_bal = v_check_bal,
+            max_value = v_max_value,
+            min_value = v_min_value,
+            bonus_per = v_bonus_per,
+            taxper = v_taxper,
+            bonus_tax = v_bonus_tax,
+            lastediton = sysdate
+          where row_id = v_row_id and master_row = v_master_row;
+       return 1;
+EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Update',
+                 v_exp_object => 'Partner Activity Detail');
+         return SQLCODE;
+  END;  
+  
+end pk_Settings;
+/
+
+prompt
+prompt Creating package body PK_UTILITY
+prompt ================================
+prompt
+create or replace package body vtu.pk_Utility is
+
+ procedure sp_Create_Audit(
+v_partner_id    data_audit.partner_id%type,
+v_act_id        data_audit.act_id%type,
+v_action_id     data_audit.action_id%type,
+v_note          data_audit.note%type,
+v_old_value     data_audit.old_value%type,
+v_new_value     data_audit.new_value%type,
+v_system_note   data_audit.system_note%type,
+v_error         data_audit.error%type,
+v_success       data_audit.success%type
+) is
+begin
+ insert into data_audit
+  (partner_id, createdon, act_id, action_id, note, old_value, new_value, system_note, error, success)
+values
+  (v_partner_id, sysdate, v_act_id, v_action_id, v_note, v_old_value, v_new_value, v_system_note, v_error, v_success);
+end sp_Create_Audit;
+
+
+end pk_Utility;
+/
+
+prompt
+prompt Creating trigger TR_CITY_BI
+prompt ===========================
+prompt
+create or replace trigger vtu.TR_City_BI
+  before insert
+  on City 
+  for each row
+declare
+  -- local variables here
+begin
+  :NEW.CityId := SEQ_City_ID.Nextval();
+end TR_City_BI;
+/
+
+prompt
+prompt Creating trigger TR_DATA_AUDIT_BI
+prompt =================================
+prompt
+create or replace trigger vtu.TR_data_audit_BI
+  before insert
+  on  data_audit
+  for each row
+declare
+  -- local variables here
+begin
+  :NEW.row_id := seq_data_audit_id.Nextval();
+end TR_data_audit_BI;
+/
+
+prompt
+prompt Creating trigger TR_DISTRICT_BI
+prompt ===============================
+prompt
+create or replace trigger vtu.TR_District_BI
+  before insert
+  on District
+  for each row
+declare
+  -- local variables here
+begin
+  :NEW.DisId := SEQ_District_ID.Nextval();
+end TR_District_BI;
+/
+
+prompt
+prompt Creating trigger TR_OPERATION_EXCEPTION_BI
+prompt ==========================================
+prompt
+create or replace trigger vtu.TR_operation_exception_BI
+
+  before insert
+  on operation_exception 
+  for each row
+declare
+  -- local variables here
+begin
+  :NEW.exp_id := seq_exception_id.Nextval();
+end TR_operation_exception_BI;
+/
+
+prompt
+prompt Creating trigger TR_ROLE_BI
+prompt ===========================
+prompt
+create or replace trigger vtu.TR_Role_BI
+  before insert
+  on AppRole 
+  for each row
+declare
+  -- local variables here
+begin
+  :NEW.RoleId := SEQ_ROLE_ID.Nextval();
+end TR_Role_BI;
+/
+
+
+spool off

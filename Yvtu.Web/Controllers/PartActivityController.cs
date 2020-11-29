@@ -35,11 +35,9 @@ namespace Yvtu.Web.Controllers
         {
           
              var  model = new ListPartnerActivityDto();
-            
 
-            model.Activities =  new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
+            model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
             model.FromRoles =  new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
-            model.ToRoles =  new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
 
             return View(model);
         }
@@ -54,10 +52,9 @@ namespace Yvtu.Web.Controllers
 
             model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
             model.FromRoles = new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
-            model.ToRoles = new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
 
-            if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0 && model.ToRoleId == 0)
-            {
+            if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0 )
+            { 
                 var result = _partActRepo.GetAllList();
                 model.PartnerActivities = result;
             }
@@ -74,7 +71,7 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var model = new CreatePartnerActivityDto();
+            var model = new CreatePartnerActivity2Dto();
             var result = _partActRepo.GetPartAct(id);
             if (result != null)
             {
@@ -82,14 +79,6 @@ namespace Yvtu.Web.Controllers
                 model.ActivityId = result.Activity.Id;
                 model.FromRole = result.FromRole;
                 model.FromRoleId = result.FromRole.Id;
-                model.ToRole = result.ToRole;
-                model.ToRoleId = result.ToRole.Id;
-                model.CheckBalanceRequired = result.CheckBalanceRequired;
-                model.MaxValue = result.MaxValue;
-                model.MinValue = result.MinValue;
-                model.TaxPercent = result.TaxPercent;
-                model.BonusPercent = result.BonusPercent;
-                model.BonusTaxPercent = result.BonusTaxPercent;
                 model.MaxQueryDurationId = result.MaxQueryDuration.Id;
                 model.MaxQueryRowsNo = result.MaxQueryRows;
                 model.ScopeId = result.Scope.Id;
@@ -97,13 +86,11 @@ namespace Yvtu.Web.Controllers
 
             }
             var fromRoles = new RoleRepo(db).GetRoles();
-            var toRoles = new RoleRepo(db).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
             model.FromRoles = fromRoles;
-            model.ToRoles = toRoles;
             model.Activities = activities;
             model.MaxQueryDuration = maxQueryDuration;
             model.Scopes = scopes;
@@ -111,7 +98,7 @@ namespace Yvtu.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(CreatePartnerActivityDto model)
+        public IActionResult Edit(CreatePartnerActivity2Dto model)
         {
             if (ModelState.IsValid)
             {
@@ -122,19 +109,12 @@ namespace Yvtu.Web.Controllers
                 pAct.Id = model.Id;
                 pAct.Activity.Id = model.ActivityId;
                 pAct.FromRole.Id = model.FromRoleId ?? 0;
-                pAct.ToRole.Id = model.ToRoleId ?? 0;
-                pAct.CheckBalanceRequired = model.CheckBalanceRequired;
-                pAct.MaxValue = model.MaxValue;
-                pAct.MinValue = model.MinValue;
-                pAct.BonusPercent = model.BonusPercent;
-                pAct.TaxPercent = model.TaxPercent;
-                pAct.BonusTaxPercent = model.BonusTaxPercent;
                 pAct.MaxQueryRows = model.MaxQueryRowsNo;
                 pAct.MaxQueryDuration.Id = model.MaxQueryDurationId;
                 pAct.Scope.Id = model.ScopeId;
                 pAct.OnlyPartnerChildren = model.OnlyPartnerChildren;
                 pAct.LastEditOn = DateTime.Now;
-                var result = await _partActRepo.EditAsync(pAct);
+                var result =  _partActRepo.Edit(pAct);
                 if (result.Success)
                 {
                     var audit = new DataAudit();
@@ -144,7 +124,7 @@ namespace Yvtu.Web.Controllers
                     audit.Success = true;
                     audit.OldValue = old.ToString();
                     audit.NewValue = pAct.ToString();
-                    await _auditing.CreateAsync(audit);
+                     _auditing.Create(audit);
                     return RedirectToAction("Index");
                 }
                 else
@@ -153,19 +133,17 @@ namespace Yvtu.Web.Controllers
                 }
             }
             var fromRoles = new RoleRepo(db).GetRoles();
-            var toRoles = new RoleRepo(db).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
             model.FromRoles = fromRoles;
-            model.ToRoles = toRoles;
             model.Activities = activities;
             model.MaxQueryDuration = maxQueryDuration;
             model.Scopes = scopes;
             return View(model);
         }
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
             var old = _partActRepo.GetPartAct(id);
             if (old != null)
@@ -176,7 +154,7 @@ namespace Yvtu.Web.Controllers
                 audit.Action.Id = "Delete";
                 audit.Success = true;
                 audit.OldValue = old.ToString();
-                await _auditing.CreateAsync(audit);
+                 _auditing.Create(audit);
                 _partActRepo.Delete(id);
             }
             return RedirectToAction("Index");
@@ -199,32 +177,53 @@ namespace Yvtu.Web.Controllers
 
             return View(model);
         }
-        [HttpPost]
-        public async Task<IActionResult> Create(CreatePartnerActivityDto model)
-        {
 
+        [HttpGet]
+        public IActionResult CreateRule()
+        {
+            var model = new CreatePartnerActivity2Dto();
+            var detailModel = new List<CreatePartnerActivityDetailDto>();
+            var fromRoles = new RoleRepo(db).GetRoles();
+            var toRoles = new RoleRepo(db).GetRoles();
+            var activities = new ActivityRepo(db).GetActivities();
+            var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
+            var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
+
+            model.FromRoles = fromRoles;
+            //detailModel.ToRoles = toRoles;
+            model.Activities = activities;
+            model.MaxQueryDuration = maxQueryDuration;
+            model.Scopes = scopes;
+            model.Details = detailModel;
+
+            ViewBag.Details = new CreatePartnerActivityDetailDto
+            {
+                ToRoles = new RoleRepo(db).GetRoles()
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult CreateRule(CreatePartnerActivity2Dto model)
+        {
             if (ModelState.IsValid)
             {
                 var pAct = new PartnerActivity();
                 pAct.Activity.Id = model.ActivityId;
                 pAct.FromRole.Id = model.FromRoleId ?? 0;
-                pAct.ToRole.Id = model.ToRoleId ?? 0 ;
-                pAct.CheckBalanceRequired = model.CheckBalanceRequired;
-                pAct.MaxValue = model.MaxValue;
-                pAct.MinValue = model.MinValue;
-                pAct.BonusPercent = model.BonusPercent;
-                pAct.TaxPercent = model.TaxPercent;
-                pAct.BonusTaxPercent = model.BonusTaxPercent;
                 pAct.MaxQueryRows = model.MaxQueryRowsNo;
                 pAct.MaxQueryDuration.Id = model.MaxQueryDurationId;
                 pAct.Scope.Id = model.ScopeId;
                 pAct.OnlyPartnerChildren = model.OnlyPartnerChildren;
                 pAct.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
 
-                var result = await _partActRepo.CreateAsync(pAct);
+                var result =  _partActRepo.Create(pAct);
                 if (result.Success)
                 {
-                    return RedirectToAction("Index");
+                    var listModel = new ListPartnerActivityDto();
+                    listModel.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
+                    listModel.FromRoles = new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
+                    return View("Index", listModel);
                 }
                 else
                 {
@@ -233,13 +232,11 @@ namespace Yvtu.Web.Controllers
             }
 
             var fromRoles = new RoleRepo(db).GetRoles();
-            var toRoles = new RoleRepo(db).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
             model.FromRoles = fromRoles;
-            model.ToRoles = toRoles;
             model.Activities = activities;
             model.MaxQueryDuration = maxQueryDuration;
             model.Scopes = scopes;
@@ -252,6 +249,48 @@ namespace Yvtu.Web.Controllers
             var result =  _partActRepo.GetPartAct(id);
 
             return View(result);
+        }
+
+        [HttpGet]
+        public IActionResult AddDetail(int id)
+        {
+            var masterModel = _partActRepo.GetPartAct(id);
+            if (masterModel == null) return null;
+            var toRoles = new RoleRepo(db).GetRoles();
+            var model = new CreatePartnerActivityDetailDto
+            {
+                ParentId = masterModel.Id,
+                ActivityId = masterModel.Activity.Id,
+                ActivityName = masterModel.Activity.Name,
+                FromRoleId = masterModel.FromRole.Id,
+                FromRoleName = masterModel.FromRole.Name,
+                ToRoles = toRoles
+            };
+
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult AddDetail(CreatePartnerActivityDetailDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var masterModel = _partActRepo.GetPartAct(model.ParentId);
+                if (masterModel == null) return null;
+                var originObject = new PartnerActivityDetail();
+                originObject.ParentId = model.ParentId;
+                originObject.ToRole.Id = model.ToRoleId;
+                originObject.CheckBalanceRequired = model.CheckBalanceRequired;
+                originObject.MinValue = model.MinValue;
+                originObject.MaxValue = model.MaxValue;
+                originObject.TaxPercent = model.TaxPercent;
+                originObject.BonusPercent = model.BonusPercent;
+                originObject.BonusTaxPercent = model.BonusTaxPercent;
+                originObject.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                var result = _partActRepo.CreateDetail(originObject);
+                return RedirectToAction("Detail", new { id = model.ParentId } );
+            }
+            model.ToRoles = new RoleRepo(db).GetRoles();
+            return View(model);
         }
     }
 }

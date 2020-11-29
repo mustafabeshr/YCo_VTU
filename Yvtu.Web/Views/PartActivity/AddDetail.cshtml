@@ -1,0 +1,107 @@
+﻿@model Yvtu.Web.Dto.CreatePartnerActivityDetailDto
+
+@{
+    ViewData["Title"] = "Create Rule Detail";
+}
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تعريف تفاصيل الصلاحية</p>
+        </div>
+
+        <form method="post">
+            @Html.HiddenFor(m => m.ParentId)
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
+            <div class="col-12 text-center">
+                <table class="table  text-center bg-white">
+                    <tbody>
+                        <tr style="border-bottom:solid 1px #EDF0F2;">
+                            <td class="DetailLabel" style="border:none;">رقم الاعداد</td>
+                            <td style="border:none;font-size:24px;font-weight:bold;">@Model.ParentId</td>
+                            <td class="DetailLabel" style="border:none;"> الاجراء</td>
+                            <td style="border:none;">@Model.ActivityName</td>
+                            <td class="DetailLabel" style="border:none;">من النوع</td>
+                            <td style="border:none;">@Model.FromRoleName</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="form-group col-12">
+                <label asp-for="ToRoleId" class="FormLabel">النوع المستفيد :</label>
+                <select asp-for="ToRoleId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
+                        asp-items="@(new SelectList(Model.ToRoles,"Id","Name"))">
+                    <option></option>
+                </select>
+                <span asp-validation-for="ToRoleId" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12">
+                <input asp-for="CheckBalanceRequired" checked type="checkbox" />
+                <label asp-for="CheckBalanceRequired" class="FormLabel">فحص الرصيد؟</label>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label asp-for="MinValue" class="FormLabel">أقل مبلغ :</label>
+                    <input id="txtMinValue" asp-for="MinValue" class="form-control RequiredInput" />
+                    <span asp-validation-for="MinValue" class="text-danger"></span>
+                </div>
+                <div class="form-group col-8">
+                    <label asp-for="MinValue" class="FormLabel">&nbsp;</label>
+                    <input id="lblMinValueName" readonly class="form-control" style="font-size:16px;font-weight:bold;color:darkslateblue;" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-4">
+                    <label asp-for="MaxValue" class="FormLabel">أكبر مبلغ :</label>
+                    <input id="txtMaxValue"  asp-for="MaxValue" class="form-control RequiredInput" />
+                    <span asp-validation-for="MaxValue" class="text-danger"></span>
+                </div>
+                <div class="form-group col-8">
+                    <label asp-for="MaxValue" class="FormLabel">&nbsp;</label>
+                    <input id="lblMaxValueName" readonly class="form-control" style="font-size:16px;font-weight:bold;color:darkslateblue;" />
+                </div>
+            </div>
+                <div class="form-group col-12">
+                    <label asp-for="TaxPercent" class="FormLabel">نسبة الضريبة % :</label>
+                    <input asp-for="TaxPercent" class="form-control RequiredInput" />
+                    <span asp-validation-for="TaxPercent" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12">
+                    <label asp-for="BonusPercent" class="FormLabel">نسبة العمولة % :</label>
+                    <input asp-for="BonusPercent" class="form-control RequiredInput" />
+                    <span asp-validation-for="BonusPercent" class="text-danger"></span>
+                </div>
+                <div class="form-group col-12">
+                    <label asp-for="BonusTaxPercent" class="FormLabel">نسبة ضريبة العمولة % :</label>
+                    <input asp-for="BonusTaxPercent" class="form-control RequiredInput" />
+                    <span asp-validation-for="BonusTaxPercent" class="text-danger"></span>
+                </div>
+                <button type="submit" class="btn btn-outline-success"
+                        style="width:100%;border-radius:10px;">
+                    <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                </button>
+        </form>
+    </div>
+</div>
+@section Scripts
+{
+    <script src="~/js/Tafqeet.js"></script>
+    <script>
+        $("#txtMinValue").on("input", function (e) {
+            var input = $(this);
+            var val = input.val();
+            document.getElementById('lblMinValueName').value = tafqeet(val);
+        });
+
+        $("#txtMaxValue").on("input", function (e) {
+            var input = $(this);
+            var val = input.val();
+            document.getElementById('lblMaxValueName').value = tafqeet(val);
+        });
+    </script>
+}

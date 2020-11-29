@@ -44,7 +44,8 @@
                             var part = UserManager.Validate(currentPartnerId).Partner;
                             currentPartnerBalance = (part.Balance - part.Reserved);
                             currentPartnerRoleName = part.Role.Name;
-                        <p><i class="fas fa-dollar-sign" style="font-size:12px;"></i>&nbsp;@currentPartnerBalance.ToString("N0")</p>
+                        <p>@*<i class="fas fa-dollar-sign" style="font-size:12px;"></i>*@@currentPartnerBalance.ToString("N0")
+                            <span style="font-size:12px;">ر.ي</span></p>
                             }
                     </div>
                     <div style="display:block;text-align:center;">

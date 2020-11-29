@@ -27,26 +27,16 @@ namespace Yvtu.Infra.Data
             return db.ExecuteSqlCommand("Delete from Partner_Activity Where Row_Id=:Row_Id", parameters) > 0;
         }
 
-        public async Task<OpertionResult> CreateAsync(PartnerActivity partnerActivity)
+        public OpertionResult Create(PartnerActivity partnerActivity)
         {
-            var insertSql = "insert into partner_activity " +
-                "   ( act_id, fromroleid, toroleid, check_bal, max_value, min_value, bonus_per " +
-                "   , taxper, bonus_tax, queryduration, act_scope, maxrec, onlypartchildren, createdon, createdby, lastediton) values " +
-                "(:v_act_id, :v_fromroleid, :v_toroleid, :v_check_bal, :v_max_value, :v_min_value, :v_bonus_per " +
-                "  , :v_taxper, :v_bonus_tax, :v_queryduration, :v_act_scope, :v_maxrec, :v_onlypartchildren, sysdate, :v_createdby, sysdate) ";
+            
             try
             {
                 #region Parameters
                 var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_act_id", OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.Activity.Id },
                  new OracleParameter{ ParameterName = "v_fromroleid",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.FromRole.Id },
-                 new OracleParameter{ ParameterName = "v_toroleid",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.ToRole.Id },
-                 new OracleParameter{ ParameterName = "v_check_bal",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.CheckBalanceRequired ? 1 : 0 },
-                 new OracleParameter{ ParameterName = "v_max_value",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MaxValue },
-                 new OracleParameter{ ParameterName = "v_min_value",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MinValue },
-                 new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.BonusPercent },
-                 new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.TaxPercent },
-                 new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.BonusTaxPercent },
                  new OracleParameter{ ParameterName = "v_queryduration",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.MaxQueryDuration.Id },
                  new OracleParameter{ ParameterName = "v_act_scope",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.Scope.Id },
                  new OracleParameter{ ParameterName = "v_maxrec",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MaxQueryRows },
@@ -54,7 +44,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.CreatedBy.Id }
                 };
                 #endregion
-                var result = await db.ExecuteSqlCommandAsync(insertSql, parameters);
+                 db.ExecuteStoredProc("pk_Settings.fn_CreatePartnerActivity", parameters);
+                var result =  int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)
                 {
@@ -70,34 +61,25 @@ namespace Yvtu.Infra.Data
                 return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
             }
         }
-        public async Task<OpertionResult> EditAsync(PartnerActivity partnerActivity)
+        public  OpertionResult Edit(PartnerActivity partnerActivity)
         {
-            var updateSql = "update partner_activity " +
-                "   set   act_id = :v_act_id, fromroleid = :v_fromroleid, toroleid = :v_toroleid, check_bal = :v_check_bal, max_value = :v_max_value, " +
-                "   min_value = :v_min_value, bonus_per = :v_bonus_per, taxper = :v_taxper, bonus_tax = :v_bonus_tax, queryduration = :v_queryduration, " +
-                "act_scope = :v_act_scope, maxrec = :v_maxrec, onlypartchildren = :v_onlypartchildren, lastediton = sysdate " +
-                "  where row_id = :v_row_id ";
+            
             try
             {
                 #region Parameters
                 var parameters = new List<OracleParameter> {
+                new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                new OracleParameter{ ParameterName = "v_row_id", OracleDbType = OracleDbType.Int32,  Value = partnerActivity.Id },
                  new OracleParameter{ ParameterName = "v_act_id", OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.Activity.Id },
                  new OracleParameter{ ParameterName = "v_fromroleid",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.FromRole.Id },
-                 new OracleParameter{ ParameterName = "v_toroleid",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.ToRole.Id },
-                 new OracleParameter{ ParameterName = "v_check_bal",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.CheckBalanceRequired ? 1 : 0 },
-                 new OracleParameter{ ParameterName = "v_max_value",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MaxValue },
-                 new OracleParameter{ ParameterName = "v_min_value",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MinValue },
-                 new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.BonusPercent },
-                 new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.TaxPercent },
-                 new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = partnerActivity.BonusTaxPercent },
                  new OracleParameter{ ParameterName = "v_queryduration",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.MaxQueryDuration.Id },
                  new OracleParameter{ ParameterName = "v_act_scope",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.Scope.Id },
                  new OracleParameter{ ParameterName = "v_maxrec",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MaxQueryRows },
-                 new OracleParameter{ ParameterName = "v_onlypartchildren",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.OnlyPartnerChildren ? 1 : 0 },
-                 new OracleParameter{ ParameterName = "v_row_id",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.Id }
+                 new OracleParameter{ ParameterName = "v_onlypartchildren",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.OnlyPartnerChildren ? 1 : 0 }
                 };
                 #endregion
-                var result = await db.ExecuteSqlCommandAsync(updateSql, parameters);
+                 db.ExecuteFunction("pk_settings.fn_updatepartneractivity", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)
                 {
@@ -139,19 +121,6 @@ namespace Yvtu.Infra.Data
                     partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
                     partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
 
-                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? int.MinValue : int.Parse(row["toroleid"].ToString());
-                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
-                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
-                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
-                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
-                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
-
-                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? false : row["check_bal"].ToString() == "1" ? true : false;
-                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
-                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
-                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
-                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
                     partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
                     partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
                     partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
@@ -162,6 +131,7 @@ namespace Yvtu.Infra.Data
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                    partAct.Details = GetDetails(partAct.Id);
 
                     activities.Add(partAct);
                 }
@@ -197,19 +167,6 @@ namespace Yvtu.Infra.Data
                     partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
                     partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
 
-                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? int.MinValue : int.Parse(row["toroleid"].ToString());
-                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
-                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
-                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
-                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
-                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
-
-                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? false : row["check_bal"].ToString() == "1" ? true : false;
-                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
-                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
-                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
-                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
                     partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
                     partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
                     partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
@@ -220,6 +177,7 @@ namespace Yvtu.Infra.Data
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                    partAct.Details = GetDetails(partAct.Id);
 
                     activities.Add(partAct);
                 }
@@ -256,19 +214,6 @@ namespace Yvtu.Infra.Data
                     partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
                     partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
 
-                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? int.MinValue : int.Parse(row["toroleid"].ToString());
-                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
-                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
-                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
-                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
-                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
-
-                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? false : row["check_bal"].ToString() == "1" ? true : false;
-                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
-                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
-                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
-                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
                     partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
                     partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
                     partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
@@ -279,6 +224,7 @@ namespace Yvtu.Infra.Data
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                    partAct.Details = GetDetails(partAct.Id);
 
                     activities.Add(partAct);
                 }
@@ -286,12 +232,11 @@ namespace Yvtu.Infra.Data
             return activities;
         }
 
-        public PartnerActivity GetPartAct(string actId, string fromRoleId, string toRoleId)
+        public PartnerActivity GetPartAct(string actId, int fromRoleId, int toRoleId)
         {
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "actId", OracleDbType = OracleDbType.Varchar2,  Value = actId },
-                 new OracleParameter{ ParameterName = "fromRoleId", OracleDbType = OracleDbType.Int32,  Value = fromRoleId },
-                 new OracleParameter{ ParameterName = "toRoleId", OracleDbType = OracleDbType.Int32,  Value = toRoleId },
+                 new OracleParameter{ ParameterName = "fromRoleId", OracleDbType = OracleDbType.Int32,  Value = fromRoleId }
             };
             var actDataTable = this.db.GetData("Select * from v_partner_activity  where act_id=:actId and fromroleid=:fromroleid and toroleid=:toroleid ", parameters);
             var partAct = new PartnerActivity();
@@ -313,19 +258,6 @@ namespace Yvtu.Infra.Data
                 partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
                 partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
 
-                partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? int.MinValue : int.Parse(row["toroleid"].ToString());
-                partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
-                partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
-                partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
-                partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
-                partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
-
-                partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? false : row["check_bal"].ToString() == "1" ? true : false;
-                partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
-                partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
-                partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
-                partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
                 partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
                 partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
                 partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
@@ -336,6 +268,8 @@ namespace Yvtu.Infra.Data
                 partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                 partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                 partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                partAct.Details = GetDetails(partAct.Id, toRoleId);
+
                 return partAct;
             }
             else
@@ -371,19 +305,6 @@ namespace Yvtu.Infra.Data
                 partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
                 partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
 
-                partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? int.MinValue : int.Parse(row["toroleid"].ToString());
-                partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
-                partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
-                partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
-                partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
-                partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
-
-                partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? false : row["check_bal"].ToString() == "1" ? true : false;
-                partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
-                partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
-                partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
-                partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
                 partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
                 partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
                 partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
@@ -394,9 +315,134 @@ namespace Yvtu.Infra.Data
                 partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                 partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                 partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                partAct.Details = GetDetails(partAct.Id);
 
             }
             return partAct;
+        }
+
+        public List<PartnerActivityDetail> GetDetails(int id)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "MasetrRowId", OracleDbType = OracleDbType.Int32,  Value = id }
+            };
+            var masterDataTable = this.db.GetData("Select * from V_PARTNER_ACTIVITY_DETAIL  where master_row=:MasetrRowId order by row_id", parameters);
+
+            var actDetails = new List<PartnerActivityDetail>();
+            if (masterDataTable != null)
+            {
+                foreach (DataRow row in masterDataTable.Rows)
+                {
+                    var partAct = new PartnerActivityDetail();
+                    partAct.Id = row["detail_row_id"] == DBNull.Value ? 0 : int.Parse(row["detail_row_id"].ToString());
+
+                    partAct.ParentId = row["master_row"] == DBNull.Value ? 0 : int.Parse(row["master_row"].ToString());
+
+                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? 0 : int.Parse(row["toroleid"].ToString());
+                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
+                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
+                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
+                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
+                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
+
+                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? true : row["check_bal"].ToString() == "1" ? true  : false;
+                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
+                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
+                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
+                    partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                    partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
+                    partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+
+                    //partAct.Parent = GetPartAct(partAct.ParentId);
+
+                    actDetails.Add(partAct);
+                }
+            }
+            return actDetails;
+        }
+        public List<PartnerActivityDetail> GetDetails(int id, int toRoleId)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "MasetrRowId", OracleDbType = OracleDbType.Int32,  Value = id },
+                 new OracleParameter{ ParameterName = "ToRoleId", OracleDbType = OracleDbType.Int32,  Value = toRoleId }
+            };
+            var masterDataTable = this.db.GetData("Select * from partner_activity_detail  where master_row=:MasetrRowId and dest_role_id=:ToRoleId order by row_id", parameters);
+
+            var actDetails = new List<PartnerActivityDetail>();
+            if (masterDataTable != null)
+            {
+                foreach (DataRow row in masterDataTable.Rows)
+                {
+                    var partAct = new PartnerActivityDetail();
+                    partAct.Id = row["detail_row_id"] == DBNull.Value ? 0 : int.Parse(row["detail_row_id"].ToString());
+
+                    partAct.ParentId = row["master_row"] == DBNull.Value ? 0 : int.Parse(row["master_row"].ToString());
+
+                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? 0 : int.Parse(row["toroleid"].ToString());
+                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
+                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
+                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
+                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
+                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
+
+                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? true : row["check_bal"].ToString() == "1" ? true : false;
+                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
+                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
+                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
+                    partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                    partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
+                    partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+
+                    partAct.Parent = GetPartAct(partAct.ParentId);
+
+                    actDetails.Add(partAct);
+                }
+            }
+            return actDetails;
+        }
+
+
+        public OpertionResult CreateDetail(PartnerActivityDetail model)
+        {
+
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_master_row", OracleDbType = OracleDbType.Int32,  Value = model.ParentId },
+                 new OracleParameter{ ParameterName = "v_dest_role_id",OracleDbType = OracleDbType.Int32,  Value = model.ToRole.Id },
+                 new OracleParameter{ ParameterName = "v_check_bal",OracleDbType = OracleDbType.Int32,  Value = model.CheckBalanceRequired ? 1 : 0 },
+                 new OracleParameter{ ParameterName = "v_max_value",OracleDbType = OracleDbType.Decimal,  Value = model.MaxValue },
+                 new OracleParameter{ ParameterName = "v_min_value",OracleDbType = OracleDbType.Decimal,  Value = model.MinValue },
+                 new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = model.BonusPercent },
+                 new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = model.TaxPercent },
+                 new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = model.BonusTaxPercent },
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id }
+                };
+                #endregion
+                db.ExecuteStoredProc("pk_settings.fn_createpartneractivitydetail", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                }
+                else
+                {
+                    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
+            }
         }
     }
 }
