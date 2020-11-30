@@ -1,0 +1,107 @@
+﻿@model Yvtu.Core.Entities.PartnerActivityDetail
+
+@{
+    ViewData["Title"] = "Rule Detail";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تفاصيل صلاحية</p>
+        </div>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 p-0">
+        <table class="table  mb-0">
+            <tbody>
+                <tr>
+                    <td class="DetailLabel">رقم الأب :</td>
+                    <td style="font-size:20px;font-weight:bold;">@Model.Parent.Id</td>
+                    <td class="DetailLabel">اسم الاجراء :</td>
+                    <td style="color:blue;">@Model.Parent.Activity.Name</td>
+                    <td class="DetailLabel">من :</td>
+                    <td style="color:darkcyan;">@Model.Parent.FromRole.Name</td>
+                </tr>
+                <tr>
+                    <td class="DetailLabel">الرقم :</td>
+                    <td style="color:darkcyan;">@Model.Id</td>
+                    <td class="DetailLabel">الى النوع :</td>
+                    <td style="font-size:20px;font-weight:bold;">@Model.ToRole.Name</td>
+                    <td class="DetailLabel">فحص الرصيد؟ :</td>
+                    <td style="color:blue;">
+                        @if (Model.CheckBalanceRequired)
+                        {
+                            <p class="text-success"><i class="fa fa-check"></i></p>
+                        }
+                        else
+                        {
+                            <p class="text-danger" style="margin:0px;"><i class="fa fa-times"></i></p>
+                        }
+                    </td>
+                </tr>
+                <tr>
+                    <td class="DetailLabel">أقل مبلغ :</td>
+                    <td style="font-size:20px;font-weight:bold;">@Model.MinValue.ToString("N0")</td>
+                    <td class="DetailLabel">اكبر مبلغ :</td>
+                    <td style="color:blue;">@Model.MaxValue.ToString("N0")</td>
+                    <td class="DetailLabel">نسبة الضريبة % :</td>
+                    <td style="color:darkcyan;">@Model.TaxPercent.ToString("N2")</td>
+                </tr>
+                <tr>
+                    <td class="DetailLabel">نسبة العمولة % :</td>
+                    <td style="font-size:20px;font-weight:bold;">@Model.BonusPercent.ToString("N2")</td>
+                    <td class="DetailLabel">نسبة ضريبة العمولة % :</td>
+                    <td style="color:blue;">@Model.BonusTaxPercent.ToString("N2")</td>
+
+                </tr>
+                <tr>
+                    <td class="DetailLabel">وقت الانشاء :</td>
+                    <td style="color:gray;">@Model.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                    <td class="DetailLabel">انشئ بواسطة :</td>
+                    <td style="color:gray;">@Model.CreatedBy.Name</td>
+                    <td class="DetailLabel">اخر وقت تعديل :</td>
+                    <td style="color:gray;">@Model.LastEditOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                </tr>
+
+                <tr style="border-top:2px solid #6407a8;">
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <a asp-action="EditDetail" asp-controller="PartActivity" asp-route-id="@Model.Id" asp-route-parentId="@Model.Parent.Id"
+                           data-toggle="tooltip" data-placement="top" title="تعديل البيانات" class="ml-3">
+                            <i class="far fa-edit  text-primary"></i>
+                        </a>
+                    </td>
+                    <td colspan="3">
+                        <span id="deleteConfirmSpan" style="display:none;">
+                            <span style="color:red;">هل انت متاكد من الحذف؟</span>
+                            <a asp-action="DeleteDetail" asp-controller="PartActivity" asp-route-id="@Model.Id" asp-route-parentId="@Model.ParentId" class="btn btn-success rounded-circle" style="width:50px;">نعم</a>
+                            <a href="#" class="btn btn-primary rounded-circle" onclick="confirmDelete(false)" style="width:50px;">لا</a>
+                        </span>
+                        <span id="deleteSpan">
+                            <a href="#" onclick="confirmDelete(true)" data-toggle="tooltip" data-placement="top" title="حذف"><i class="far fa-trash-alt  text-danger"></i></a>
+                        </span>
+                    </td>
+                    <td>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+
+    <script src="~/js/CustomScript.js"></script>
+
+}

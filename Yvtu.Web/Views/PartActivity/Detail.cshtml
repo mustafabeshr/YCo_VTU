@@ -55,10 +55,7 @@
                             <p class="text-danger" style="margin:0px;"><i class="fa fa-times"></i></p>
                         }
                     </td>
-
                     <td colspan="2" style="text-align:right;">
-                        
-                       
                     </td>
                     <td class="DetailLabel">التفاصيل :</td>
                     <td>
@@ -73,15 +70,12 @@
                         </a>
                     </td>
                     <td>
-                        
-
                     </td>
                     <td>
                         <a asp-action="Edit" asp-controller="PartActivity" asp-route-id="@Model.Id"
                            data-toggle="tooltip" data-placement="top" title="تعديل البيانات" class="ml-3">
                             <i class="far fa-edit  text-primary"></i>
                         </a>
-
                     </td>
                     <td colspan="3">
                         <span id="deleteConfirmSpan" style="display:none;">
@@ -94,16 +88,10 @@
                         </span>
                     </td>
                     <td>
-                        
                     </td>
-                    
                 </tr>
-
             </tbody>
         </table>
-
-
-
     </div>
 </div>
 
@@ -145,7 +133,7 @@
                     <td style="font-family:Amiri-Regular">@item.BonusTaxPercent.ToString("N2")</td>
                     <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
 
-                    <td><a asp-action="Detail" asp-controller="PartActivity" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                    <td><a asp-action="MoreDetail" asp-controller="PartActivity" asp-route-id="@item.Id" asp-route-parentId="@Model.Id"><i class="far fa-list-alt"></i></a></td>
                 </tr>
                 }
             </tbody>

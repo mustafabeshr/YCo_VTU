@@ -25,5 +25,23 @@ namespace Yvtu.Core.Entities
         public DateTime LastEditOn { get; set; }
 
         public virtual PartnerActivity Parent { get;set; }
+
+        public override string ToString()
+        {
+            var content = "Id =" + Id + Environment.NewLine +
+                "Parent Id =" + ParentId + Environment.NewLine +
+                "Check Balance Required =" + CheckBalanceRequired + Environment.NewLine +
+                "To Role Id =" + ToRole.Id + Environment.NewLine +
+                "To Role Name =" + ToRole.Name + Environment.NewLine +
+                "Min Value=" + MinValue.ToString("N0") + Environment.NewLine +
+                "Max Value =" + MaxValue.ToString("N0") + Environment.NewLine +
+                "Tax Per =" + TaxPercent.ToString("N2") + Environment.NewLine +
+                "Bonus Per =" + BonusPercent.ToString("N2") + Environment.NewLine +
+                "Bonus Tax Per =" + BonusTaxPercent.ToString("N2") + Environment.NewLine +
+                "Created On=" + CreatedOn.ToString("yyyy/MM/dd H:mm:ss") + Environment.NewLine +
+                "Created By=" + CreatedBy.Id + Environment.NewLine +
+                "Last Edit On=" + LastEditOn.ToString("yyyy/MM/dd H:mm:ss");
+            return content;
+        }
     }
 }

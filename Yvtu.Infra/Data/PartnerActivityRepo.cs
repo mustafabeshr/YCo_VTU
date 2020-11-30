@@ -321,7 +321,7 @@ namespace Yvtu.Infra.Data
             return partAct;
         }
 
-        public List<PartnerActivityDetail> GetDetails(int id)
+        public List<PartnerActivityDetail> GetDetails(int id, bool withMaster = false)
         {
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "MasetrRowId", OracleDbType = OracleDbType.Int32,  Value = id }
@@ -356,14 +356,14 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
 
-                    //partAct.Parent = GetPartAct(partAct.ParentId);
+                    if (withMaster)  partAct.Parent = GetPartAct(partAct.ParentId);
 
                     actDetails.Add(partAct);
                 }
             }
             return actDetails;
         }
-        public List<PartnerActivityDetail> GetDetails(int id, int toRoleId)
+        public List<PartnerActivityDetail> GetDetails(int id, int toRoleId, bool withMaster = false)
         {
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "MasetrRowId", OracleDbType = OracleDbType.Int32,  Value = id },
@@ -399,7 +399,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
 
-                    partAct.Parent = GetPartAct(partAct.ParentId);
+                    if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
 
                     actDetails.Add(partAct);
                 }
@@ -407,10 +407,48 @@ namespace Yvtu.Infra.Data
             return actDetails;
         }
 
+        public PartnerActivityDetail GetDetail(int id, int parentId, bool withMaster = false)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "Row_Id", OracleDbType = OracleDbType.Int32,  Value = id },
+                 new OracleParameter{ ParameterName = "parentId", OracleDbType = OracleDbType.Int32,  Value = parentId }
+            };
+            var masterDataTable = this.db.GetData("Select * from V_PARTNER_ACTIVITY_DETAIL  where detail_row_id=:Row_Id and row_id=:parentId ", parameters);
 
+            var partAct = new PartnerActivityDetail();
+            if (masterDataTable != null)
+            {
+                DataRow row = masterDataTable.Rows[0];
+                    
+                    partAct.Id = row["detail_row_id"] == DBNull.Value ? 0 : int.Parse(row["detail_row_id"].ToString());
+
+                    partAct.ParentId = row["master_row"] == DBNull.Value ? 0 : int.Parse(row["master_row"].ToString());
+
+                    partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? 0 : int.Parse(row["toroleid"].ToString());
+                    partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
+                    partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
+                    partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
+                    partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
+                    partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
+
+                    partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? true : row["check_bal"].ToString() == "1" ? true : false;
+                    partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
+                    partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
+                    partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+                    partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+                    partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
+                    partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                    partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
+                    partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+
+                    if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
+
+            }
+            return partAct;
+        }
         public OpertionResult CreateDetail(PartnerActivityDetail model)
         {
-
             try
             {
                 #region Parameters
@@ -444,5 +482,53 @@ namespace Yvtu.Infra.Data
                 return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
             }
         }
+
+        public OpertionResult UpdateDetail(PartnerActivityDetail model)
+        {
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_row_id", OracleDbType = OracleDbType.Int32,  Value = model.Id },
+                 new OracleParameter{ ParameterName = "v_master_row", OracleDbType = OracleDbType.Int32,  Value = model.ParentId },
+                 new OracleParameter{ ParameterName = "v_dest_role_id",OracleDbType = OracleDbType.Int32,  Value = model.ToRole.Id },
+                 new OracleParameter{ ParameterName = "v_check_bal",OracleDbType = OracleDbType.Int32,  Value = model.CheckBalanceRequired ? 1 : 0 },
+                 new OracleParameter{ ParameterName = "v_max_value",OracleDbType = OracleDbType.Decimal,  Value = model.MaxValue },
+                 new OracleParameter{ ParameterName = "v_min_value",OracleDbType = OracleDbType.Decimal,  Value = model.MinValue },
+                 new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = model.BonusPercent },
+                 new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = model.TaxPercent },
+                 new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = model.BonusTaxPercent },
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id }
+                };
+                #endregion
+                db.ExecuteStoredProc("pk_settings.fn_updatepartneractivitydetail", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                }
+                else
+                {
+                    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
+            }
+        }
+
+        public bool DeleteDetail(int id, int parentId)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "DetailRow_Id", OracleDbType = OracleDbType.Int32,  Value = id },
+                 new OracleParameter{ ParameterName = "Parent_Row_Id", OracleDbType = OracleDbType.Int32,  Value = parentId }
+            };
+            //var v = db.ExecuteSqlCommand("Delete from Partner_Activity_Detail Where Row_Id=:DetailRow_Id and master_row=:Parent_Row_Id", parameters);
+            return db.ExecuteSqlCommand("Delete from Partner_Activity_Detail Where Row_Id=:DetailRow_Id and master_row=:Parent_Row_Id", parameters) > 0;
+        }
     }
+
 }

@@ -269,6 +269,13 @@ namespace Yvtu.Web.Controllers
 
             return View(model);
         }
+        [HttpGet]
+        public IActionResult MoreDetail(int id, int parentId)
+        {
+            var model = _partActRepo.GetDetail(id, parentId, true);
+            if (model == null) return null;
+            return View(model);
+        }
         [HttpPost]
         public IActionResult AddDetail(CreatePartnerActivityDetailDto model)
         {
@@ -287,10 +294,93 @@ namespace Yvtu.Web.Controllers
                 originObject.BonusTaxPercent = model.BonusTaxPercent;
                 originObject.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
                 var result = _partActRepo.CreateDetail(originObject);
-                return RedirectToAction("Detail", new { id = model.ParentId } );
+                if (result.Success)
+                {
+                   
+                    return RedirectToAction("Detail", new { id = model.ParentId });
+                }
+               
             }
             model.ToRoles = new RoleRepo(db).GetRoles();
             return View(model);
+        }
+        [HttpGet]
+        public IActionResult EditDetail(int id, int parentId)
+        {
+            var model = _partActRepo.GetDetail(id, parentId, true);
+            if (model == null) return null;
+            var toRoles = new RoleRepo(db).GetRoles();
+            
+            var viewModel = new CreatePartnerActivityDetailDto
+            {
+                ParentId = model.Parent.Id,
+                ActivityId = model.Parent.Activity.Id,
+                ActivityName = model.Parent.Activity.Name,
+                ToRoleId = model.ToRole.Id,
+                ToRole = model.ToRole,
+                CheckBalanceRequired = model.CheckBalanceRequired,
+                MinValue = model.MinValue,
+                MaxValue = model.MaxValue,
+                TaxPercent = model.TaxPercent,
+                BonusPercent = model.BonusPercent,
+                BonusTaxPercent = model.BonusTaxPercent,
+                ToRoles = toRoles
+            };
+
+            return View(viewModel);
+        }
+        [HttpPost]
+        public IActionResult EditDetail(CreatePartnerActivityDetailDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var old = _partActRepo.GetDetail(model.Id, model.ParentId);
+                if (old == null) return View(model);
+
+                
+                var originObject = new PartnerActivityDetail();
+                originObject.Id = model.Id;
+                originObject.ParentId = model.ParentId;
+                originObject.ToRole.Id = model.ToRoleId;
+                originObject.CheckBalanceRequired = model.CheckBalanceRequired;
+                originObject.MinValue = model.MinValue;
+                originObject.MaxValue = model.MaxValue;
+                originObject.TaxPercent = model.TaxPercent;
+                originObject.BonusPercent = model.BonusPercent;
+                originObject.BonusTaxPercent = model.BonusTaxPercent;
+                originObject.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                var result = _partActRepo.UpdateDetail(originObject);
+                if (result.Success)
+                {
+                    var audit = new DataAudit();
+                    audit.Activity.Id = "PartnerActivity.Detail";
+                    audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.Action.Id = "Update";
+                    audit.Success = true;
+                    audit.OldValue = old.ToString();
+                    audit.NewValue = originObject.ToString();
+                    _auditing.Create(audit);
+                }
+                return RedirectToAction("Detail", new { id = model.ParentId });
+            }
+            model.ToRoles = new RoleRepo(db).GetRoles();
+            return View(model);
+        }
+        public IActionResult DeleteDetail(int id, int parentId)
+        {
+            var old = _partActRepo.GetDetail(id, parentId);
+            if (old != null)
+            {
+                var audit = new DataAudit();
+                audit.Activity.Id = "PartnerActivity.Detail";
+                audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                audit.Action.Id = "Delete";
+                audit.Success = true;
+                audit.OldValue = old.ToString();
+                _auditing.Create(audit);
+                _partActRepo.DeleteDetail(id, parentId);
+            }
+            return RedirectToAction("Detail", new { id = parentId });
         }
     }
 }
