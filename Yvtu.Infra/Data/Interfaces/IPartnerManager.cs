@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Yvtu.Core.Entities;
+using Yvtu.Core.Queries;
 
 namespace Yvtu.Infra.Data.Interfaces
 {
@@ -36,7 +37,7 @@ namespace Yvtu.Infra.Data.Interfaces
         OpertionResult Create(Partner partner);
         Task<OpertionResult> CreateAsync(Partner partner);
 
-        OpertionResult ChangePwd(string PartnerId, string newPwd);
+        bool ChangePwd(int PartnerAcc, string PartnerId, string newPwd);
         Task<OpertionResult> ChangePwdAsync(string PartnerId, string newPwd);
         IEnumerable<Claim> GetUserClaims(Partner user);
         string GetCurrentUserId(HttpContext httpContext);
@@ -45,5 +46,11 @@ namespace Yvtu.Infra.Data.Interfaces
         Task SignOut(HttpContext httpContext);
         bool IncreaseWrongPwdAttempts(string partnerId, bool lockAccount );
         bool PreSuccessLogin(string partnerId);
+        Partner GetPartnerByAccount(int account);
+        int GetCurrentUserAccount(HttpContext httpContext);
+        int GetCurrentUserRole(HttpContext httpContext);
+        string GetCurrentUserRoleCode(HttpContext httpContext);
+        List<Partner> GetPartners(PartnerQuery param);
+        bool ResetPassword(Partner partner);
     }
 }

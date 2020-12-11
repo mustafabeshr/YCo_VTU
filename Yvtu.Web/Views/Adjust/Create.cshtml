@@ -1,0 +1,280 @@
+﻿@model Yvtu.Web.Dto.CreateAdjustmentDto
+
+@{
+    ViewData["Title"] = "تسوية";
+}
+
+
+<div class="row bg-white">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تسوية</p>
+        </div>
+    </div>
+</div>
+
+<div class="row bg-white">
+    <div class="col-12 p-0">
+        @using (Html.BeginForm())
+        {
+            @Html.HiddenFor(x => x.OriginTrans.AccessChannel)
+            @Html.HiddenFor(x => x.OriginTrans.Adjusted)
+            @Html.HiddenFor(x => x.OriginTrans.AdjustmentNo)
+            @Html.HiddenFor(x => x.OriginTrans.Amount)
+            @Html.HiddenFor(x => x.OriginTrans.BillNo)
+            @Html.HiddenFor(x => x.OriginTrans.BonusPercent)
+            @Html.HiddenFor(x => x.OriginTrans.BounsAmount)
+            @Html.HiddenFor(x => x.OriginTrans.BounsTaxAmount)
+            @Html.HiddenFor(x => x.OriginTrans.BounsTaxPercent)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedOn)
+            @Html.HiddenFor(x => x.OriginTrans.Id)
+            @Html.HiddenFor(x => x.OriginTrans.NetAmount)
+            @Html.HiddenFor(x => x.OriginTrans.Note)
+            @Html.HiddenFor(x => x.OriginTrans.Partner)
+            @Html.HiddenFor(x => x.OriginTrans.PayBank)
+            @Html.HiddenFor(x => x.OriginTrans.PayDate)
+            @Html.HiddenFor(x => x.OriginTrans.PayNo)
+            @Html.HiddenFor(x => x.OriginTrans.PayType)
+            @Html.HiddenFor(x => x.OriginTrans.ReceivedAmount)
+            @Html.HiddenFor(x => x.OriginTrans.RequestAmount)
+            @Html.HiddenFor(x => x.OriginTrans.RequestNo)
+            @Html.HiddenFor(x => x.OriginTrans.TaxAmount)
+            @Html.HiddenFor(x => x.OriginTrans.TaxPercent)
+            @Html.HiddenFor(x => x.OriginTrans.Partner.Id)
+            @Html.HiddenFor(x => x.OriginTrans.Partner.Name)
+            @Html.HiddenFor(x => x.OriginTrans.Partner.Account)
+            @Html.HiddenFor(x => x.OriginTrans.Partner.Role.Id)
+            @Html.HiddenFor(x => x.OriginTrans.Partner.Role.Name)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy.Id)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy.Name)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy.Account)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy.Role.Id)
+            @Html.HiddenFor(x => x.OriginTrans.CreatedBy.Role.Name)
+            @Html.HiddenFor(x => x.OriginTrans.TaxPercent)
+            @Html.HiddenFor(x => x.TaxPercent)
+            @Html.HiddenFor(x => x.BonusPercent)
+            @Html.HiddenFor(x => x.BounsTaxPercent)
+            @Html.HiddenFor(x => x.TaxAmount)
+            @Html.HiddenFor(x => x.SettingsPeriodDays)
+            @Html.HiddenFor(x => x.ReceivedAmount)
+            @Html.HiddenFor(x => x.PeriodDays)
+            @Html.HiddenFor(x => x.Note)
+            @Html.HiddenFor(x => x.NetAmount)
+            @Html.HiddenFor(x => x.MoneyTransferId)
+            <table class="table mb-0">
+                <tbody>
+                    <tr>
+                        <td class="DetailLabel" style="width:10%;">رقم الحركة :</td>
+                        <td style="font-size:20px;font-weight:bold;">@Model.OriginTrans.Id</td>
+                        <td class="DetailLabel" style="width:10%;">المبلغ :</td>
+                        <td style="color:blue;">
+                            @Model.OriginTrans.Amount.ToString("N2")
+                            <input id="txtOAmount" hidden asp-for="OriginTrans.Amount" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">تاريخ الانشاء :</td>
+                        <td colspan="3">@Model.OriginTrans.CreatedOn.ToString("ss:mm:H yyyy/MM/dd")</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2" class="text-center" style="background-color:#fdee9f">مـــن</td>
+                        <td colspan="2" class="text-center" style="background-color:#fdee9f">الــــى</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الرقم :</td>
+                        <td>@Model.OriginTrans.CreatedBy.Id</td>
+                        <td class="DetailLabel">الرقم :</td>
+                        <td style="color:blue;">@Model.OriginTrans.Partner.Id</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الاسم :</td>
+                        <td>@Model.OriginTrans.CreatedBy.Name</td>
+                        <td class="DetailLabel">الاسم :</td>
+                        <td style="color:blue;">@Model.OriginTrans.Partner.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">النوع :</td>
+                        <td>@Model.OriginTrans.CreatedBy.Role.Name</td>
+                        <td class="DetailLabel">النوع :</td>
+                        <td style="color:blue;">@Model.OriginTrans.Partner.Role.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الحساب :</td>
+                        <td>@Model.OriginTrans.CreatedBy.Account</td>
+                        <td class="DetailLabel">الحساب :</td>
+                        <td style="color:blue;">@Model.OriginTrans.Partner.Account</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الرصيد :</td>
+                        <td>@Model.OriginTrans.CreatedBy.Balance.ToString("N2")</td>
+                        <td class="DetailLabel">الرصيد :</td>
+                        <td style="color:blue;">@Model.OriginTrans.Partner.Balance.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">المالية</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">صافي الايراد :</td>
+                        <td>
+                            @Model.OriginTrans.NetAmount.ToString("N2")
+                            <input id="txtONetAmount" hidden asp-for="OriginTrans.NetAmount" />
+                        </td>
+                        <td class="DetailLabel">المبلغ المطلوب :</td>
+                        <td style="color:blue;">
+                            @Model.OriginTrans.ReceivedAmount.ToString("N2")
+                            <input id="txtOReceivedAmount" hidden asp-for="OriginTrans.ReceivedAmount" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">نسبة الضريبة :</td>
+                        <td>
+                            @Model.OriginTrans.TaxPercent.ToString("N2")
+                            <input id="txtTaxPercent" hidden asp-for="OriginTrans.TaxPercent" />
+                        </td>
+                        <td class="DetailLabel">مبلغ الضريبة :</td>
+                        <td style="color:blue;">
+                            @Model.OriginTrans.TaxAmount.ToString("N2")
+                            <input id="txtOTaxAmount" hidden asp-for="OriginTrans.TaxAmount" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">نسبة العمولة :</td>
+                        <td>
+                            @Model.OriginTrans.BonusPercent.ToString("N2")
+                            <input id="txtBonusPercent" hidden asp-for="OriginTrans.BonusPercent" />
+                        </td>
+                        <td class="DetailLabel">مبلغ العمولة :</td>
+                        <td style="color:blue;">
+                            @Model.OriginTrans.BounsAmount.ToString("N2")
+                            <input id="txtOBounsAmount" hidden asp-for="OriginTrans.BounsAmount" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">نسبة ضريبة العمولة :</td>
+                        <td>
+                            @Model.OriginTrans.BounsTaxPercent.ToString("N2")
+                            <input id="txtBounsTaxPercent" hidden asp-for="OriginTrans.BounsTaxPercent" />
+                        </td>
+                        <td class="DetailLabel">مبلغ ضريبة العمولة :</td>
+                        <td style="color:blue;">
+                            @Model.OriginTrans.BounsTaxAmount.ToString("N2")
+                            <input id="txtOBounsTaxAmount" hidden asp-for="OriginTrans.BounsTaxAmount" />
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td colspan="2" class="text-center" style="background-color:#fdee9f">بيانات التسوية</td>
+                        <td colspan="2" class="text-center" style="background-color:#fdee9f">البيانات المتوقعة بعد التسوية</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <div class="container">
+
+
+                                @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+                                {
+                                    <div class="form-group">
+                                        <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                                    </div>
+                                }
+
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="Amount" class="FormLabel pt-2">الـــمــــبـــلــــــغ :</label>
+                                        <div class="col-8 pl-2">
+                                            <input id="txtAmount" asp-for="Amount" class="form-control RequiredInput text-center" style="font-size:20px;font-weight:bold;" />
+                                            <span asp-validation-for="Amount" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="TaxAmount" class="FormLabel pt-2">الــضـــــريبـــــة :</label>
+                                        <div class="col-8">
+                                            <label id="lblTaxAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:darkslateblue;">0</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpTaxAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="BounsAmount" class="FormLabel pt-2">العـــمــــولــــة :</label>
+                                        <div class="col-8">
+                                            <label id="lblBounsAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:darkslateblue;">0</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpBounsAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="BounsTaxAmount" class="FormLabel pt-2">ض العمــولـة :</label>
+                                        <div class="col-8">
+                                            <label id="lblBounsTaxAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:darkslateblue;">0</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpBounsTaxAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="NetAmount" class="FormLabel pt-2">الصافي :</label>
+                                        <div class="col-8">
+                                            <label id="lblNetAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:darkslateblue;">0</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpNetAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group col-6 row">
+                                        <label asp-for="ReceivedAmount" class="FormLabel pt-2">المبلغ المطلوب :</label>
+                                        <div class="col-8">
+                                            <label id="lblReceivedAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:darkslateblue;">0</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-6 row">
+                                        <label id="lblExpReceivedAmount" class="form-control text-center" style="font-size:18px;font-weight:bold;color:purple;">0</label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-outline-success"
+                                        style="width:100%;border-radius:10px;">
+                                    <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <table style="width:100%;">
+                                <tbody>
+                                    <tr>
+                                        <td class="FormLabel" style="width:10%;">نسبة الضريبة</td>
+                                        <td style="width:20%;">@Model.TaxPercent</td>
+                                        <td class="FormLabel" style="width:10%;">نسبة العمولة</td>
+                                        <td style="width:20%;">@Model.BonusPercent</td>
+                                        <td class="FormLabel" style="width:20%;">نسبة ضريبة العمولة</td>
+                                        <td style="width:10%;">@Model.BounsTaxPercent</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/js/CreateAdj.js"></script>
+}

@@ -9,6 +9,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
+using Yvtu.Core.Queries;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.Infra.Data
@@ -16,15 +17,52 @@ namespace Yvtu.Infra.Data
     public class PartnerManager : IPartnerManager
     {
         private readonly IAppDbContext db;
+        private readonly IPartnerActivityRepo partnerActivity;
 
-        public PartnerManager(IAppDbContext db)
+        public PartnerManager(IAppDbContext db, IPartnerActivityRepo partnerActivity)
         {
             this.db = db;
+            this.partnerActivity = partnerActivity;
         }
 
-        public OpertionResult ChangePwd(string PartnerId, string newPwd)
+        public bool ChangePwd(int PartnerAcc, string PartnerId,string newPwd)
         {
-            throw new NotImplementedException();
+            //var pass = Utility.GenerateNewCode(4);
+            byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
+            string hash = Pbkdf2Hasher.ComputeHash(newPwd, salt);
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32,  Value = PartnerAcc },
+                 new OracleParameter{ ParameterName = "v_pwd",OracleDbType = OracleDbType.Varchar2,  Value =  hash},
+                 new OracleParameter{ ParameterName = "v_extra",OracleDbType = OracleDbType.Varchar2,  Value = Convert.ToBase64String(salt) }
+                };
+
+                #endregion
+                db.ExecuteStoredProc("pk_infra.fn_resetpassword", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    var msg = "تم تغيير كلمة المرور الخاصبة بك الى " + newPwd;
+                    new OutSMSRepo(db).Create(new OutSMS
+                    {
+                        Receiver = PartnerId,
+                        Message = msg
+                    });
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         public Task<OpertionResult> ChangePwdAsync(string PartnerId, string newPwd)
@@ -37,32 +75,19 @@ namespace Yvtu.Infra.Data
             byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
             string hash = Pbkdf2Hasher.ComputeHash(partner.Pwd, salt);
 
-            var insertSql = "insert into partner (partner_id, partner_name, brandname, balance, reserved, verificationcodenext, " +
-                "  locktime, roleid, id_no, id_type, id_place, id_issued, status, statusby, " +
-                "   createdby, cityid, districtid, street, zone, extra_address, pair_mobile, " +
-                "  mobile, fixed, fax, email, pwd, extra, ip_address) values" +
-                "(:v_partner_id, :v_partner_name, :v_brandname, :v_balance, :v_reserved, :v_verificationcodenext, " +
-                "  :v_locktime, :v_roleid, :v_id_no, :v_id_type, :v_id_place, :v_id_issued, :v_status, :v_statusby, " +
-                "  :v_createdby, :v_cityid, :v_districtid, :v_street, :v_zone, :v_extra_address, :v_pair_mobile, " +
-                "  :v_mobile, :v_fixed, :v_fax, :v_email, :v_pwd, :v_extra, :v_ip_address)";
             try
             {
                 #region Parameters
                 var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_partner_id", OracleDbType = OracleDbType.Varchar2,  Value = partner.Id },
                  new OracleParameter{ ParameterName = "v_partner_name",OracleDbType = OracleDbType.Varchar2,  Value = partner.Name },
                  new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.Varchar2,  Value = partner.BrandName },
-                 new OracleParameter{ ParameterName = "v_balance",OracleDbType = OracleDbType.Int32,   Value = 0 },
-                 new OracleParameter{ ParameterName = "v_reserved", OracleDbType = OracleDbType.Int32,  Value = 0 },
-                 new OracleParameter{ ParameterName = "v_verificationcodenext", OracleDbType = OracleDbType.Single, Value = partner.VerificationCodeNext ? 1 : 0 },
-                 new OracleParameter{ ParameterName = "v_locktime", OracleDbType = OracleDbType.Date, Value = null },
                  new OracleParameter{ ParameterName = "v_roleid", OracleDbType = OracleDbType.Int32, Value = partner.Role.Id },
                  new OracleParameter{ ParameterName = "v_id_no", OracleDbType = OracleDbType.Int32, Value = partner.PersonalId.Id },
                  new OracleParameter{ ParameterName = "v_id_type", OracleDbType = OracleDbType.Int32, Value = partner.PersonalId.IdType.Id },
                  new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.Varchar2, Value = partner.PersonalId.Place },
                  new OracleParameter{ ParameterName = "v_id_issued", OracleDbType = OracleDbType.Date, Value = partner.PersonalId.Issued },
-                 new OracleParameter{ ParameterName = "v_status", OracleDbType = OracleDbType.Int32, Value = partner.Status.Id },
-                 new OracleParameter{ ParameterName = "v_statusby", OracleDbType = OracleDbType.Varchar2, Value = partner.StatusBy.Id },
                  new OracleParameter{ ParameterName = "v_createdby", OracleDbType = OracleDbType.Varchar2, Value = partner.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_cityid", OracleDbType = OracleDbType.Int32, Value = partner.Address.City.Id},
                  new OracleParameter{ ParameterName = "v_districtid", OracleDbType = OracleDbType.Int32, Value = partner.Address.District.Id },
@@ -76,16 +101,23 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_email", OracleDbType = OracleDbType.Varchar2, Value = partner.ContactInfo.Email },
                  new OracleParameter{ ParameterName = "v_pwd", OracleDbType = OracleDbType.Varchar2, Value = hash },
                  new OracleParameter{ ParameterName = "v_extra", OracleDbType = OracleDbType.Varchar2, Value = Convert.ToBase64String(salt) },
-                 new OracleParameter{ ParameterName = "v_ip_address", OracleDbType = OracleDbType.Varchar2, Value = partner.IPAddress}
+                 new OracleParameter{ ParameterName = "v_ip_address", OracleDbType = OracleDbType.Varchar2, Value = partner.IPAddress},
+                 new OracleParameter{ ParameterName = "v_ref_partner", OracleDbType = OracleDbType.Varchar2, Value = partner.RefPartner.Id}
 
             };
 
                 #endregion
-
-                var result = await db.ExecuteSqlCommandAsync(insertSql, parameters);
+                await db.ExecuteStoredProcAsync("pk_infra.fn_createpartner", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)
                 {
+                    var msg = "تم انشاء حساب لك بخدمة الشاحن الفوري و كلمة المرور هي  " + partner.Pwd;
+                    new OutSMSRepo(db).Create(new OutSMS
+                    {
+                        Receiver = partner.Id,
+                        Message = msg
+                    });
                     return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
                 }
                 else
@@ -100,7 +132,46 @@ namespace Yvtu.Infra.Data
 
         }
 
+        public bool ResetPassword(Partner partner)
+        {
+            var pass = Utility.GenerateNewCode(4);
+            byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
+            string hash = Pbkdf2Hasher.ComputeHash(pass, salt);
 
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Varchar2,  Value = partner.Account },
+                 new OracleParameter{ ParameterName = "v_pwd",OracleDbType = OracleDbType.Varchar2,  Value =  hash},
+                 new OracleParameter{ ParameterName = "v_extra",OracleDbType = OracleDbType.Varchar2,  Value = Convert.ToBase64String(salt) }
+                };
+
+                #endregion
+                db.ExecuteStoredProc("pk_infra.fn_resetpassword", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    var msg = "تم اعادة تعيين كلمة المرور الخاصة بك الى " + pass;
+                    new OutSMSRepo(db).Create(new OutSMS
+                    {
+                        Receiver = partner.Id,
+                        Message = msg
+                    });
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            catch 
+            {
+                return false;
+            }
+        }
 
         public Partner GetCurrentUser(HttpContext httpContext)
         {
@@ -112,7 +183,7 @@ namespace Yvtu.Infra.Data
             if (!httpContext.User.Identity.IsAuthenticated)
                 return "-1";
 
-            Claim claim = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            Claim claim = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone);
 
             if (claim == null)
                 return "-1";
@@ -123,6 +194,57 @@ namespace Yvtu.Infra.Data
             //    return "-1";
 
             return currentUserId;
+        }
+        public int GetCurrentUserAccount(HttpContext httpContext)
+        {
+            if (!httpContext.User.Identity.IsAuthenticated)
+                return -1;
+
+            Claim claim = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+
+            if (claim == null)
+                return -1;
+
+            int currentUserId = int.Parse(claim.Value);
+
+            //if (!int.TryParse(claim.Value, out currentUserId))
+            //    return "-1";
+
+            return currentUserId;
+        }
+        public int GetCurrentUserRole(HttpContext httpContext)
+        {
+            if (!httpContext.User.Identity.IsAuthenticated)
+                return -1;
+
+            Claim claim = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName);
+
+            if (claim == null)
+                return -1;
+
+            int currentUserId = int.Parse(claim.Value);
+
+            //if (!int.TryParse(claim.Value, out currentUserId))
+            //    return "-1";
+
+            return currentUserId;
+        }
+        public string GetCurrentUserRoleCode(HttpContext httpContext)
+        {
+            if (!httpContext.User.Identity.IsAuthenticated)
+                return "-1";
+
+            Claim claim = httpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+            if (claim == null)
+                return "-1";
+
+            string currentUserRoleCode = claim.Value;
+
+            //if (!int.TryParse(claim.Value, out currentUserId))
+            //    return "-1";
+
+            return currentUserRoleCode;
         }
 
         public Task SignIn(HttpContext httpContext, Partner partner, bool isPersistent = false)
@@ -137,10 +259,11 @@ namespace Yvtu.Infra.Data
 
         public PartBasicInfo GetPartnerBasicInfo(string partnerId)
         {
-            var partner = GetPartner(partnerId);
+            var partner = GetActivePartner(partnerId);
             if (partner == null) return null;
             var basicInfo = new PartBasicInfo();
             basicInfo.Id = partner.Id;
+            basicInfo.Account = partner.Account;
             basicInfo.Name = partner.Name;
             basicInfo.Role = partner.Role;
             basicInfo.Balance = partner.Balance;
@@ -148,7 +271,7 @@ namespace Yvtu.Infra.Data
         }
         public ValidatePartnerResult Validate(string partnerId)
         {
-            var partner = GetPartner(partnerId);
+            var partner = GetActivePartner(partnerId);
             if (partner == null)
             {
                 return new ValidatePartnerResult { Partner = null, Success = false, Error = "NotFound" };
@@ -157,20 +280,15 @@ namespace Yvtu.Infra.Data
             {
                 return new ValidatePartnerResult { Partner = partner, Success = true, Error = string.Empty };
             }
-
         }
-        private Partner GetPartner(string Id)
-        {
-            var parameters = new List<OracleParameter> {
-                 new OracleParameter{ ParameterName = "partnerId", OracleDbType = OracleDbType.Varchar2,  Value = Id },
-            };
-            var partnerDataTable = db.GetData("select * from partner where partner_id=:partnerId", parameters);
-            if (partnerDataTable == null) return null;
 
+        private Partner ConvertDataRowToPartner(DataRow dataRow)
+        {
+            if (dataRow == null) return null;
             #region Convert to Partner Object
             var partner = new Partner();
-            DataRow dataRow = partnerDataTable.Rows[0];
             partner.Id = dataRow["partner_id"] == DBNull.Value ? string.Empty : dataRow["partner_id"].ToString();
+            partner.Account = dataRow["partner_acc"] == DBNull.Value ? -1 : int.Parse(dataRow["partner_acc"].ToString());
             partner.Name = dataRow["partner_name"] == DBNull.Value ? string.Empty : dataRow["partner_name"].ToString();
             partner.BrandName = dataRow["brandname"] == DBNull.Value ? string.Empty : dataRow["brandname"].ToString();
             partner.Balance = dataRow["balance"] == DBNull.Value ? long.MinValue : long.Parse(dataRow["balance"].ToString());
@@ -201,17 +319,19 @@ namespace Yvtu.Infra.Data
             partner.Pwd = dataRow["pwd"] == DBNull.Value ? string.Empty : dataRow["pwd"].ToString();
             partner.Extra = dataRow["extra"] == DBNull.Value ? string.Empty : dataRow["extra"].ToString();
             partner.IPAddress = dataRow["ip_address"] == DBNull.Value ? string.Empty : dataRow["ip_address"].ToString();
+            partner.LastLoginOn = dataRow["last_login"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(dataRow["last_login"].ToString());
+
             // get sub objects
             // Role
-            partner.Role = new RoleRepo(db).GetRole(partner.Role.Id);
+            partner.Role = new RoleRepo(db, partnerActivity).GetRole(partner.Role.Id);
             partner.PersonalId.IdType = new IdTypeRepo(db).GetIdType(partner.PersonalId.IdType.Id);
             partner.Status = new PartnerStatusRepo(db).GetStatus(partner.Status.Id);
             partner.Address.City = new CityRepo(db).GetCity(partner.Address.City.Id);
             partner.Address.District = new DistrictRepo(db).GetDistrict(partner.Address.District.Id);
 
-
+            var statusBy = dataRow["STATUSBY"] == DBNull.Value ? string.Empty : dataRow["STATUSBY"].ToString();
             var statusUserparameter = new List<OracleParameter> {
-                 new OracleParameter{ ParameterName = "statusBy", OracleDbType = OracleDbType.Varchar2,  Value = Id },
+                 new OracleParameter{ ParameterName = "statusBy", OracleDbType = OracleDbType.Varchar2,  Value = statusBy },
             };
             var statusByDataTable = db.GetData("select * from partner where partner_id=:statusBy", statusUserparameter);
             if (statusByDataTable != null)
@@ -222,8 +342,9 @@ namespace Yvtu.Infra.Data
 
             }
 
+            var createdBy = dataRow["CREATEDBY"] == DBNull.Value ? string.Empty : dataRow["CREATEDBY"].ToString();
             var createUserparameter = new List<OracleParameter> {
-                 new OracleParameter{ ParameterName = "createBy", OracleDbType = OracleDbType.Varchar2,  Value = Id },
+                 new OracleParameter{ ParameterName = "createBy", OracleDbType = OracleDbType.Varchar2,  Value = createdBy },
             };
             var createByDataTable = db.GetData("select * from partner where partner_id=:createBy", createUserparameter);
             if (createByDataTable != null)
@@ -233,13 +354,51 @@ namespace Yvtu.Infra.Data
                 partner.CreatedBy.Name = dr["partner_name"] == null ? string.Empty : dr["partner_name"].ToString();
 
             }
+            var refPartnerId = dataRow["REF_PARTNER"] == DBNull.Value ? string.Empty : dataRow["REF_PARTNER"].ToString();
+            var refPartparameter = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "RefPart", OracleDbType = OracleDbType.Varchar2,  Value = refPartnerId },
+            };
+
+            var refDataTable = db.GetData("select * from partner where partner_id=:RefPart", refPartparameter);
+            if (statusByDataTable != null)
+            {
+                DataRow dr = refDataTable.Rows[0];
+                partner.RefPartner.Id = dr["partner_id"] == null ? string.Empty : dr["partner_id"].ToString();
+                partner.RefPartner.Name = dr["partner_name"] == null ? string.Empty : dr["partner_name"].ToString();
+
+            }
             /////////////////////////
 
             #endregion
             return partner;
+        }
+        private Partner GetActivePartner(string Id)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "partnerId", OracleDbType = OracleDbType.Varchar2,  Value = Id },
+            };
+            var partnerDataTable = db.GetData("select * from partner where partner_id=:partnerId and (status <> 3)", parameters);
+            if (partnerDataTable == null || partnerDataTable.Rows.Count == 0) return null;
+
+            var partner = new Partner();
+            partner = ConvertDataRowToPartner(partnerDataTable.Rows[0]);
+            return partner;
 
         }
 
+        public Partner GetPartnerByAccount(int account)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "partnerAccount", OracleDbType = OracleDbType.Int32,  Value = account },
+            };
+            var partnerDataTable = db.GetData("select * from partner where partner_acc=:partnerAccount", parameters);
+            if (partnerDataTable == null) return null;
+
+            #region Convert to Partner Object
+            var partner = ConvertDataRowToPartner(partnerDataTable.Rows[0]);
+            #endregion
+            return partner;
+        }
         public bool IncreaseWrongPwdAttempts(string partnerId, bool lockAccount)
         {
             var parameters = new List<OracleParameter> {
@@ -262,9 +421,11 @@ namespace Yvtu.Infra.Data
         {
             List<Claim> claims = new List<Claim>();
 
-            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.MobilePhone, user.Id));
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Account.ToString()));
             claims.Add(new Claim(ClaimTypes.Name, user.Name));
             claims.Add(new Claim(ClaimTypes.GivenName, user.Role.Id.ToString()));
+            claims.Add(new Claim(ClaimTypes.Role, user.Role.Code));
             claims.AddRange(this.GetUserRoleClaims(user));
             return claims;
         }
@@ -295,6 +456,66 @@ namespace Yvtu.Infra.Data
             string sql = "Update partner set WRONG_PWD_ATTEMPTS = 0 ,last_login = sysdate, locktime = null ,status = 1, statuson=sysdate where partner_id = :PartnerId";
 
             return db.ExecuteSqlCommand(sql, parameters) > 0;
+        }
+
+        public List<Partner> GetPartners(PartnerQuery param)
+        {
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            if (!string.IsNullOrEmpty(param.QPartnerId))
+            {
+                var parm = new OracleParameter { ParameterName = "QPartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
+                WhereClause.Append(" WHERE partner_id=:QPartnerId ");
+                parameters.Add(parm);
+            }
+            if (param.QAccount > 0)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE partner_acc=:QAccount " : " AND partner_acc=:QAccount  ");
+                var parm = new OracleParameter { ParameterName = "QAccount", OracleDbType = OracleDbType.Int32, Value = param.QAccount };
+                parameters.Add(parm);
+            }
+            if (!string.IsNullOrEmpty(param.QRefPartnerId))
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ref_partner=:QRefPartnerId " : " AND ref_partner=:QRefPartnerId  ");
+                var parm = new OracleParameter { ParameterName = "QRefPartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.QRefPartnerId };
+                parameters.Add(parm);
+            }
+            if (param.QRoleId > 0)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE roleid=:QRoleId " : " AND roleid=:QRoleId  ");
+                var parm = new OracleParameter { ParameterName = "QRoleId", OracleDbType = OracleDbType.Int32, Value = param.QRoleId };
+                parameters.Add(parm);
+            }
+            if (param.QStatusId > 0)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:QStatusId " : " AND status=:QStatusId  ");
+                var parm = new OracleParameter { ParameterName = "QStatusId", OracleDbType = OracleDbType.Int32, Value = param.QStatusId };
+                parameters.Add(parm);
+            }
+
+            if (!string.IsNullOrEmpty(param.QPartnerName))
+            {
+                //param.QPartnerName = Utility.RemoveSpecialChar(param.QPartnerName);
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE (partner_name LIKE '%' ||  :QPartnerName || '%') "
+                    : " AND (partner_name LIKE '%' ||  :QPartnerName || '%') ");
+                var parm = new OracleParameter { ParameterName = "QPartnerName", OracleDbType = OracleDbType.NVarchar2, Value = param.QPartnerName };
+                parameters.Add(parm);
+            }
+
+            WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ROWNUM <= 200": " AND ROWNUM <= 200 " );
+
+            var dataTable = this.db.GetData("Select * from partner  " + WhereClause + " order by partner_name ", parameters);
+
+            if (dataTable == null) return null;
+            if (dataTable.Rows.Count == 0) return null;
+
+            var partners = new List<Partner>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var obj = ConvertDataRowToPartner(row);
+                partners.Add(obj);
+            }
+            return partners;
         }
 
 

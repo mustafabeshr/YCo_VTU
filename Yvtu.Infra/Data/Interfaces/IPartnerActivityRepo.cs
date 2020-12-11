@@ -10,12 +10,14 @@ namespace Yvtu.Infra.Data.Interfaces
     {
         List<PartnerActivity> GetAllList();
         PartnerActivity GetPartAct(string actId, int fromRoleId, int toRoleId);
+        PartnerActivity GetPartAct(string actId, int fromRoleId);
         PartnerActivity GetPartAct(int id);
         List<PartnerActivity> GetListByActivity(string activityId);
         List<PartnerActivity> GetListByActivityWithFromRole(string activityId, int fromRoleId);
         List<PartnerActivityDetail> GetDetails(int id, bool withMaster = false);
         List<PartnerActivityDetail> GetDetails(int id, int toRoleId, bool withMaster = false);
         PartnerActivityDetail GetDetail(int id, int parentId, bool withMaster = false);
+        PartnerActivityDetail GetDetail(string actId, int fromRoleId, int toRoleId, bool withMaster = false);
         OpertionResult Create(PartnerActivity partnerActivity);
         OpertionResult CreateDetail(PartnerActivityDetail model);
         OpertionResult Edit(PartnerActivity partnerActivity);

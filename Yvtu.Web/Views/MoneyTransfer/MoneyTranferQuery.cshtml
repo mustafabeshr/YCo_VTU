@@ -1,0 +1,119 @@
+﻿@model Yvtu.Core.Queries.MoneyTransferQueryDto
+
+@{
+    ViewData["Title"] = "Query Money Transfer";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام التفصيلي عن نقل الرصيد</p>
+        </div>
+        <form asp-controller="MoneyTransfer" asp-action="MoneyTranferQuery" method="post">
+            <div class="form-row">
+                <div class="form-group col-2">
+                    <label asp-for="QId" class="FormLabel">رقم الحركة:</label>
+                    <input asp-for="QId" class="form-control" />
+                </div>
+                <div class="form-group col-2">
+                    <label asp-for="QPartnerId" class="FormLabel">الموبايل:</label>
+                    <input asp-for="QPartnerId" class="form-control text-center" />
+                </div>
+                @*<div class="form-group col-1">
+                    <label asp-for="QPartnerAccount" class="FormLabel">الحساب:</label>
+                    <input asp-for="QPartnerAccount" class="form-control text-center" />
+                </div>*@
+                <div class="form-group col-1">
+                    <label asp-for="QListTypeId" class="FormLabel">النوع:</label>
+                    <select asp-for="QListTypeId" class="form-control pb-0 pt-0">
+                        <option value="all">الكل</option>
+                        <option value="debit">مدين</option>
+                        <option value="credit">دائن</option>
+                    </select>
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="QFromDate" class="FormLabel">من تاريخ  :</label>
+                    <input asp-for="QFromDate" class="form-control" />
+                </div>
+                <div class="form-group col-3">
+                    <label asp-for="QToDate" class="FormLabel">الى تاريخ  :</label>
+                    <input asp-for="QToDate" class="form-control" />
+                </div>
+                <div class="form-group col-1">
+                    <label class="FormLabel">&nbsp;</label>
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error) && Model.Error != "N/A")
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+
+
+@if (Model != null && Model.Results != null)
+{
+    <div class="row p-0 bg-white">
+        <div class="col-12 p-0">
+            
+            <table class="table">
+                <thead>
+                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <td style="font-weight:normal"></td>
+                        <td style="font-weight:normal"></td>
+                        <td style="font-weight:normal;border-left:1px solid white;border-right:1px solid white;" colspan="2">من</td>
+                        <td style="font-weight:normal;border-left:1px solid white;border-right:1px solid white;" colspan="2">الى</td>
+                        <td style="font-weight:normal;border-left:1px solid white;border-right:1px solid white;" colspan="6">المبـــــالـــــغ</td>
+                        <td style="font-weight:normal"></td>
+                    </tr>
+                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <td style="font-weight:normal">#</td>
+                        <td style="font-weight:normal">التاريخ</td>
+                        <td style="font-weight:normal">الرقم</td>
+                        <td style="font-weight:normal">النوع</td>
+                        <td style="font-weight:normal">الرقم</td>
+                        <td style="font-weight:normal">النوع</td>
+                        <td style="font-weight:normal">المبلغ</td>
+                        <td style="font-weight:normal">الصافي</td>
+                        <td style="font-weight:normal">الضريبة</td>
+                        <td style="font-weight:normal">العمولة</td>
+                        <td style="font-weight:normal">ض العمولة</td>
+                        <td style="font-weight:normal">المستلم</td>
+                        <td style="font-weight:normal">التفاصيل</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        string rowColor= item.Adjusted ? "yellow" : "white";
+                        <tr style="background-color:@rowColor">
+                            <td style="font-size:16px;font-weight:bold;">@item.Id</td>
+                            <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-family:Amiri-Regular">@item.CreatorBy</td>
+                            <td style="font-family:Amiri-Regular">@item.CreatorByRoleName</td>
+                            <td style="font-family:Amiri-Regular">@item.PartnerId</td>
+                            <td style="font-family:Amiri-Regular">@item.PartnerRoleName</td>
+                            <td>@item.Amount.ToString("N0")</td>
+                            <td>@item.NetAmount.ToString("N2")</td>
+                            <td>@item.TaxAmount.ToString("N2")</td>
+                            <td>@item.BounsAmount.ToString("N2")</td>
+                            <td>@item.BounsTaxAmount.ToString("N2")</td>
+                            <td>@item.ReceivedAmount.ToString("N2")</td>
+                            <td><a asp-action="Detail" asp-controller="MoneyTransfer" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+

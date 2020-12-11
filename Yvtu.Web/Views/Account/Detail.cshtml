@@ -1,0 +1,164 @@
+﻿@model Yvtu.Core.Entities.Partner
+@inject Yvtu.Infra.Data.Interfaces.IPartnerManager partner
+
+@{
+    ViewData["Title"] = "تفاصيل";
+}
+
+<div class="row bg-white">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تفاصيل جهة</p>
+        </div>
+    </div>
+</div>
+
+<div class="row text-center">
+        <div class="col-4">
+            @if (partner.GetCurrentUserRoleCode(Context) == "Admin")
+            {
+                <a class="btn btn-outline-info" asp-action="Resetpass" asp-controller="Account" asp-route-account="@Model.Account" style="font-size:11px;">
+                    <i class="fas fa-magic"></i>
+                    &nbsp;&nbsp;  إعادة تعيين كلمة المرور
+                </a>
+            }
+        </div>
+        <div class="col-4">
+            <a class="btn btn-outline-info" asp-action="Index" asp-controller="Account" style="font-size:11px;">
+                <i class="fas arrow-alt-circle-left"></i>
+                الاستعلام الجهات
+            </a>
+        </div>
+</div>
+
+<div class="row bg-white">
+    <div class="col-12 p-0">
+        
+        <div class="row">
+
+            <table class="table mb-0">
+                <tbody>
+                    <tr>
+                        <td class="DetailLabel" style="width:10%;">الرقم :</td>
+                        <td style="font-size:20px;font-weight:bold;">@Model.Id</td>
+                        <td class="DetailLabel" style="width:10%;">الحساب :</td>
+                        <td style="color:blue;">@Model.Account</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel" style="width:10%;">الاسم :</td>
+                        <td colspan="3">@Model.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الاسم التجاري :</td>
+                        <td>@Model.BrandName</td>
+                        <td class="DetailLabel">النوع :</td>
+                        <td style="color:blue;">@Model.Role.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الرقم الاحتياطي :</td>
+                        <td>@Model.PairMobile</td>
+                        <td class="DetailLabel">الرقم المرجعي :</td>
+                        <td style="color:blue;">@Model.RefPartner.Id &nbsp; @Model.RefPartner.Name</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الرصيد :</td>
+                        <td>@Model.Balance.ToString("N2")</td>
+                        <td class="DetailLabel">المبلغ المحجوز :</td>
+                        <td style="color:blue;">@Model.Reserved.ToString("N2")</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">تاريخ الانشاء :</td>
+                        <td>@Model.CreatedOn.ToString("H:mm:ss yyyy/MM/dd")</td>
+                        <td class="DetailLabel">انشاء بواسطة :</td>
+                        <td>@Model.CreatedBy.Id &nbsp; @Model.CreatedBy.Name </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">الحالة</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الحالة :</td>
+                        <td>@Model.Status.Name</td>
+                        <td class="DetailLabel">التاريخ :</td>
+                        <td>@Model.StatusOn.ToString("H:mm:ss yyyy/MM/dd") </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">بواسطة :</td>
+                        <td>@Model.StatusBy.Id</td>
+                        <td class="DetailLabel">الاسم :</td>
+                        <td>@Model.StatusBy.Name </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">بواسطة :</td>
+                        <td>@Model.StatusBy.Id</td>
+                        <td class="DetailLabel">الاسم :</td>
+                        <td>@Model.StatusBy.Name </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">بيانات الهوية</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">نوعها :</td>
+                        <td>@Model.PersonalId.IdType.Name</td>
+                        <td class="DetailLabel">رقمها :</td>
+                        <td>@Model.PersonalId.Id </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">تاريخ صدورها :</td>
+                        <td>@Model.PersonalId.Issued.ToString("yyyy/MM/dd")</td>
+                        <td class="DetailLabel">مكان صدورها :</td>
+                        <td>@Model.PersonalId.Place </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">بيانات العنوان</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">المدينة :</td>
+                        <td>@Model.Address.City.Name</td>
+                        <td class="DetailLabel">المديرية :</td>
+                        <td>@Model.Address.District.Name </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">الحي :</td>
+                        <td>@Model.Address.Zone</td>
+                        <td class="DetailLabel">الشارع :</td>
+                        <td>@Model.Address.Street </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">اضافية :</td>
+                        <td colspan="3">@Model.Address.ExtraInfo</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">بيانات التواصل</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">موبايل :</td>
+                        <td>@Model.Address.City.Name</td>
+                        <td class="DetailLabel">هاتف ثابت :</td>
+                        <td>@Model.Address.District.Name </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">فاكس :</td>
+                        <td>@Model.Address.Zone</td>
+                        <td class="DetailLabel">بريد الكتروني :</td>
+                        <td>@Model.Address.Street </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="text-center" style="background-color:#fdee9f">أخرى</td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">عنوان السيرفر :</td>
+                        <td>@Model.IPAddress</td>
+                        <td class="DetailLabel">اخر دخول :</td>
+                        <td>@Model.LastLoginOn.ToString("H:mm:ss yyyy/MM/dd") </td>
+                    </tr>
+                    <tr>
+                        <td class="DetailLabel">عدد الدخول الخاطئ :</td>
+                        <td>@Model.WrongPwdAttempts</td>
+                        <td class="DetailLabel">تاريخ الايقاف :</td>
+                        <td>@Model.LockTime.ToString("H:mm:ss yyyy/MM/dd") </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

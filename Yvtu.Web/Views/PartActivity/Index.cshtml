@@ -10,6 +10,7 @@
             <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الصلاحيات</p>
         </div>
         <form asp-controller="PartActivity" asp-action="Index" method="post">
+
             <div class="form-row">
                 <div class="form-group col-5">
                     <label asp-for="ActivityId" class="FormLabel">الاجراء :</label>
@@ -23,7 +24,7 @@
                         <option value="">All</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group col-2">
                     <label class="FormLabel">&nbsp;</label>
                     <button type="submit" class="btn btn-outline-success"
@@ -32,6 +33,12 @@
                     </button>
                 </div>
             </div>
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error))
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
         </form>
     </div>
 </div>
@@ -49,6 +56,7 @@
                         <th style="font-weight:normal">من</th>
                         <th style="font-weight:normal">مدة الاستعلام</th>
                         <th style="font-weight:normal">مدى الاستعلام</th>
+                        <th style="font-weight:normal"># الفرعية</th>
                         <th style="font-weight:normal">عدد النتائج</th>
                         <th style="font-weight:normal">حصري</th>
                         <th style="font-weight:normal">تفاصيل</th>
@@ -64,6 +72,7 @@
                         <td style="font-family:Amiri-Regular">@item.FromRole.Name</td>
                         <td style="font-family:Amiri-Regular">@item.MaxQueryDuration.Name</td>
                         <td style="font-family:Amiri-Regular">@item.Scope.Name</td>
+                        <td>@item.Details.Count</td>
                         <td>@item.MaxQueryRows.ToString("N0")</td>
                         <td style="font-family:Amiri-Regular">
                             @if (item.OnlyPartnerChildren)

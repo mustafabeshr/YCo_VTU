@@ -13,7 +13,7 @@ namespace Yvtu.Web.Dto
         public string ActivityId { get; set; }
         public SelectList FromRoles { get; set; }
         public int FromRoleId { get; set; }
-
+        public string Error { get; set; }
         public List<PartnerActivity> PartnerActivities { get; set; }
     }
 }

@@ -18,14 +18,24 @@
                     <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
                 </div>
             }
+            
             <div class="form-row text-right">
-                <div class="col-12">
-                    <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
-                        تحويل رصيد شاحن فوري بمبلغ
-                    </label>
-                    @*<div class="text-center" style="font-size:24px;color:rebeccapurple;"><span>@Model.Id</span></div>*@
-
-                    <span class="float-left" style="font-size:16px;color:gray;">@DateTime.Now.ToString("yyyy/MM/dd H:mm:ss")</span>
+                <div class="col-12 row">
+                    <div class="col-4">
+                        <label style="font-family: 'ArefRuqaa-Bold';font-size: 22px; font-weight: bold; color: black;">
+                            تحويل رصيد شاحن فوري بمبلغ
+                        </label>
+                    </div>
+                    <div class="col-4 text-center" style="font-size:24px;color:rebeccapurple;">
+                        <span>@Model.Id</span>
+                        @if (Model != null && Model.Id > 0)
+                        {
+                            <a href="CreatePDF/@Model.Id" target="_blank" class="blink_me"><i class="fa fa-print" style="color:blueviolet;"></i></a>
+                        }
+                    </div>
+                    <div class="col-4">
+                        <span class="float-left" style="font-size:16px;color:gray;">@DateTime.Now.ToString("yyyy/MM/dd H:mm:ss")</span>
+                    </div>
                 </div>
                 <div class="col-12 text-center p-2" style="background-color:#EDF0F2;">
                     <label style="font-size:22px;font-weight:bold;color:green;">@Model.Amount.ToString("N2")</label>
@@ -155,10 +165,14 @@
                     </table>
                 </div>
             </div>
-            <button type="submit" class="btn btn-outline-success"
-                    style="width:100%;border-radius:10px;">
-                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
-            </button>
+            @if (Model != null && Model.Id == 0)
+            {
+                <button type="submit" class="btn btn-outline-success"
+                        style="width:100%;border-radius:10px;">
+                    <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                </button>
+            }
+
             @Html.HiddenFor(m => m.Id)
             @Html.HiddenFor(m => m.Amount)
             @Html.HiddenFor(m => m.AmountName)
@@ -194,3 +208,4 @@
 
     </div>
 </div>
+

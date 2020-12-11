@@ -37,7 +37,7 @@ namespace Yvtu.Web.Controllers
              var  model = new ListPartnerActivityDto();
 
             model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
-            model.FromRoles =  new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
+            model.FromRoles =  new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
             return View(model);
         }
@@ -51,7 +51,7 @@ namespace Yvtu.Web.Controllers
             }
 
             model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
-            model.FromRoles = new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
+            model.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
             if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0 )
             { 
@@ -85,7 +85,7 @@ namespace Yvtu.Web.Controllers
                 model.OnlyPartnerChildren = result.OnlyPartnerChildren;
 
             }
-            var fromRoles = new RoleRepo(db).GetRoles();
+            var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
@@ -132,7 +132,7 @@ namespace Yvtu.Web.Controllers
                     model.Error = result.Error;
                 }
             }
-            var fromRoles = new RoleRepo(db).GetRoles();
+            var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
@@ -163,8 +163,8 @@ namespace Yvtu.Web.Controllers
         public IActionResult Create()
         {
             var model = new CreatePartnerActivityDto();
-            var fromRoles = new RoleRepo(db).GetRoles();
-            var toRoles = new RoleRepo(db).GetRoles();
+            var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
+            var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
@@ -183,8 +183,8 @@ namespace Yvtu.Web.Controllers
         {
             var model = new CreatePartnerActivity2Dto();
             var detailModel = new List<CreatePartnerActivityDetailDto>();
-            var fromRoles = new RoleRepo(db).GetRoles();
-            var toRoles = new RoleRepo(db).GetRoles();
+            var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
+            var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
@@ -198,7 +198,7 @@ namespace Yvtu.Web.Controllers
 
             ViewBag.Details = new CreatePartnerActivityDetailDto
             {
-                ToRoles = new RoleRepo(db).GetRoles()
+                ToRoles = new RoleRepo(db, _partActRepo).GetRoles()
             };
             return View(model);
         }
@@ -216,13 +216,14 @@ namespace Yvtu.Web.Controllers
                 pAct.Scope.Id = model.ScopeId;
                 pAct.OnlyPartnerChildren = model.OnlyPartnerChildren;
                 pAct.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                pAct.CreatedBy.Account = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
 
                 var result =  _partActRepo.Create(pAct);
                 if (result.Success)
                 {
                     var listModel = new ListPartnerActivityDto();
                     listModel.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
-                    listModel.FromRoles = new SelectList(new RoleRepo(db).GetRoles(), "Id", "Name");
+                    listModel.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
                     return View("Index", listModel);
                 }
                 else
@@ -231,7 +232,7 @@ namespace Yvtu.Web.Controllers
                 }
             }
 
-            var fromRoles = new RoleRepo(db).GetRoles();
+            var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var activities = new ActivityRepo(db).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
@@ -256,7 +257,7 @@ namespace Yvtu.Web.Controllers
         {
             var masterModel = _partActRepo.GetPartAct(id);
             if (masterModel == null) return null;
-            var toRoles = new RoleRepo(db).GetRoles();
+            var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var model = new CreatePartnerActivityDetailDto
             {
                 ParentId = masterModel.Id,
@@ -301,7 +302,7 @@ namespace Yvtu.Web.Controllers
                 }
                
             }
-            model.ToRoles = new RoleRepo(db).GetRoles();
+            model.ToRoles = new RoleRepo(db, _partActRepo).GetRoles();
             return View(model);
         }
         [HttpGet]
@@ -309,7 +310,7 @@ namespace Yvtu.Web.Controllers
         {
             var model = _partActRepo.GetDetail(id, parentId, true);
             if (model == null) return null;
-            var toRoles = new RoleRepo(db).GetRoles();
+            var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
             
             var viewModel = new CreatePartnerActivityDetailDto
             {
@@ -363,7 +364,7 @@ namespace Yvtu.Web.Controllers
                 }
                 return RedirectToAction("Detail", new { id = model.ParentId });
             }
-            model.ToRoles = new RoleRepo(db).GetRoles();
+            model.ToRoles = new RoleRepo(db, _partActRepo).GetRoles();
             return View(model);
         }
         public IActionResult DeleteDetail(int id, int parentId)

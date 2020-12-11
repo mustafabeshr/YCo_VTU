@@ -1,0 +1,129 @@
+﻿@model Yvtu.Core.Queries.RechargeQuery
+
+@{
+    ViewData["Title"] = "Recharge Query";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن حركة التحصيل</p>
+        </div>
+        <form asp-controller="Recharge" asp-action="Index" method="post">
+            @await Component.InvokeAsync("NToastNotify")
+            <div class="form-row">
+                <div class="form-group col-3  row">
+                    <label asp-for="QSubsId" class="FormLabel pt-2">ر.المشترك:</label>
+                    <div class="col-9">
+                        <input asp-for="QSubsId" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="QPosId" class="FormLabel pt-2">ر.النقطة:</label>
+                    <div class="col-9">
+                        <input asp-for="QPosId" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="QPosAccount" class="FormLabel pt-2">الحساب:</label>
+                    <div class="col-9">
+                        <input asp-for="QPosAccount" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="StatusId" class="FormLabel pt-2">الحالة:</label>
+                    <div class="col-10">
+                        <select asp-for="StatusId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-3  row">
+                    <label asp-for="AccessChannelId" class="FormLabel pt-2">القناة:</label>
+                    <div class="col-10">
+                        <select asp-for="AccessChannelId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.AccessChannel,"Id","Name"))">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-4  row">
+                    <label asp-for="QFromDate" class="FormLabel pt-2">من:</label>
+                    <div class="col-10">
+                        <input asp-for="QFromDate" style="width:100%;" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-4  row">
+                    <label asp-for="QToDate" class="FormLabel pt-2">الى:</label>
+                    <div class="col-10">
+                        <input asp-for="QToDate" style="width:100%;" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-1 row">
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error) && Model.Error != "N/A")
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+
+
+@if (Model != null && Model.Results != null)
+{
+    <div class="row p-0 bg-white">
+        <div class="col-12 p-0">
+
+            <table class="table">
+                <thead>
+                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <td style="font-weight:normal">#</td>
+                        <td style="font-weight:normal">التاريخ</td>
+                        <td style="font-weight:normal">المبلغ</td>
+                        <td style="font-weight:normal">المشترك</td>
+                        <td style="font-weight:normal">الحالة</td>
+                        <td style="font-weight:normal">وقت الحالة</td>
+                        <td style="font-weight:normal">النقطة</td>
+                        <td style="font-weight:normal">رصيدها</td>
+                        <td style="font-weight:normal">القناة</td>
+                        <td style="font-weight:normal">التفاصيل</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        <tr>
+                            <td style="font-size:16px;font-weight:bold;">@item.Id</td>
+                            <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-family:Amiri-Regular;color:blue;">@item.SubsNo</td>
+                            <td style="font-family:Amiri-Regular">@item.StatusName</td>
+                            <td style="font-family:Amiri-Regular">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-family:Amiri-Regular">@item.POSId&rArr;@item.POSName</td>
+                            <td style="font-size: 13px;">@item.POSBalance.ToString("N2")</td>
+                            <td style="font-size: 13px;">@item.AccessChannelName</td>
+                            <td style="font-size: 13px;">@item.POSAccount</td>
+                            <td><a asp-action="Detail" asp-controller="Recharge" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+

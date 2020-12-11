@@ -1,0 +1,40 @@
+﻿@model Yvtu.Web.Dto.ResetPassDto
+
+@{
+    ViewData["Title"] = "اعادة تعيين كلمة المرور";
+}
+
+<div class="row bg-white">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">إعادة تعيين كلمة المرور</p>
+        </div>
+    </div>
+</div>
+<div class="row bg-white text-center">
+    @if (!string.IsNullOrEmpty(Model.Error))
+    {
+        <div class="card" style="color:red;width: 18rem;margin:auto">
+            <i class="fa fa-ban fa-2x"></i>
+            <div class="card-body">
+                <h5 class="card-title">خــطـــأ</h5>
+                <p class="card-text">لم يتم إعادة تعيين كلمة المرور</p>
+                <p class="card-text">@Model.Error</p>
+            </div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.Success))
+    {
+        <div class="card" style="color:green;width: 18rem;margin:auto">
+            <i class="fa fa-check fa-2x"></i>
+            <div class="card-body">
+                <h5 class="card-title">نجاح</h5>
+                <p class="card-text">تم تغيير اعادة تعيين كلمة المرور بنجاح</p>
+                <p class="card-text">@Model.PartnerName</p>
+                <p class="card-text">@Model.PartnerId</p>
+                <p class="card-text">سيتم ارسال رسالة قصيرة بكلمة المرور الجديدة الى الرقم @Model.PartnerId</p>
+            </div>
+        </div>
+    }
+</div>

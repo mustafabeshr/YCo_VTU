@@ -42,6 +42,7 @@ namespace Yvtu.Core.Entities
                 "Max Query Rows=" + MaxQueryRows + Environment.NewLine +
                 "Created On=" + CreatedOn.ToString("yyyy/MM/dd H:mm:ss") + Environment.NewLine +
                 "Created By=" + CreatedBy.Id + Environment.NewLine +
+                "Created By Account=" + CreatedBy.Account + Environment.NewLine +
                 "Last Edit On=" + LastEditOn.ToString("yyyy/MM/dd H:mm:ss");
             return content;
         }

@@ -49,6 +49,18 @@ namespace Yvtu.Infra.Data
             }
         }
 
+        public async Task<int> ExecuteStoredProcAsync(string spName, IEnumerable<OracleParameter> parameters)
+        {
+            using (var conn = GetConnection("DbConn"))
+            {
+                var cmd = GetCommand(spName, parameters);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Connection = conn;
+                if (conn.State != ConnectionState.Open) conn.Open();
+                return await cmd.ExecuteNonQueryAsync();
+            }
+        }
+
         public int ExecuteFunction(string spName, IEnumerable<OracleParameter> parameters)
         {
             using (var conn = GetConnection("DbConn"))

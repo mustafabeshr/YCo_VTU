@@ -22,6 +22,7 @@ namespace Yvtu.Infra.Data.Interfaces
                 #region Parameters
                     var parameters = new List<OracleParameter> {
                     new OracleParameter{ ParameterName = "v_partner_id", OracleDbType = OracleDbType.Varchar2,  Value = data.PartnerId },
+                    new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32,  Value = data.PartnerAccount },
                     new OracleParameter{ ParameterName = "v_act_id",OracleDbType = OracleDbType.Varchar2,  Value = data.Activity.Id },
                     new OracleParameter{ ParameterName = "v_action_id",OracleDbType = OracleDbType.Varchar2,  Value = data.Action.Id },
                     new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = data.Note},
@@ -48,7 +49,7 @@ namespace Yvtu.Infra.Data.Interfaces
             }
         }
 
-        public List<DataAudit> GetAuditig(string partnerId, string activityId, string actionId, DateTime startDate, DateTime endDate)
+        public List<DataAudit> GetAuditig(int partnerAccount, string partnerId, string activityId, string actionId, DateTime startDate, DateTime endDate)
         {
             string sql = "Select * from v_data_audit ";
             string whereClause = string.Empty;
@@ -61,6 +62,14 @@ namespace Yvtu.Infra.Data.Interfaces
                 parameters.Add(param1);
                 whereClause = " WHERE partner_id=:partnerId ";
             }
+
+            if (partnerAccount > 0)
+            {
+                var param1 = new OracleParameter() { ParameterName = "partnerAcc", OracleDbType = OracleDbType.Int32, Value = partnerAccount };
+                parameters.Add(param1);
+                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE partner_acc=:partnerAcc " : " AND partner_acc=:partnerAcc ";
+            }
+
             if (!string.IsNullOrEmpty(activityId))
             {
                 var param1 = new OracleParameter() { ParameterName = "activityId", OracleDbType = OracleDbType.Varchar2, Value = activityId };
@@ -107,6 +116,7 @@ namespace Yvtu.Infra.Data.Interfaces
                     var currObj = new DataAudit();
                     currObj.Id = row["row_id"] == DBNull.Value ? 0 : int.Parse(row["row_id"].ToString());
                     currObj.PartnerId = row["partner_id"] == DBNull.Value ? string.Empty : row["partner_id"].ToString();
+                    currObj.PartnerAccount = row["partner_acc"] == DBNull.Value ? -1 : int.Parse(row["partner_acc"].ToString());
                     currObj.PartnerName = row["partner_name"] == DBNull.Value ? string.Empty : row["partner_name"].ToString();
                     currObj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     currObj.Activity.Id = row["act_id"] == DBNull.Value ? string.Empty : row["act_id"].ToString();

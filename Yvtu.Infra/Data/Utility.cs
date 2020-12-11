@@ -158,6 +158,12 @@ namespace Yvtu.Infra.Data
                 return false;
 
         }
+
+        public static string RemoveSpecialChar(string value)
+        {
+            string NewValue = Regex.Replace(value, @"/[|!#$%&()=?»«@£§€{};<'>_""]", "");
+            return NewValue;
+        }
     }
 
    public class MonyToString

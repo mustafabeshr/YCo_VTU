@@ -1,0 +1,121 @@
+﻿@model Yvtu.Core.Queries.PartnerQuery
+
+@{
+    ViewData["Title"] = "Partner Query";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن المستخدمين و الجهات</p>
+        </div>
+        <form asp-controller="Account" asp-action="Index" method="post">
+            <div class="form-row">
+                <div class="form-group col-3  row">
+                    <label asp-for="QPartnerId" class="FormLabel pt-2">الرقم:</label>
+                    <div class="col-10">
+                        <input asp-for="QPartnerId" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="QAccount" class="FormLabel pt-2">الحساب:</label>
+                    <div class="col-9">
+                        <input asp-for="QAccount" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="QRefPartnerId" class="FormLabel pt-2">المرجع:</label>
+                    <div class="col-10">
+                        <input asp-for="QRefPartnerId" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-3  row">
+                    <label asp-for="QStatusId" class="FormLabel pt-2">الحالة:</label>
+                    <div class="col-10">
+                        <select asp-for="QStatusId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="form-row">
+                <div class="form-group col-3  row">
+                    <label asp-for="QRoleId" class="FormLabel pt-2">النوع:</label>
+                    <div class="col-10">
+                        <select asp-for="QRoleId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group col-8  row">
+                    <label asp-for="QPartnerName" class="FormLabel pt-2">الاسم:</label>
+                    <div class="col-10">
+                        <input asp-for="QPartnerName" style="width:100%;" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-1 row">
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+            @if (Model != null && !string.IsNullOrEmpty(Model.Error) && Model.Error != "N/A")
+            {
+                <div class="form-group">
+                    <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
+                </div>
+            }
+        </form>
+    </div>
+</div>
+
+
+
+@if (Model != null && Model.Partners != null)
+{
+    <div class="row p-0 bg-white">
+        <div class="col-12 p-0">
+
+            <table class="table">
+                <thead>
+                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <td style="font-weight:normal">#</td>
+                        <td style="font-weight:normal">الاسم</td>
+                        <td style="font-weight:normal">الحساب</td>
+                        <td style="font-weight:normal">النوع</td>
+                        <td style="font-weight:normal">الرصيد</td>
+                        <td style="font-weight:normal">المحجوز</td>
+                        <td style="font-weight:normal">الحالة</td>
+                        <td style="font-weight:normal">تاريخ الحالة</td>
+                        <td style="font-weight:normal">تاريخ الانشاء</td>
+                        <td style="font-weight:normal">التفاصيل</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Partners)
+                    {
+                        <tr>
+                            <td style="font-size:16px;font-weight:bold;">@item.Id</td>
+                            <td style="font-family:Amiri-Regular">@item.Name</td>
+                            <td style="font-family:Amiri-Regular;color:blue;">@item.Account</td>
+                            <td style="font-family:Amiri-Regular">@item.Role.Name</td>
+                            <td style="font-family:Amiri-Regular">@item.Balance.ToString("N2")</td>
+                            <td style="font-family:Amiri-Regular">@item.Reserved.ToString("N2")</td>
+                            <td style="font-size: 13px;">@item.Status.Name</td>
+                            <td style="font-size: 13px;">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-size: 13px;">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td><a asp-action="Detail" asp-controller="Account" asp-route-account="@item.Account"><i class="far fa-list-alt"></i></a></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+

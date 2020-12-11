@@ -9,6 +9,6 @@ namespace Yvtu.Infra.Data.Interfaces
     public interface IDataAuditRepo
     {
         OpertionResult Create(DataAudit data);
-        List<DataAudit> GetAuditig(string partnerId, string activityId, string actionId, DateTime startDate, DateTime endDate);
+        List<DataAudit> GetAuditig(int partnerAccount, string partnerId, string activityId, string actionId, DateTime startDate, DateTime endDate);
     }
 }

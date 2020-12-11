@@ -1,15 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Yvtu.Core.Entities;
+using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Web.Dto;
+using Yvtu.Web.Reports;
 
 namespace Yvtu.Web.Controllers
 {
@@ -19,13 +27,61 @@ namespace Yvtu.Web.Controllers
         private readonly IAppDbContext _db;
         private readonly IPartnerManager _partnerManager;
         private readonly IPartnerActivityRepo _partnerActivity;
+        private readonly IConverter converter;
+        private readonly IWebHostEnvironment environment;
 
         public MoneyTransferController(IAppDbContext db, IPartnerManager partnerManager
-            , IPartnerActivityRepo partnerActivity)
+            , IPartnerActivityRepo partnerActivity, IConverter converter, IWebHostEnvironment environment)
         {
             this._db = db;
             this._partnerManager = partnerManager;
             this._partnerActivity = partnerActivity;
+            this.converter = converter;
+            this.environment = environment;
+        }
+        //[HttpGet]
+        public IActionResult CreatePDF(int id)
+        {
+            var model = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetSingleOrDefault(id);
+            if (model == null) return Ok("غير موجود");
+            var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
+            var permission = _partnerActivity.GetPartAct("Money.Transfer.Print", int.Parse(roleId));
+            var currUserId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.MobilePhone).Value;
+            if (permission == null) return LocalRedirect("/Account/AccessDenied");
+            if (permission.Scope.Id != "Everyone" && model.CreatedBy.Id != currUserId) return LocalRedirect("/Account/AccessDenied");
+
+
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Portrait,
+                PaperSize =  PaperKind.A4,
+                Margins = new MarginSettings { Top = 10},
+                DocumentTitle = "Money Transfer"
+                
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = new MoneyTransferTemplate(_db, _partnerManager, environment, _partnerActivity).GetHTMLString(id),
+                WebSettings =
+                {
+                    DefaultEncoding = "utf-8",UserStyleSheet=Path.Combine(environment.WebRootPath, "css","Reports","rptMoneyTransfer.css")
+                },
+                //HeaderSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true},
+                FooterSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true, Center="Y Company"},
+                
+                
+            };
+
+            var pdf = new HtmlToPdfDocument {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+            
+            var file = converter.Convert(pdf);
+
+            return File(file, "application/pdf");
         }
         public IActionResult Index()
         {
@@ -36,8 +92,8 @@ namespace Yvtu.Web.Controllers
         public IActionResult Create()
         {
             var model = new CreateMoneyTransferDto();
-            var currentPartId = _partnerManager.GetCurrentUserId(this.HttpContext);
-            var currentPart = _partnerManager.Validate(currentPartId).Partner;
+            var currentPartAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
+            var currentPart = _partnerManager.GetPartnerByAccount(currentPartAccount);
             model.CreatorBalance = currentPart.Balance - currentPart.Reserved;
             var payTypes = new CommonCodeRepo(_db).GetCodesByType("pay.type");
             model.PayType = payTypes;
@@ -70,7 +126,7 @@ namespace Yvtu.Web.Controllers
                     return View(model);
                 }
                 result.AmountName = new MonyToString().NumToStr(result.Amount);
-                result.PayTypeName = new CommonCodeRepo(_db).GetCodesById(model.PayTypeId).Name;
+                result.PayTypeName = new CommonCodeRepo(_db).GetCodesById(model.PayTypeId, "pay.type").Name;
                 result.PayTypeId = model.PayTypeId;
                 result.PayNo = model.PayNo;
                 result.PayDate = model.PayDate;
@@ -101,7 +157,7 @@ namespace Yvtu.Web.Controllers
             moneyTransfer.PayNo = model.PayNo;
             moneyTransfer.PayDate = model.PayDate;
             moneyTransfer.PayBank = model.PayBank;
-            moneyTransfer.CreatedBy.Id = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier).Value;
+            moneyTransfer.CreatedBy.Id = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.MobilePhone).Value;
             moneyTransfer.AccessChannel.Id = "web";
             moneyTransfer.Amount = model.Amount;
             moneyTransfer.BillNo = model.BillNo;
@@ -109,10 +165,15 @@ namespace Yvtu.Web.Controllers
             moneyTransfer.RequestAmount = model.RequestAmount;
             moneyTransfer.Note = model.Note;
 
-            var result = new MoneyTransferRepo(_db).Create(moneyTransfer);
+            var result = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).Create(moneyTransfer);
             if (result.Success)
             {
                 model.Id = result.AffectedCount;
+                ModelState.SetModelValue("Id", new ValueProviderResult("" + result.AffectedCount + "", CultureInfo.InvariantCulture));
+                //CreatePDF(model.Id);
+                return View(model);
+                //return RedirectToAction("CreatePDF", new { id = model.Id });
+                //return RedirectToAction("Create");
             }
             else
             {
@@ -143,8 +204,9 @@ namespace Yvtu.Web.Controllers
             {
                 var partner = validateResult.Partner;
                 var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
-                var moneyTransferSettings = _partnerActivity.GetPartAct("Money.Transfer", int.Parse(roleId), partner.Role.Id);
-                if (moneyTransferSettings == null || moneyTransferSettings.Details == null || moneyTransferSettings.Details.Count == 0) return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
+                var moneyTransferSettings = _partnerActivity.GetDetail("Money.Transfer", int.Parse(roleId), partner.Role.Id, true);
+                if (moneyTransferSettings == null) 
+                    return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
                 
                 var model = new CreateMoneyTransferDto
                 {
@@ -152,32 +214,32 @@ namespace Yvtu.Web.Controllers
                     PartnerName = partner.Name,
                     PartnerRoleName = partner.Role.Name,
                     PartnerBalance = partner.Balance,
-                    TaxPercent = moneyTransferSettings.Details[0].TaxPercent,
-                    BonusPercent = moneyTransferSettings.Details[0].BonusPercent,
-                    BounsTaxPercent = moneyTransferSettings.Details[0].BonusTaxPercent,
+                    TaxPercent = moneyTransferSettings.TaxPercent,
+                    BonusPercent = moneyTransferSettings.BonusPercent,
+                    BounsTaxPercent = moneyTransferSettings.BonusTaxPercent,
                     Error = "N/A"
                 };
                 if (amount <= 0) return model;
 
-                if (moneyTransferSettings.Details[0].MaxValue > 0 && amount > moneyTransferSettings.Details[0].MaxValue)
+                if (moneyTransferSettings.MaxValue > 0 && amount > moneyTransferSettings.MaxValue)
                 {
-                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.Details[0].MaxValue.ToString("N0")} " ;
+                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue.ToString("N0")} " ;
                     return model;
                 }
-                if (moneyTransferSettings.Details[0].MinValue > 0 && amount < moneyTransferSettings.Details[0].MinValue)
+                if (moneyTransferSettings.MinValue > 0 && amount < moneyTransferSettings.MinValue)
                 {
-                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.Details[0].MinValue.ToString("N0")} ";
+                    model.Error = $"المبلغ اقل من الاحد الادنى المسموح به {moneyTransferSettings.MinValue.ToString("N0")} ";
                     return model;
                 }
 
-                var currPartId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.NameIdentifier).Value;
-                var currPart = _partnerManager.Validate(currPartId).Partner;
-                model.CreateorId = currPartId;
+                var currParAccountd = _partnerManager.GetCurrentUserAccount(this.HttpContext);
+                var currPart = _partnerManager.GetPartnerByAccount(currParAccountd);
+                model.CreateorId = currPart.Id;
                 model.CreateorName = currPart.Name;
                 model.CreateorRoleId = currPart.Role.Id;
                 model.CreateorRoleName = currPart.Role.Name;
                 model.CreatorBalance = currPart.Balance - currPart.Reserved;
-                if (moneyTransferSettings.Details[0].CheckBalanceRequired)
+                if (moneyTransferSettings.CheckBalanceRequired)
                 {
                     
                     if (amount > model.CreatorBalance)
@@ -187,10 +249,10 @@ namespace Yvtu.Web.Controllers
                     }
                 }
 
-                var netAmount = amount / ((moneyTransferSettings.Details[0].TaxPercent / 100) + 1) ;
-                var taxAmount = netAmount * (moneyTransferSettings.Details[0].TaxPercent / 100);
-                var bounsAmount = netAmount * (moneyTransferSettings.Details[0].BonusPercent / 100);
-                var bounsTaxAmount = bounsAmount * (moneyTransferSettings.Details[0].BonusTaxPercent / 100);
+                var netAmount = amount / ((moneyTransferSettings.TaxPercent / 100) + 1) ;
+                var taxAmount = netAmount * (moneyTransferSettings.TaxPercent / 100);
+                var bounsAmount = netAmount * (moneyTransferSettings.BonusPercent / 100);
+                var bounsTaxAmount = bounsAmount * (moneyTransferSettings.BonusTaxPercent / 100);
                 var recievedAmount = (amount - bounsAmount + bounsTaxAmount);
 
                 model.Amount = amount;
@@ -209,6 +271,68 @@ namespace Yvtu.Web.Controllers
             }
             
 
+        }
+        [HttpGet]
+        public IActionResult MoneyTranferQuery()
+        {
+            var model = new MoneyTransferQueryDto();
+            model.PageNo = 0;
+            model.NoPerPage = 10;
+            model.TotalPages = 0;
+            model.QPartnerId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone).Value;
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult MoneyTranferQuery(MoneyTransferQueryDto model)
+        {
+            //var cur = ++model.PageNo;
+            //ModelState.SetModelValue("PageNo", new ValueProviderResult(""+cur+"", CultureInfo.InvariantCulture));
+            model.Error = string.Empty;
+            Partner targetPartner = null;
+            var currUserId = _partnerManager.GetCurrentUserId(this.HttpContext);
+            var currRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var currAccountId = _partnerManager.GetCurrentUserAccount(this.HttpContext);
+
+            var permission = _partnerActivity.GetPartAct("Money.Transfer.Query", currRoleId);
+            if (permission == null || permission.Details == null)
+            {
+                model.Error = "ليس لديك الصلاحيات الكافية";
+                return View(model);
+            }
+
+            if (permission.Scope.Id == "CurOpOnly" && model.QPartnerId != currUserId)
+            {
+                model.Error = "ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم";
+                return View(model);
+            }
+            else if (permission.Scope.Id == "Exclusive" && targetPartner != null &&  targetPartner.RefPartner.Id != currUserId)
+            {
+                model.Error = "ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم";
+                return View(model);
+            }
+
+            if (!string.IsNullOrEmpty(model.QPartnerId) && model.QPartnerId != currUserId)
+            {
+                var validateTargetPartnerResult = _partnerManager.Validate(model.QPartnerId);
+                targetPartner = validateTargetPartnerResult.Success ? validateTargetPartnerResult.Partner : null;
+                if (targetPartner == null)
+                {
+                    model.Error = "يرجى التأكد من الرقم المراد الاستعلام عنه";
+                    return View(model);
+                }
+            }
+
+            model.QueryUser = _partnerManager.GetCurrentUserId(this.HttpContext);
+            model.QScope = permission.Scope.Id;
+            var result = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).MTQuery(model);
+            return View(result);
+     
+        }
+        [HttpGet]
+        public IActionResult Detail(int id)
+        {
+            var model = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetSingleOrDefault(id);
+            return View(model);
         }
     }
 }

@@ -15,7 +15,7 @@
             @*<div asp-validation-summary="All" class="text-danger"></div>*@
             <div class="form-row">
                 <div class="form-group col-12">
-                    
+
                     <label asp-for="Name" class="FormLabel">الاسم :</label>
                     <input asp-for="Name" class="form-control RequiredInput" />
                     <span asp-validation-for="Name" class="text-danger"></span>
@@ -137,9 +137,9 @@
             </div>
             <div class="form-row">
                 <div class="form-group col-6">
-                    <label asp-for="ExtraAddressInfo" class="FormLabel">معلومات اضافية :</label>
-                    <input asp-for="ExtraAddressInfo" class="form-control" />
-                    <span asp-validation-for="ExtraAddressInfo" class="text-danger"></span>
+                    <label asp-for="RefPartnerId" class="FormLabel">رقم المرجعية :</label>
+                    <input asp-for="RefPartnerId" class="form-control" />
+                    <span asp-validation-for="RefPartnerId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-6">
                     <label asp-for="IPAddress" class="FormLabel">عنوان السيرفر :</label>
@@ -147,10 +147,17 @@
                     <span asp-validation-for="IPAddress" class="text-danger"></span>
                 </div>
             </div>
-            <button type="submit" class="btn btn-outline-success"
-                    style="width:100%;border-radius:10px;">
-                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
-            </button>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label asp-for="ExtraAddressInfo" class="FormLabel">معلومات اضافية :</label>
+                    <input asp-for="ExtraAddressInfo" class="form-control" />
+                    <span asp-validation-for="ExtraAddressInfo" class="text-danger"></span>
+                </div>
+            </div>
+                <button type="submit" class="btn btn-outline-success"
+                        style="width:100%;border-radius:10px;">
+                    <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                </button>
 
         </form>
     </div>

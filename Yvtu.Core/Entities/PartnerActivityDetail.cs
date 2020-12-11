@@ -40,6 +40,7 @@ namespace Yvtu.Core.Entities
                 "Bonus Tax Per =" + BonusTaxPercent.ToString("N2") + Environment.NewLine +
                 "Created On=" + CreatedOn.ToString("yyyy/MM/dd H:mm:ss") + Environment.NewLine +
                 "Created By=" + CreatedBy.Id + Environment.NewLine +
+                "Created By Account=" + CreatedBy.Account + Environment.NewLine +
                 "Last Edit On=" + LastEditOn.ToString("yyyy/MM/dd H:mm:ss");
             return content;
         }

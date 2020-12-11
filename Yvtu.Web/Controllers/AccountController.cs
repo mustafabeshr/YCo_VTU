@@ -7,27 +7,110 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NToastNotify;
 using Yvtu.Core.Entities;
+using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
+    
     public class AccountController : Controller
     {
         private readonly IAppDbContext db;
         private readonly IPartnerManager partner;
+        private readonly IPartnerActivityRepo partnerActivity;
+        private readonly IToastNotification toastNotification;
 
         public AccountController(IAppDbContext db
-            ,IPartnerManager partner)
+            ,IPartnerManager partner
+            ,IPartnerActivityRepo partnerActivity
+            , IToastNotification toastNotification)
         {
             this.db = db;
             this.partner = partner;
+            this.partnerActivity = partnerActivity;
+            this.toastNotification = toastNotification;
         }
         public IActionResult Index()
         {
-            return View();
+            var model = new PartnerQuery();
+            var roles = new RoleRepo(db, partnerActivity).GetRoles();
+            var statuses = new PartnerStatusRepo(db).GetStatusList();
+            model.Roles = roles;
+            model.Statuses = statuses;
+            return View(model);
+        }
+
+        public IActionResult Detail(int account)
+        {
+            var model = partner.GetPartnerByAccount(account);
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult ResetPass(int account)
+        {
+            var model = new ResetPassDto();
+            var roleCode = partner.GetCurrentUserRoleCode(this.HttpContext);
+            if (roleCode != "Admin")
+            {
+                model.Error = "ليس لديك الصلاحية الكافية";
+                model.Success = string.Empty;
+            }
+            else
+            {
+                var partnerModel = this.partner.GetPartnerByAccount(account);
+                var persmission = partnerActivity.GetPartAct("Partner.ResetPassword", this.partner.GetCurrentUserRole(this.HttpContext));
+
+                if (persmission == null)
+                {
+                    model.PartnerId = partnerModel.Id;
+                    model.PartnerName = partnerModel.Name;
+                    model.Error = "ليس لديك الصلاحية الكافية";
+                    model.Success = string.Empty;
+                }
+                else if (persmission.Details == null)
+                {
+                    model.PartnerId = partnerModel.Id;
+                    model.PartnerName = partnerModel.Name;
+                    model.Error = "ليس لديك الصلاحية الكافية";
+                    model.Success = string.Empty;
+                }
+                else if (!persmission.Details.Exists(x => x.ToRole.Id == partnerModel.Role.Id))
+                {
+                    model.PartnerId = partnerModel.Id;
+                    model.PartnerName = partnerModel.Name;
+                    model.Error = "ليس لديك الصلاحية الكافية";
+                    model.Success = string.Empty;
+                }
+                else
+                {
+                    var result = partner.ResetPassword(partnerModel);
+                    if (result)
+                    {
+                        model.PartnerId = partnerModel.Id;
+                        model.PartnerName = partnerModel.Name;
+                        model.Error = string.Empty;
+                        model.Success = "تم تغيير كلمة المرور";
+                        toastNotification.AddSuccessToastMessage("تم اعادة تعيين كلمة المرور بنجاح");
+                    }
+                }
+            }
+            return base.View(model);
+            
+        }
+
+        [HttpPost]
+        public IActionResult Index(PartnerQuery model)
+        {
+            model.Partners = partner.GetPartners(model);
+            var roles = new RoleRepo(db, partnerActivity).GetRoles();
+            var statuses = new PartnerStatusRepo(db).GetStatusList();
+            model.Roles = roles;
+            model.Statuses = statuses;
+            return View(model);
         }
 
         [HttpGet]
@@ -52,7 +135,6 @@ namespace Yvtu.Web.Controllers
                 var partnerResult = this.partner.Validate(model.Id);
                 if (partnerResult.Success)
                 {
-                    
                     if (partnerResult.Partner.Status.Id > 2)
                     {
                         model.Error = "عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا";
@@ -61,6 +143,7 @@ namespace Yvtu.Web.Controllers
                     if (partnerResult.Partner.LockTime > DateTime.Now)
                     {
                         model.Error = "عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(partnerResult.Partner.LockTime);
+                        toastNotification.AddErrorToastMessage("حسابك متوقف مؤقتا");
                         return View(model);
                     }
 
@@ -104,11 +187,18 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var currentRoleId = partner.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Create", currentRoleId);
+            if (permission == null)
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new CreatePartnerDto();
-            var roles = new RoleRepo(db).GetRoles();
+            var roles = new RoleRepo(db, partnerActivity).GetAuthorizedRoles("Partner.Create", currentRoleId);
             var idTypes = new IdTypeRepo(db).GetTypes();
             var cities = new CityRepo(db).GetCities();
-            //var districts = new DistrictRepo(db).GetDistricts();
+         
+            model.RefPartnerId = partner.GetCurrentUserId(this.HttpContext);
             model.Roles = roles;
             model.IdTypes = idTypes;
             model.Cities = cities;
@@ -146,6 +236,7 @@ namespace Yvtu.Web.Controllers
                 createdPartner.Status.Id = 1;
                 createdPartner.StatusBy.Id = partner.GetCurrentUserId(this.HttpContext);
                 createdPartner.IPAddress = model.IPAddress;
+                createdPartner.RefPartner.Id = model.RefPartnerId;
 
 
                 var result = await partner.CreateAsync(createdPartner);
@@ -155,7 +246,7 @@ namespace Yvtu.Web.Controllers
                 }
             }
             //var model = new CreatePartnerDto();
-            var roles = new RoleRepo(db).GetRoles();
+            var roles = new RoleRepo(db, partnerActivity).GetRoles();
             var idTypes = new IdTypeRepo(db).GetTypes();
             var cities = new CityRepo(db).GetCities();
             var districts = new DistrictRepo(db).GetDistrictsByCity(model.CityId ?? 0);
@@ -175,6 +266,56 @@ namespace Yvtu.Web.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return this.RedirectToAction("Login");
+        }
+        [HttpGet]
+        public IActionResult ChangePass()
+        {
+            return View();
+        }
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ChangePass(ChangePassDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var currentPartner = partner.GetPartnerByAccount(partner.GetCurrentUserAccount(this.HttpContext));
+                if (currentPartner == null)
+                {
+                    model.Error = "عذرا ، لا يمكنك تغيير كلمة المرور الخاصة بك";
+                    return View(model);
+                }
+                if (currentPartner.Status.Id > 2)
+                {
+                    model.Error = "عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا";
+                    return View(model);
+                }
+                if (currentPartner.LockTime > DateTime.Now)
+                {
+                    model.Error = "عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(currentPartner.LockTime);
+                    await SignOut();
+                }
+                if (!System.Text.RegularExpressions.Regex.IsMatch( model.NewPass.ToString(), "^[0-9]{4,6}$"))
+                {
+                    model.Error = "كلمة المرور الجديدة غير مستوفية للشروط";
+                    return View(model);
+                }
+                byte[] salt = Convert.FromBase64String(currentPartner.Extra);
+                string hash = Pbkdf2Hasher.ComputeHash(model.OldPass.ToString(), salt);
+
+                if (currentPartner.Pwd != hash)
+                {
+                    bool lockAccount = false;
+                    if (currentPartner.WrongPwdAttempts >= 2) lockAccount = true;
+                    partner.IncreaseWrongPwdAttempts(currentPartner.Id, lockAccount);
+                    model.Error = "كلمة المرور القديمة غير صحيح" + Environment.NewLine + "(" + currentPartner.WrongPwdAttempts + ")";
+                    return View(model);
+                }
+
+                partner.ChangePwd(currentPartner.Account, currentPartner.Id, model.NewPass.ToString());
+                toastNotification.AddSuccessToastMessage("تم تغيير كلمة المرور بنجاح");
+            }
+
+            return View(model);
         }
     }
 }

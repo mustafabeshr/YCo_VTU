@@ -57,6 +57,9 @@ namespace Yvtu.Web.Dto
         [StringLength(150, ErrorMessage = "يجب ان لا يزيد طول المعلومات الاضافية عن 150 حرف")]
         public string ExtraAddressInfo { get; set; }
         public string IPAddress { get; set; }
+        [Required(ErrorMessage = "يجب ادخال رقم الجهة المرجعية لهذا الحساب")]
+        [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
+        public string RefPartnerId { get; set; }
 
         public virtual List<Role> Roles { get; set; }
         public virtual List<IdType> IdTypes { get; set; }

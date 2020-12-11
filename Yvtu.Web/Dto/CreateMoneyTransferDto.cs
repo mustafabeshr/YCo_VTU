@@ -11,6 +11,7 @@ namespace Yvtu.Web.Dto
     public class CreateMoneyTransferDto
     {
         public int Id { get; set; }
+        public string OPType { get; set; }
         [Required(ErrorMessage = "يجب تحديد الجهة المراد نقل الرصيد اليها")]
         [StringLength(9, ErrorMessage = "يجب ان يكون طول الرقم 9 ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]

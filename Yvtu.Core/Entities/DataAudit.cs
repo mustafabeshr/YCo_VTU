@@ -13,6 +13,7 @@ namespace Yvtu.Core.Entities
         }
         public int Id { get; set; }
         public string PartnerId { get; set; }
+        public int PartnerAccount { get; set; }
         public string PartnerName { get; set; }
         public DateTime CreatedOn { get; set; }
         public Activity Activity { get; set; }

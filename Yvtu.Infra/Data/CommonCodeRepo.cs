@@ -40,12 +40,13 @@ namespace Yvtu.Infra.Data
             }
             return commonCodes;
         }
-        public CommonCode GetCodesById(string id)
+        public CommonCode GetCodesById(string id, string type)
         {
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "CodeId", OracleDbType = OracleDbType.Varchar2,  Value = id },
+                 new OracleParameter{ ParameterName = "CodeType", OracleDbType = OracleDbType.Varchar2,  Value = type }
             };
-            var codeDataTable = this.db.GetData("Select * from Common_Code where code_id = :CodeId", parameters);
+            var codeDataTable = this.db.GetData("Select * from Common_Code where code_id = :CodeId and code_type = :CodeType", parameters);
             var commonCode = new CommonCode();
             if (codeDataTable != null && codeDataTable.Rows.Count > 0)
             {

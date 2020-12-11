@@ -41,7 +41,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_act_scope",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.Scope.Id },
                  new OracleParameter{ ParameterName = "v_maxrec",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.MaxQueryRows },
                  new OracleParameter{ ParameterName = "v_onlypartchildren",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.OnlyPartnerChildren ? 1 : 0 },
-                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.CreatedBy.Id }
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = partnerActivity.CreatedBy.Id },
+                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = partnerActivity.CreatedBy.Account }
                 };
                 #endregion
                  db.ExecuteStoredProc("pk_Settings.fn_CreatePartnerActivity", parameters);
@@ -130,6 +131,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
                     partAct.Details = GetDetails(partAct.Id);
 
@@ -176,6 +178,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
                     partAct.Details = GetDetails(partAct.Id);
 
@@ -223,6 +226,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
                     partAct.Details = GetDetails(partAct.Id);
 
@@ -232,13 +236,13 @@ namespace Yvtu.Infra.Data
             return activities;
         }
 
-        public PartnerActivity GetPartAct(string actId, int fromRoleId, int toRoleId)
+        public PartnerActivity GetPartAct(string actId, int fromRoleId)
         {
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "actId", OracleDbType = OracleDbType.Varchar2,  Value = actId },
                  new OracleParameter{ ParameterName = "fromRoleId", OracleDbType = OracleDbType.Int32,  Value = fromRoleId }
             };
-            var actDataTable = this.db.GetData("Select * from v_partner_activity  where act_id=:actId and fromroleid=:fromroleid and toroleid=:toroleid ", parameters);
+            var actDataTable = this.db.GetData("Select * from v_partner_activity  where act_id=:actId and fromroleid=:fromRoleId ", parameters);
             var partAct = new PartnerActivity();
             if (actDataTable != null && actDataTable.Rows.Count > 0)
             {
@@ -267,6 +271,54 @@ namespace Yvtu.Infra.Data
                 partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                 partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                 partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
+                partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+                partAct.Details = GetDetails(partAct.Id, false);
+                return partAct;
+            }
+            else
+            {
+                return null;
+            }
+
+        }
+
+        public PartnerActivity GetPartAct(string actId, int fromRoleId, int toRoleId)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "actId", OracleDbType = OracleDbType.Varchar2,  Value = actId },
+                 new OracleParameter{ ParameterName = "fromRoleId", OracleDbType = OracleDbType.Int32,  Value = fromRoleId }
+            };
+            var actDataTable = this.db.GetData("Select * from v_partner_activity  where act_id=:actId and fromroleid=:fromRoleId ", parameters);
+            var partAct = new PartnerActivity();
+            if (actDataTable != null && actDataTable.Rows.Count > 0)
+            {
+                DataRow row = actDataTable.Rows[0];
+                partAct.Id = row["row_id"] == DBNull.Value ? 0 : int.Parse(row["row_id"].ToString());
+
+                partAct.Activity.Id = row["act_id"] == DBNull.Value ? string.Empty : row["act_id"].ToString();
+                partAct.Activity.Name = row["act_name"] == DBNull.Value ? string.Empty : row["act_name"].ToString();
+                partAct.Activity.Type = row["act_type"] == DBNull.Value ? string.Empty : row["act_type"].ToString();
+                partAct.Activity.Order = row["act_order"] == DBNull.Value ? 0 : int.Parse(row["act_order"].ToString());
+                partAct.Activity.Internal = row["internal_use"] == DBNull.Value ? false : row["internal_use"].ToString() == "1" ? true : false;
+
+                partAct.FromRole.Id = row["fromroleid"] == DBNull.Value ? 0 : int.Parse(row["fromroleid"].ToString());
+                partAct.FromRole.Name = row["fromrolename"] == DBNull.Value ? string.Empty : row["fromrolename"].ToString();
+                partAct.FromRole.IsActive = row["fromroleisactive"] == DBNull.Value ? false : row["fromroleisactive"].ToString() == "1" ? true : false;
+                partAct.FromRole.Weight = row["fromroleweight"] == DBNull.Value ? 0 : int.Parse(row["fromroleweight"].ToString());
+                partAct.FromRole.Order = row["fromroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["fromroleorder"].ToString());
+                partAct.FromRole.Code = row["fromordercode"] == DBNull.Value ? string.Empty : row["fromordercode"].ToString();
+
+                partAct.MaxQueryDuration.Id = row["queryduration"] == DBNull.Value ? string.Empty : row["queryduration"].ToString();
+                partAct.MaxQueryDuration.Name = row["queryduration_name"] == DBNull.Value ? string.Empty : row["queryduration_name"].ToString();
+                partAct.Scope.Id = row["act_scope"] == DBNull.Value ? string.Empty : row["act_scope"].ToString();
+                partAct.Scope.Name = row["act_scope_name"] == DBNull.Value ? string.Empty : row["act_scope_name"].ToString();
+                partAct.MaxQueryRows = row["maxrec"] == DBNull.Value ? 0 : int.Parse(row["maxrec"].ToString());
+                partAct.OnlyPartnerChildren = row["onlypartchildren"] == DBNull.Value ? false : row["onlypartchildren"].ToString() == "1" ? true : false;
+                partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
+                partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                 partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
                 partAct.Details = GetDetails(partAct.Id, toRoleId);
 
@@ -314,6 +366,7 @@ namespace Yvtu.Infra.Data
                 partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                 partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                 partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                 partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
                 partAct.Details = GetDetails(partAct.Id);
 
@@ -354,6 +407,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
 
                     if (withMaster)  partAct.Parent = GetPartAct(partAct.ParentId);
@@ -397,6 +451,7 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
 
                     if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
@@ -440,9 +495,52 @@ namespace Yvtu.Infra.Data
                     partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                     partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
                     partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                    partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                     partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
 
                     if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
+
+            }
+            return partAct;
+        }
+        public PartnerActivityDetail GetDetail(string actId, int fromRoleId, int toRoleId, bool withMaster = false)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "actId", OracleDbType = OracleDbType.Varchar2,  Value = actId },
+                 new OracleParameter{ ParameterName = "fromId", OracleDbType = OracleDbType.Int32,  Value = fromRoleId },
+                 new OracleParameter{ ParameterName = "toId", OracleDbType = OracleDbType.Int32,  Value = toRoleId }
+            };
+            var masterDataTable = this.db.GetData("Select * from V_PARTNER_ACTIVITY_DETAIL  where act_id=:actId and fromroleid=:fromId and toroleid=:toId ", parameters);
+
+            var partAct = new PartnerActivityDetail();
+            if (masterDataTable != null)
+            {
+                DataRow row = masterDataTable.Rows[0];
+
+                partAct.Id = row["detail_row_id"] == DBNull.Value ? 0 : int.Parse(row["detail_row_id"].ToString());
+
+                partAct.ParentId = row["master_row"] == DBNull.Value ? 0 : int.Parse(row["master_row"].ToString());
+
+                partAct.ToRole.Id = row["toroleid"] == DBNull.Value ? 0 : int.Parse(row["toroleid"].ToString());
+                partAct.ToRole.Name = row["torolename"] == DBNull.Value ? string.Empty : row["torolename"].ToString();
+                partAct.ToRole.IsActive = row["toroleisactive"] == DBNull.Value ? false : row["toroleisactive"].ToString() == "1" ? true : false;
+                partAct.ToRole.Weight = row["toroleweight"] == DBNull.Value ? 0 : int.Parse(row["toroleweight"].ToString());
+                partAct.ToRole.Order = row["toroleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["toroleorder"].ToString());
+                partAct.ToRole.Code = row["torolecode"] == DBNull.Value ? string.Empty : row["torolecode"].ToString();
+
+                partAct.CheckBalanceRequired = row["check_bal"] == DBNull.Value ? true : row["check_bal"].ToString() == "1" ? true : false;
+                partAct.MaxValue = row["max_value"] == DBNull.Value ? 0 : int.Parse(row["max_value"].ToString());
+                partAct.MinValue = row["min_value"] == DBNull.Value ? 0 : int.Parse(row["min_value"].ToString());
+                partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+                partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+                partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
+                partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
+                partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                partAct.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
+                partAct.CreatedBy.Name = row["createdname"] == DBNull.Value ? string.Empty : row["createdname"].ToString();
+
+                if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
 
             }
             return partAct;
@@ -462,7 +560,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = model.BonusPercent },
                  new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = model.TaxPercent },
                  new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = model.BonusTaxPercent },
-                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id }
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id },
+                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = model.CreatedBy.Account }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_settings.fn_createpartneractivitydetail", parameters);

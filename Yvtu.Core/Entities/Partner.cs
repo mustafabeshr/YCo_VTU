@@ -18,8 +18,10 @@ namespace Yvtu.Core.Entities
             Address.District = new District();
             ContactInfo = new ContactInfo();
             CreatedBy = new AppUser();
+            RefPartner = new AppUser();
         }
         public string Id { get; set; }
+        public int Account { get; set; }
         public string Name { get; set; }
         public string BrandName { get; set; }
         public Role Role { get; set; }
@@ -31,6 +33,7 @@ namespace Yvtu.Core.Entities
         public String PairMobile { get; set; }
         public ContactInfo ContactInfo { get; set; }
         public DateTime CreatedOn { get; set; }
+        public DateTime LastLoginOn { get; set; }
         public AppUser CreatedBy { get; set; } 
         public DateTime LockTime { get; set; }
         public bool VerificationCodeNext { get; set; }
@@ -40,5 +43,6 @@ namespace Yvtu.Core.Entities
         public long Reserved { get; set; }
         public int WrongPwdAttempts { get; set; }
         public string IPAddress { get; set; }
+        public AppUser RefPartner { get; set; }
     }
 }

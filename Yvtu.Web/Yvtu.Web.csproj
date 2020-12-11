@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DinkToPDF" Version="1.0.8" />
+    <PackageReference Include="NToastNotify" Version="7.0.0" />
     <PackageReference Include="popper.js" Version="1.16.1" />
   </ItemGroup>
 

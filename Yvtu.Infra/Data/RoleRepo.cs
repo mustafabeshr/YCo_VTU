@@ -12,10 +12,12 @@ namespace Yvtu.Infra.Data
     public class RoleRepo
     {
         private readonly IAppDbContext db;
+        private readonly IPartnerActivityRepo partnerActivityRepo;
 
-        public RoleRepo(IAppDbContext db)
+        public RoleRepo(IAppDbContext db,  IPartnerActivityRepo partnerActivityRepo)
         {
             this.db = db;
+            this.partnerActivityRepo = partnerActivityRepo;
         }
 
         public List<Role> GetRoles()
@@ -35,6 +37,19 @@ namespace Yvtu.Infra.Data
                     role.Order = row["roleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["roleorder"].ToString());
                     roles.Add(role);
                 }
+            }
+            return roles;
+        }
+        public List<Role> GetAuthorizedRoles(string actId,int roleId)
+        {
+            var permission = partnerActivityRepo.GetPartAct(actId, roleId);
+            if (permission == null) return null;
+            if (permission.Details == null) return null;
+            var roles = new List<Role>();
+            foreach (var item in permission.Details)
+            {
+                var role = GetRole(item.ToRole.Id);
+                roles.Add(role);
             }
             return roles;
         }
