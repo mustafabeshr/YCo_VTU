@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Yvtu.Infra\Yvtu.Infra.csproj" />
+    <ProjectReference Include="..\Yvtu.SMSRec\Yvtu.SMSRec.csproj" />
   </ItemGroup>
 
 </Project>

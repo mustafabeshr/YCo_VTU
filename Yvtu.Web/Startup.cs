@@ -36,7 +36,7 @@ namespace Yvtu.Web
             services.AddScoped<IPartnerManager, PartnerManager>();
             services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
             services.AddScoped<IDataAuditRepo, DataAuditRepo>();
-            services.AddSingleton<IAppDbContext, AppDbContext>();
+            services.AddSingleton<IAppDbContext,AppDbContext>();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddControllersWithViews().AddNToastNotifyNoty(new NToastNotify.NotyOptions()
             {

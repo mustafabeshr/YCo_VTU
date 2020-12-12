@@ -6,17 +6,18 @@ using System.Text;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data.Interfaces;
 
-namespace Yvtu.Infra.Data
+namespace Yvtu.SMSRec.Repo
 {
-    public class OutSMSRepo
-    {
-        private readonly IAppDbContext db;
+    public class SMSInRepo
 
-        public OutSMSRepo(IAppDbContext db)
+    {
+        private readonly IRecDbContext db;
+
+        public SMSInRepo(IRecDbContext db)
         {
             this.db = db;
         }
-        public OpertionResult Create(SMSOut outSMS)
+        public OpertionResult Create(SMSIn sms)
         {
 
             try
@@ -24,11 +25,14 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.Varchar2,  Value = outSMS.Message },
-                 new OracleParameter{ ParameterName = "v_receiver",OracleDbType = OracleDbType.Varchar2,  Value = outSMS.Receiver },
+                 new OracleParameter{ ParameterName = "v_reciever",OracleDbType = OracleDbType.Varchar2,  Value = sms.Receiver },
+                 new OracleParameter{ ParameterName = "v_sender",OracleDbType = OracleDbType.Varchar2,  Value = sms.Sender },
+                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.Varchar2,  Value = sms.Message },
+                 new OracleParameter{ ParameterName = "v_ref_no",OracleDbType = OracleDbType.Int32,  Value = sms.RefNo },
+                 new OracleParameter{ ParameterName = "v_lang",OracleDbType = OracleDbType.Varchar2,  Value = sms.Lang }
                 };
                 #endregion
-                db.ExecuteStoredProc("pk_infra.fn_createoutsms", parameters);
+                db.ExecuteStoredProc("pk_infra.fn_create_in_sms", parameters);
                 var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)

@@ -6,13 +6,13 @@ using System.Text;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data.Interfaces;
 
-namespace Yvtu.Infra.Data
+namespace Yvtu.SMSRec.Repo
 {
     public class OutSMSRepo
     {
-        private readonly IAppDbContext db;
+        private readonly IRecDbContext db;
 
-        public OutSMSRepo(IAppDbContext db)
+        public OutSMSRepo(IRecDbContext db)
         {
             this.db = db;
         }

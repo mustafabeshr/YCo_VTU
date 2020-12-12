@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+  <!-- Values Guide ... -->
+  <!--
+     Interface_No : (byte) any number between 1..255
+     Bind_Type :(string) S=Sender only,R=Receiver only ,SR=Both
+     Auto_Start : (bool) 1=yes , 0=no
+     Auto_Sending : (bool)  1=yes , 0=no
+     SendingData_Table : (string) full table name
+     Sending_Speed : (byte) any number between 1..255
+     Braodcast_Queueing : (bool) 1=yes , 0=no
+     Channel : (byte) any number between 1..255
+     Sending_Daily_Report : (bool) 1=yes , 0=no
+     Sending_Daily_Report_Time : (string) time representation HH:mm and in 24 hours mode
+     Daily_Report_Lang : (string) E for English or A for Arabic
+  -->
+  <!-- **************************************************************-->
+  <!-- 01 -->
+  <Interface>
+    <Interface_No>1</Interface_No>
+    <Bind_Type>S</Bind_Type>
+    <Auto_Start>1</Auto_Start>
+    <Auto_Sending>1</Auto_Sending>
+    <SendingData_Table>[dbo].[res_Book]</SendingData_Table>
+    <Sending_Speed>10</Sending_Speed>
+    <Braodcast_Queueing>0</Braodcast_Queueing>
+    <Braodcast_Table>Broadcast</Braodcast_Table>
+    <Channel>1</Channel>
+    <Sending_Daily_Report>0</Sending_Daily_Report>
+    <Sending_Daily_Report_Time>22:00</Sending_Daily_Report_Time>
+    <Daily_Report_Lang>E</Daily_Report_Lang>
+    <Status>closed</Status>
+  </Interface>
+
+
+  
+

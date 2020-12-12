@@ -47,7 +47,7 @@ namespace Yvtu.Infra.Data
                 if (result > 0)
                 {
                     var msg = "تم تغيير كلمة المرور الخاصبة بك الى " + newPwd;
-                    new OutSMSRepo(db).Create(new OutSMS
+                    new OutSMSRepo(db).Create(new SMSOut
                     {
                         Receiver = PartnerId,
                         Message = msg
@@ -113,7 +113,7 @@ namespace Yvtu.Infra.Data
                 if (result > 0)
                 {
                     var msg = "تم انشاء حساب لك بخدمة الشاحن الفوري و كلمة المرور هي  " + partner.Pwd;
-                    new OutSMSRepo(db).Create(new OutSMS
+                    new OutSMSRepo(db).Create(new SMSOut
                     {
                         Receiver = partner.Id,
                         Message = msg
@@ -155,7 +155,7 @@ namespace Yvtu.Infra.Data
                 if (result > 0)
                 {
                     var msg = "تم اعادة تعيين كلمة المرور الخاصة بك الى " + pass;
-                    new OutSMSRepo(db).Create(new OutSMS
+                    new OutSMSRepo(db).Create(new SMSOut
                     {
                         Receiver = partner.Id,
                         Message = msg

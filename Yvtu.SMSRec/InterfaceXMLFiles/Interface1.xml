@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+  <!-- Values Guide ... -->
+  <!--
+     Interface_No : (byte) any number between 1..255
+     Bind_Type :(string) S=Sender only,R=Receiver only ,SR=Both
+     Auto_Start : (bool) 1=yes , 0=no
+     Channel : (byte) any number between 1..255
+  -->
+  <!-- **************************************************************-->
+  <!-- 01 -->
+  <Interface>
+    <Interface_No>1</Interface_No>
+    <Bind_Type>R</Bind_Type>
+    <Auto_Start>0</Auto_Start>
+    <Channel>1</Channel>
+  </Interface>
+
+
+  
+
