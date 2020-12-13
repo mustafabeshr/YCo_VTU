@@ -14,7 +14,7 @@ namespace Yvtu.SMSRec
             this.db = db;
         }
         // Write your code in this class to process the request ...
-        public RequestReturnValue Parse_Request(Delivered_Message ClientMessage,out PartnerRequest parsedRequest)
+        public RequestReturnValue Parse_Request(Delivered_Message ClientMessage, byte queueNo, out PartnerRequest parsedRequest)
         {
             RequestReturnValue ret = new RequestReturnValue();
             string ch = string.Empty;
@@ -57,7 +57,7 @@ namespace Yvtu.SMSRec
                         Tokens[i] = Tokens[i].Trim();
                     }
                     
-                    if (Tokens[0] == "ت")
+                    if (Tokens[0] == "ت" || Tokens[0].ToLower() == "t")
                     {
                         #region Money Transfer
                         if (Tokens.Length < 4)
@@ -66,6 +66,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "REQUEST_TOO_SHORT";
                             ret.Ret_Message_to_Client = "عذرا طلب نقل رصيد غير مكتمل ، يرجى التأكد و المحاولة مرة اخرى";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (!Util.ValidRegEx(Tokens[1], SharedParams.AmountPattern))
@@ -74,6 +75,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "INVALID_AMOUNT";
                             ret.Ret_Message_to_Client = "المبلغ غير صحيح ، يرجى التاكد و المحاولة لاحقا";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (!Util.ValidRegEx(Tokens[2], SharedParams.MobileNumberPattern))
@@ -82,6 +84,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "WRONG_MOBILE";
                             ret.Ret_Message_to_Client = "رقم المشترك غير صحيح ، يرجى التاكد و المحاولة لاحقا";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (!Util.ValidRegEx(Tokens[3], SharedParams.PINCodePattern))
@@ -90,6 +93,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "INVALID_PIN_CODE";
                             ret.Ret_Message_to_Client = "الرقم السري غير صحيح ، يرجى التاكد و المحاولة لاحقا";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (Tokens[2] == ClientMessage.Mobile_No)
@@ -98,6 +102,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "TransferToHimself";
                             ret.Ret_Message_to_Client = "عذرا لا يمكنك نقل رصيد الى نفسك";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
@@ -107,6 +112,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Not_Found";
                             ret.Ret_Message_to_Client = "عذرا ليس لديك حساب بالخدمة";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (partner.Balance < double.Parse(Tokens[1]))
@@ -115,6 +121,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "NotEnoughBalance";
                             ret.Ret_Message_to_Client = "رصيدك غير كافي لاجراء عملية نقل رصيد";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         var targetPartner = new Repo.PartnerManager(db).GetActivePartner(Tokens[2]);
@@ -124,6 +131,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Another_Partner_Not_Found";
                             ret.Ret_Message_to_Client = "عذرا الرقم "+ Tokens[2] + "المراد نقل الرصيد اليه ليس لديه حساب";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Money.Transfer", partner.Role.Id, targetPartner.Role.Id);
@@ -133,6 +141,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Unauthorized";
                             ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (permission.Details == null)
@@ -141,6 +150,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Unauthorized";
                             ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية لنقل رصيد لهذه الجهة";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (permission.Details[0].MinValue > 0 && int.Parse(Tokens[1]) < permission.Details[0].MinValue)
@@ -149,6 +159,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "AmountLessThanMinimum";
                             ret.Ret_Message_to_Client = "عذرا المبلغ المراد نقله اقل من الحد الادنى " + permission.Details[0].MinValue.ToString("N0");
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         if (permission.Details[0].MaxValue > 0 &&int.Parse(Tokens[1]) > permission.Details[0].MaxValue)
@@ -157,6 +168,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "AmountMoreThanMaximum";
                             ret.Ret_Message_to_Client = "عذرا المبلغ المراد نقله اكبر من الحد الاعلى  " + permission.Details[0].MaxValue.ToString("N0");
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
                             return ret;
                         }
                         #region Client weather authonticated or not  
@@ -249,6 +261,14 @@ namespace Yvtu.SMSRec
                                     return ret;
                                 }
                                 #endregion
+                            } else
+                            {
+                                ret.Ret_ID = -1;
+                                ret.Ret_Message = "WrongPass";
+                                ret.Ret_Message_to_Client = "عذرا الرقم السري غير صحيح  ";
+                                ret.Ret_Status = false;
+                                parsedRequest.RequestId = 2;
+                                return ret;
                             }
                         }
                         
@@ -264,6 +284,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "REQUEST_TOO_SHORT";
                             ret.Ret_Message_to_Client = "عذرا لم يتم ارسال الرقم السري ، يرجى التأكد و المحاولة مرة اخرى";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
                             return ret;
                         }
                         if (!Util.ValidRegEx(Tokens[1], SharedParams.PINCodePattern))
@@ -272,6 +293,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "INVALID_PIN_CODE";
                             ret.Ret_Message_to_Client = "الرقم السري غير صحيح ، يرجى التاكد و المحاولة لاحقا";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
                             return ret;
                         }
                         var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
@@ -281,6 +303,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Not_Found";
                             ret.Ret_Message_to_Client = "عذرا ليس لديك حساب بالخدمة";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
                             return ret;
                         }
                         var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Balance.Query", partner.Role.Id);
@@ -290,6 +313,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message = "Unauthorized";
                             ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية";
                             ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
                             return ret;
                         }
                         var isCorrectPass = new Repo.PartnerManager(db).CheckPass(partner, Tokens[1]);
@@ -299,7 +323,7 @@ namespace Yvtu.SMSRec
                             ret.Ret_ID = 1;
                             ret.Ret_Status = true;
                             parsedRequest.Id = 1;
-                            parsedRequest.RequestId = 1;
+                            parsedRequest.RequestId = 3;
                             parsedRequest.RequestName = "Balance Query";
                             parsedRequest.Status = 1;
                             parsedRequest.MobileNo = partner.Id;
@@ -314,7 +338,185 @@ namespace Yvtu.SMSRec
 
                             return ret;
                         }
+                        else
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "WrongPass";
+                            ret.Ret_Message_to_Client = "عذرا الرقم السري غير صحيح  ";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
+                        }
 
+                        #endregion
+                    }
+                    else if (Util.ContainsOnlyNumbers(ClientMessage.Message.Replace(" ",string.Empty)))
+                    {
+                        #region Recharge
+                        if (Tokens.Length < 3)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "REQUEST_TOO_SHORT";
+                            ret.Ret_Message_to_Client = "عذرا طلب شحن رصيد غير مكتمل ، يرجى التأكد و المحاولة مرة اخرى";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[0], SharedParams.AmountPattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "INVALID_AMOUNT";
+                            ret.Ret_Message_to_Client = "المبلغ غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[1], SharedParams.MobileNumberPattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "WRONG_MOBILE";
+                            ret.Ret_Message_to_Client = "رقم المشترك غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[2], SharedParams.PINCodePattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "INVALID_PIN_CODE";
+                            ret.Ret_Message_to_Client = "الرقم السري غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
+                        if (partner == null)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Not_Found";
+                            ret.Ret_Message_to_Client = "عذرا ليس لديك حساب بالخدمة";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (partner.Balance < double.Parse(Tokens[0]))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "NotEnoughBalance";
+                            ret.Ret_Message_to_Client = "رصيدك غير كافي لاجراء عملية شحن رصيد";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Recharge.Create", partner.Role.Id, 9);
+                        if (permission == null)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Unauthorized";
+                            ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (permission.Details == null)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Unauthorized";
+                            ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية لشحن رصيد لهذا الرقم";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (permission.Details[0].MinValue > 0 && int.Parse(Tokens[0]) < permission.Details[0].MinValue)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "AmountLessThanMinimum";
+                            ret.Ret_Message_to_Client = "عذرا المبلغ اقل من الحد الادنى " + permission.Details[0].MinValue.ToString("N0");
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        if (permission.Details[0].MaxValue > 0 && int.Parse(Tokens[0]) > permission.Details[0].MaxValue)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "AmountMoreThanMaximum";
+                            ret.Ret_Message_to_Client = "عذرا المبلغ اكبر من الحد الاعلى  " + permission.Details[0].MaxValue.ToString("N0");
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        #region Client weather authonticated or not  
+                        if (partner.Status.Id == 1)
+                        {
+                            var isCorrectPass = new Repo.PartnerManager(db).CheckPass(partner, Tokens[2]);
+                            if (isCorrectPass)
+                            {
+                                #region Do Queue Recharge Request
+                                var recharge = new RechargeCollection();
+                                recharge.SubscriberNo = Tokens[1];
+                                recharge.Amount = double.Parse(Tokens[0]);
+                                recharge.PointOfSale = partner;
+                                recharge.QueueNo = queueNo > 0 ? queueNo : 1;
+                                recharge.AccessChannel.Id = "sms";
+                                var result = new Repo.RechargeCollectionRepo(db).Create(recharge);
+                                if (result.Success)
+                                {
+                                    ret.Ret_ID = result.AffectedCount;
+                                    ret.Ret_Status = true;
+                                    parsedRequest.Id = result.AffectedCount;
+                                    parsedRequest.RequestId = 1;
+                                    parsedRequest.RequestName = "Recharge";
+                                    parsedRequest.MobileNo = partner.Id;
+                                    parsedRequest.Shortcode = recharge.SubscriberNo;
+                                    parsedRequest.ReplayDesc = recharge.Amount.ToString("N0");
+                                    return ret;
+                                }
+                                else if (result.AffectedCount == -501)
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "NotEnoughBalance";
+                                    ret.Ret_Message_to_Client = "عذرا رصيدك غير كافي";
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                else if (result.AffectedCount == -512)
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "PartnerIncorrectState";
+                                    ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء العملية بسبب الحالة";
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                else if (result.AffectedCount == -513)
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "Unauthorized";
+                                    ret.Ret_Message_to_Client = "عذرا ليس لديك الصلاحية الكافية";
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                else if (result.AffectedCount == -511)
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "DontHaveAccount";
+                                    ret.Ret_Message_to_Client = "عذرا ليس لديك حساب فعالا في الخدمة";
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                #endregion
+                            }
+                            else
+                            {
+                                ret.Ret_ID = -1;
+                                ret.Ret_Message = "WrongPass";
+                                ret.Ret_Message_to_Client = "عذرا الرقم السري غير صحيح  ";
+                                ret.Ret_Status = false;
+                                parsedRequest.RequestId = 1;
+                                return ret;
+                            }
+                        }
+                        
+                        #endregion
                         #endregion
                     }
 

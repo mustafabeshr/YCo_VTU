@@ -8,8 +8,6 @@ namespace Yvtu.Core.Queries
 {
     public class RechargeQuery
     {
-        
-
         [StringLength(9)]
         public string QPosId { get; set; }
         [StringLength(9)]

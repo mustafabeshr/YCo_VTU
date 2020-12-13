@@ -113,7 +113,6 @@ namespace Yvtu.SMSRec
             {
                 currentChannel = byte.Parse(((currentChannel % SharedParams.ChannelsCount)+1).ToString());
                 return currentChannel;
-               
              }
             catch (Exception ex)
             {
@@ -181,7 +180,7 @@ namespace Yvtu.SMSRec
         {       // Delivered message start parsing ...
             try {
                 bool res;
-                int RequestId=0;
+                
                 CurrentLogMessage c2 = null;
                 DeliverMessage.Delivered_Message delmsg = (DeliverMessage.Delivered_Message)e.Argument;
                 if (delmsg.Short_code == SharedParams.Short_Code.ToString())
@@ -189,13 +188,14 @@ namespace Yvtu.SMSRec
                 DeliverMessage DeliverMsg = new DeliverMessage(db);
                 DeliverMessage.RequestReturnValue RQretuenvalue = new DeliverMessage.RequestReturnValue();
                     var RQpack = new PartnerRequest();
-                    RQretuenvalue = DeliverMsg.Parse_Request(delmsg, out RQpack);
+                    var queueNo = getCurrentChannelNo();
+                    RQretuenvalue = DeliverMsg.Parse_Request(delmsg, queueNo, out RQpack);
                     if (RQretuenvalue.Ret_Status == true)
                     {
                         c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo,
-                            RQpack.RequestName +" - " + RQpack.Shortcode + " - " + RQpack.ReplayDesc +" success ("+ RQpack .Id+ ")", "partnerok");
+                            RQpack.RequestName +" - " + RQpack.Shortcode + " - " + RQpack.ReplayDesc +" success ("+ RQpack .Id+ ") Q("+ queueNo + ")", "partnerok");
                         bw_Delivery.ReportProgress(0, c2);
-                        if (RQpack.RequestId == 1)
+                        if (RQpack.RequestId == 3)
                         {
                             var result = new Repo.PartnerRequestRepo(db).Create(RQpack);
                         }
@@ -213,7 +213,7 @@ namespace Yvtu.SMSRec
                             BadRequest.Error = RQretuenvalue.Ret_Message;
                             BadRequest.AccessChannel = "sms";
                             BadRequest.QueueNo = 1;
-                            BadRequest.RequestId = 2;
+                            BadRequest.RequestId = RQpack.RequestId;
                             BadRequest.ReplayDesc = RQretuenvalue.Ret_Message_to_Client;
                             BadRequest.ReplayTime = DateTime.Now;
                             BadRequest.Status = 2;
@@ -356,8 +356,8 @@ namespace Yvtu.SMSRec
         }
         private void frm_interface_FormClosed(object sender, FormClosedEventArgs e)
         {
-            SharedParams.InterfaceDictionary[_interface_no].Status = "closed";
-            _parentForm.RefreshInterfacesCount();
+            //SharedParams.InterfaceDictionary[_interface_no].Status = "closed";
+            //_parentForm.RefreshInterfacesCount();
         }
         private void smppclient_BindEvent(bool bindstatus)
         {
