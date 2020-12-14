@@ -180,7 +180,7 @@ namespace Yvtu.RechargePrc
                                     var result = operation.DoRecharge(GrabbedRequest);
                                     watch.Stop();
                                     double elapsedMs = watch.ElapsedMilliseconds;
-                                    msg = " done within " + Math.Round(elapsedMs / 1000, 2) + " sec " + AttachMessage;
+                                    msg = operation.resultDisplayMsg + "  within " + Math.Round(elapsedMs / 1000, 2) + " sec " ;
                                     logmessage += msg;
                                     worker.ReportProgress(40, msg);
                                     if (!chwithoutlog.Checked) WritingLOGToFILE(logmessage);

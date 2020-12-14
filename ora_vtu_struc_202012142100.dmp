@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 13/12/2020, 23:40:38 23:40:38  --
+-- Created by mbeshr on 14/12/2020, 21:00:40 21:00:40  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012132340.log
+spool ora_vtu_struc_202012142100.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -1278,7 +1278,7 @@ prompt
 create sequence VTU.SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 41
+start with 181
 increment by 1
 cache 20;
 
@@ -2488,7 +2488,13 @@ begin
      begin
         update partner set balance = balance - v_CollectionRow.Amount, reserved = reserved - v_CollectionRow.Amount where partner_acc= v_CollectionRow.Pos_Acc;
      end;
+   else if (v_update_bal = 1 and v_status = 2) then
+     begin
+        update partner set reserved = reserved - v_CollectionRow.Amount where partner_acc= v_CollectionRow.Pos_Acc;
+     end;
    end if;
+   end if;
+   
    return v_cl_id;
 
  EXCEPTION

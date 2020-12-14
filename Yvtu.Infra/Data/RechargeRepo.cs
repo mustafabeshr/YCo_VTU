@@ -169,7 +169,7 @@ namespace Yvtu.Infra.Data
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_cl_id", OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Id},
-                 new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Status },
+                 new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Status.Id },
                  new OracleParameter{ ParameterName = "v_ref_no",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.RefNo },
                  new OracleParameter{ ParameterName = "v_ref_message",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.RefMessage },
                  new OracleParameter{ ParameterName = "v_ref_time",OracleDbType = OracleDbType.Date,  Value = rechargeCollection.RefTime },
