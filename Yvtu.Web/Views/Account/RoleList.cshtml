@@ -1,0 +1,48 @@
+﻿@model List<Yvtu.Web.Dto.RoleQueryDto>
+
+
+@{
+    ViewData["Title"] = "Role List";
+}
+
+@if (Model != null && Model.Count > 0)
+{
+    <div class="row p-0 bg-white">
+        <div class="col-12 p-0">
+
+            <table class="table">
+                <thead>
+                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                        <td style="font-weight:normal">#</td>
+                        <td style="font-weight:normal">الاسم</td>
+                        <td style="font-weight:normal">Code</td>
+                        <td style="font-weight:normal">فعال</td>
+                        <td style="font-weight:normal">عدد الجهات</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="text-center" >
+                            <td style="font-size:16px;font-weight:bold;">@item.Id</td>
+                            <td style="font-family:Amiri-Regular">@item.Name</td>
+                            <td style="font-family:Amiri-Regular;color:blue;">@item.Code</td>
+                            <td style="font-family:Amiri-Regular">
+                                @if (@item.IsActive)
+                                {
+                                    <p class="text-success"><i class="fa fa-check"></i></p>
+                                }
+                                else
+                                {
+                                    <p class="text-danger" style="margin:0px;"><i class="fa fa-times"></i></p>
+                                }
+                                
+                            </td>
+                            <td style="font-family:Amiri-Regular">@item.PartnerCount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

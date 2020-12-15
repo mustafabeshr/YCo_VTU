@@ -13,7 +13,7 @@ using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     public class PartActivityController : Controller
     {
         private readonly IAppDbContext db;
@@ -60,9 +60,13 @@ namespace Yvtu.Web.Controllers
             }
             else
             {
-                if (model != null && !string.IsNullOrEmpty(model.ActivityId))
+                if (model != null && !string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0)
                 {
                     var result = _partActRepo.GetListByActivity(model.ActivityId);
+                    model.PartnerActivities = result;
+                } else
+                {
+                    var result = _partActRepo.GetListByActivityWithFromRole(model.ActivityId, model.FromRoleId);
                     model.PartnerActivities = result;
                 }
             }
@@ -118,7 +122,7 @@ namespace Yvtu.Web.Controllers
                 if (result.Success)
                 {
                     var audit = new DataAudit();
-                    audit.Activity.Id = "PartnerActivity";
+                    audit.Activity.Id = "PartnerActivity.Edit";
                     audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
                     audit.Action.Id = "Update";
                     audit.Success = true;
@@ -149,7 +153,7 @@ namespace Yvtu.Web.Controllers
             if (old != null)
             {
                 var audit = new DataAudit();
-                audit.Activity.Id = "PartnerActivity";
+                audit.Activity.Id = "PartnerActivity.Delete";
                 audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
                 audit.Action.Id = "Delete";
                 audit.Success = true;

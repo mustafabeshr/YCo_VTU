@@ -36,6 +36,13 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult Index()
         {
+            var currentRoleId = partner.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Query", currentRoleId);
+            if (permission == null)
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var model = new PartnerQuery();
             var roles = new RoleRepo(db, partnerActivity).GetRoles();
             var statuses = new PartnerStatusRepo(db).GetStatusList();
@@ -124,6 +131,35 @@ namespace Yvtu.Web.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public IActionResult RoleList()
+        {
+            var currentRoleId = partner.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("AppRole.Query", currentRoleId);
+            if (permission == null)
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var lst = new RoleRepo(db, null).GetRoles();
+            if (lst == null) return View(new List<RoleQueryDto>());
+            var queryList = new List<RoleQueryDto>();
+            foreach (var item in lst)
+            {
+                var obj = new RoleQueryDto();
+                obj.Id = item.Id;
+                obj.Name = item.Name;
+                obj.Code = item.Code;
+                obj.Order = item.Order;
+                obj.Weight = item.Weight;
+                obj.IsActive = item.IsActive;
+                obj.PartnerCount = new RoleRepo(db, null).GetPartnerCount(item.Id);
+                queryList.Add(obj);
+            }
+            return View(queryList);
+        }
+
 
 
         [HttpPost]

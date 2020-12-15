@@ -1,54 +1,32 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 14/12/2020, 21:00:40 21:00:40  --
+-- Created by mbeshr on 15/12/2020, 21:48:21 21:48:21  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012142100.log
+spool ora_vtu_struc_202012152147.log
 
 prompt
 prompt Creating table ACTIVITIES
 prompt =========================
 prompt
-create table VTU.ACTIVITIES
+create table ACTIVITIES
 (
   act_id       VARCHAR2(100) not null,
   act_name     NVARCHAR2(200) not null,
   act_type     VARCHAR2(100) not null,
-  act_order    NUMBER(3) default 0 not null,
+  act_order    NUMBER default 0 not null,
   internal_use NUMBER(1) default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.ACTIVITIES
-  add constraint FK_ACTIVITIES primary key (ACT_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table ACTIVITIES
+  add constraint FK_ACTIVITIES primary key (ACT_ID);
 
 prompt
 prompt Creating table APPROLE
 prompt ======================
 prompt
-create table VTU.APPROLE
+create table APPROLE
 (
   roleid    NUMBER not null,
   rolename  NVARCHAR2(100) not null,
@@ -57,144 +35,56 @@ create table VTU.APPROLE
   roleorder NUMBER(2) default 0 not null,
   rolecode  VARCHAR2(100)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.APPROLE
-  add constraint PK_ROLE primary key (ROLEID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table APPROLE
+  add constraint PK_ROLE primary key (ROLEID);
 
 prompt
 prompt Creating table PARTNER_STATUS
 prompt =============================
 prompt
-create table VTU.PARTNER_STATUS
+create table PARTNER_STATUS
 (
   statusid   NUMBER not null,
   statusname NVARCHAR2(200)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_STATUS
-  add constraint PK_PARTNER_STATUS primary key (STATUSID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table PARTNER_STATUS
+  add constraint PK_PARTNER_STATUS primary key (STATUSID);
 
 prompt
 prompt Creating table CITY
 prompt ===================
 prompt
-create table VTU.CITY
+create table CITY
 (
   cityid    NUMBER not null,
   cityname  NVARCHAR2(100) not null,
   cityorder NUMBER(2) default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.CITY
-  add constraint PK_CITY primary key (CITYID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table CITY
+  add constraint PK_CITY primary key (CITYID);
 
 prompt
 prompt Creating table IDTYPES
 prompt ======================
 prompt
-create table VTU.IDTYPES
+create table IDTYPES
 (
   idtypeid   NUMBER not null,
   idtypename NVARCHAR2(200),
   isactive   NUMBER(1) default 1 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.IDTYPES
-  add constraint PK_IDTYPE primary key (IDTYPEID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table IDTYPES
+  add constraint PK_IDTYPE primary key (IDTYPEID);
 
 prompt
 prompt Creating table PARTNER
 prompt ======================
 prompt
-create table VTU.PARTNER
+create table PARTNER
 (
   partner_id           VARCHAR2(9) not null,
   partner_name         NVARCHAR2(200) not null,
@@ -231,61 +121,28 @@ create table VTU.PARTNER
   partner_acc          NUMBER not null,
   ref_partner          VARCHAR2(9)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-create index VTU.IDX_PARTNER_ID on VTU.PARTNER (PARTNER_ID)
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER
-  add constraint PK_PARTNER primary key (PARTNER_ACC)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER
+;
+create index IDX_PARTNER_ID on PARTNER (PARTNER_ID);
+alter table PARTNER
+  add constraint PK_PARTNER primary key (PARTNER_ACC);
+alter table PARTNER
   add constraint FK_PARTNER_CITY foreign key (CITYID)
-  references VTU.CITY (CITYID) on delete set null;
-alter table VTU.PARTNER
+  references CITY (CITYID) on delete set null;
+alter table PARTNER
   add constraint FK_PARTNER_IDTYPE foreign key (ID_TYPE)
-  references VTU.IDTYPES (IDTYPEID) on delete set null;
-alter table VTU.PARTNER
+  references IDTYPES (IDTYPEID) on delete set null;
+alter table PARTNER
   add constraint FK_PARTNER_ROLE foreign key (ROLEID)
-  references VTU.APPROLE (ROLEID) on delete set null;
-alter table VTU.PARTNER
+  references APPROLE (ROLEID) on delete set null;
+alter table PARTNER
   add constraint FK_PARTNER_STATUS foreign key (STATUS)
-  references VTU.PARTNER_STATUS (STATUSID) on delete set null;
+  references PARTNER_STATUS (STATUSID) on delete set null;
 
 prompt
 prompt Creating table ADJUSTMENT
 prompt =========================
 prompt
-create table VTU.ADJUSTMENT
+create table ADJUSTMENT
 (
   adj_id         NUMBER not null,
   createon       DATE default sysdate not null,
@@ -316,63 +173,29 @@ create table VTU.ADJUSTMENT
   src_id         VARCHAR2(9),
   sett_period    NUMBER default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.ADJUSTMENT
-  add constraint PK_ADJUSTEMENT primary key (ADJ_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.ADJUSTMENT
-  add constraint UQ_ADJUSTEMENT unique (MONEYTRANFERID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.ADJUSTMENT
+;
+alter table ADJUSTMENT
+  add constraint PK_ADJUSTEMENT primary key (ADJ_ID);
+alter table ADJUSTMENT
+  add constraint UQ_ADJUSTEMENT unique (MONEYTRANFERID);
+alter table ADJUSTMENT
   add constraint FK1_ADJUSTEMENT foreign key (SRC_ACC)
-  references VTU.PARTNER (PARTNER_ACC);
-alter table VTU.ADJUSTMENT
+  references PARTNER (PARTNER_ACC);
+alter table ADJUSTMENT
   add constraint FK2_ADJUSTEMENT foreign key (DEST_ACC)
-  references VTU.PARTNER (PARTNER_ACC);
-alter table VTU.ADJUSTMENT
+  references PARTNER (PARTNER_ACC);
+alter table ADJUSTMENT
   add constraint FK3_ADJUSTEMENT foreign key (SRC_ROLE_ID)
-  references VTU.APPROLE (ROLEID);
-alter table VTU.ADJUSTMENT
+  references APPROLE (ROLEID);
+alter table ADJUSTMENT
   add constraint FK4_ADJUSTEMENT foreign key (DEST_ROLE_ID)
-  references VTU.APPROLE (ROLEID);
+  references APPROLE (ROLEID);
 
 prompt
 prompt Creating table COLLECTION
 prompt =========================
 prompt
-create table VTU.COLLECTION
+create table COLLECTION
 (
   cl_id          NUMBER not null,
   createdon      DATE default sysdate not null,
@@ -391,37 +214,15 @@ create table VTU.COLLECTION
   ref_trans_no   VARCHAR2(100),
   debug_info     NVARCHAR2(500)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.COLLECTION
-  add constraint PK_COLLECTION primary key (CL_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table COLLECTION
+  add constraint PK_COLLECTION primary key (CL_ID);
 
 prompt
 prompt Creating table COLLECTION_DRAFT
 prompt ===============================
 prompt
-create table VTU.COLLECTION_DRAFT
+create table COLLECTION_DRAFT
 (
   row_id         NUMBER not null,
   ref_no         NUMBER not null,
@@ -429,91 +230,35 @@ create table VTU.COLLECTION_DRAFT
   access_channel VARCHAR2(100),
   createdon      DATE default sysdate not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.COLLECTION_DRAFT
-  add constraint PK_COLLECTION_DRAFT primary key (ROW_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.COLLECTION_DRAFT
-  add constraint UQ_COLLECTION_DRAFT unique (REF_NO)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.COLLECTION_DRAFT
+;
+alter table COLLECTION_DRAFT
+  add constraint PK_COLLECTION_DRAFT primary key (ROW_ID);
+alter table COLLECTION_DRAFT
+  add constraint UQ_COLLECTION_DRAFT unique (REF_NO);
+alter table COLLECTION_DRAFT
   add constraint FK_COLLECTION_DRAFT foreign key (REF_NO)
-  references VTU.COLLECTION (CL_ID) on delete cascade;
+  references COLLECTION (CL_ID) on delete cascade;
 
 prompt
 prompt Creating table COMMON_CODE
 prompt ==========================
 prompt
-create table VTU.COMMON_CODE
+create table COMMON_CODE
 (
   code_id    VARCHAR2(100) not null,
   code_name  NVARCHAR2(150),
   code_type  VARCHAR2(100) not null,
   code_order NUMBER(3)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.COMMON_CODE
-  add constraint FK_COMMON_CODE primary key (CODE_ID, CODE_TYPE)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table COMMON_CODE
+  add constraint FK_COMMON_CODE primary key (CODE_ID, CODE_TYPE);
 
 prompt
 prompt Creating table DATA_AUDIT
 prompt =========================
 prompt
-create table VTU.DATA_AUDIT
+create table DATA_AUDIT
 (
   row_id      NUMBER not null,
   partner_id  VARCHAR2(9) not null,
@@ -528,163 +273,79 @@ create table VTU.DATA_AUDIT
   success     NUMBER(1) default 1 not null,
   partner_acc NUMBER
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-comment on column VTU.DATA_AUDIT.action_id
+;
+comment on column DATA_AUDIT.action_id
   is 'common_code.code_type = ''audit.action''';
-alter table VTU.DATA_AUDIT
-  add constraint FK_DATA_AUDIT primary key (ROW_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.DATA_AUDIT
+alter table DATA_AUDIT
+  add constraint FK_DATA_AUDIT primary key (ROW_ID);
+alter table DATA_AUDIT
   add constraint FK2_DATA_AUDIT foreign key (ACT_ID)
-  references VTU.ACTIVITIES (ACT_ID);
+  references ACTIVITIES (ACT_ID);
 
 prompt
 prompt Creating table DISTRICT
 prompt =======================
 prompt
-create table VTU.DISTRICT
+create table DISTRICT
 (
   disid    NUMBER not null,
   disname  NVARCHAR2(200) not null,
   disorder NUMBER(2) default 0 not null,
   cityid   NUMBER not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.DISTRICT
-  add constraint PK_DISTRICT primary key (DISID, CITYID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.DISTRICT
+;
+alter table DISTRICT
+  add constraint PK_DISTRICT primary key (DISID, CITYID);
+alter table DISTRICT
   add constraint FK_DISTRICT_CITY foreign key (CITYID)
-  references VTU.CITY (CITYID) on delete cascade;
+  references CITY (CITYID) on delete cascade;
 
 prompt
 prompt Creating table ERROR_LIST
 prompt =========================
 prompt
-create table VTU.ERROR_LIST
+create table ERROR_LIST
 (
   error_no   NUMBER,
   error_desc NVARCHAR2(200)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
 
 prompt
 prompt Creating table EVENT
 prompt ====================
 prompt
-create table VTU.EVENT
+create table EVENT
 (
   event_id    VARCHAR2(100) not null,
   event_name  NVARCHAR2(200) not null,
   event_order NUMBER default 0 not null,
   createdon   DATE default sysdate not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255;
-alter table VTU.EVENT
-  add constraint PK_EVENT primary key (EVENT_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255;
+;
+alter table EVENT
+  add constraint PK_EVENT primary key (EVENT_ID);
 
 prompt
 prompt Creating table GLOGALSETTINGS
 prompt =============================
 prompt
-create table VTU.GLOGALSETTINGS
+create table GLOGALSETTINGS
 (
   sett_code  VARCHAR2(150) not null,
   sett_value NVARCHAR2(200) not null,
   sett_name  NVARCHAR2(200) not null,
   sett_order NUMBER default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.GLOGALSETTINGS
-  add constraint PK_GLOGALSETTINGS primary key (SETT_CODE)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table GLOGALSETTINGS
+  add constraint PK_GLOGALSETTINGS primary key (SETT_CODE);
 
 prompt
 prompt Creating table MONEY_TRANSFER
 prompt =============================
 prompt
-create table VTU.MONEY_TRANSFER
+create table MONEY_TRANSFER
 (
   trans_id        NUMBER not null,
   part_id         VARCHAR2(9) not null,
@@ -717,46 +378,24 @@ create table VTU.MONEY_TRANSFER
   part_acc        NUMBER,
   creator_acc     NUMBER
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.MONEY_TRANSFER
-  add constraint PK_MONEY_TRANSFER primary key (TRANS_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.MONEY_TRANSFER
+;
+alter table MONEY_TRANSFER
+  add constraint PK_MONEY_TRANSFER primary key (TRANS_ID);
+alter table MONEY_TRANSFER
   add constraint FK1_MONEY_TRANSFER foreign key (PART_ROLE_ID)
-  references VTU.APPROLE (ROLEID);
-alter table VTU.MONEY_TRANSFER
+  references APPROLE (ROLEID);
+alter table MONEY_TRANSFER
   add constraint FK2_MONEY_TRANSFER foreign key (PART_ACC)
-  references VTU.PARTNER (PARTNER_ACC);
-alter table VTU.MONEY_TRANSFER
+  references PARTNER (PARTNER_ACC);
+alter table MONEY_TRANSFER
   add constraint FK3_MONEY_TRANSFER foreign key (CREATOR_ACC)
-  references VTU.PARTNER (PARTNER_ACC);
+  references PARTNER (PARTNER_ACC);
 
 prompt
 prompt Creating table OPERATION_EXCEPTION
 prompt ==================================
 prompt
-create table VTU.OPERATION_EXCEPTION
+create table OPERATION_EXCEPTION
 (
   exp_id        NUMBER not null,
   exp_code      NUMBER,
@@ -765,37 +404,15 @@ create table VTU.OPERATION_EXCEPTION
   exp_operation VARCHAR2(100),
   exp_object    VARCHAR2(100)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.OPERATION_EXCEPTION
-  add constraint PK_OPERATION_EXCEPTION primary key (EXP_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table OPERATION_EXCEPTION
+  add constraint PK_OPERATION_EXCEPTION primary key (EXP_ID);
 
 prompt
 prompt Creating table PARTNER_ACTIVITY
 prompt ===============================
 prompt
-create table VTU.PARTNER_ACTIVITY
+create table PARTNER_ACTIVITY
 (
   row_id           NUMBER not null,
   act_id           VARCHAR2(100) not null,
@@ -809,57 +426,23 @@ create table VTU.PARTNER_ACTIVITY
   lastediton       DATE default sysdate not null,
   createdbyacc     NUMBER default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY
-  add constraint PK_PARTNER_ACTIVITY primary key (ROW_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY
-  add constraint UQ_PARTNER_ACTIVITY unique (ACT_ID, FROMROLEID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY
+;
+alter table PARTNER_ACTIVITY
+  add constraint PK_PARTNER_ACTIVITY primary key (ROW_ID);
+alter table PARTNER_ACTIVITY
+  add constraint UQ_PARTNER_ACTIVITY unique (ACT_ID, FROMROLEID);
+alter table PARTNER_ACTIVITY
   add constraint FK1_PARTNER_ACTIVITY foreign key (ACT_ID)
-  references VTU.ACTIVITIES (ACT_ID) on delete cascade;
-alter table VTU.PARTNER_ACTIVITY
+  references ACTIVITIES (ACT_ID) on delete cascade;
+alter table PARTNER_ACTIVITY
   add constraint FK2_PARTNER_ACTIVITY foreign key (FROMROLEID)
-  references VTU.APPROLE (ROLEID);
+  references APPROLE (ROLEID);
 
 prompt
 prompt Creating table PARTNER_ACTIVITY_DETAIL
 prompt ======================================
 prompt
-create table VTU.PARTNER_ACTIVITY_DETAIL
+create table PARTNER_ACTIVITY_DETAIL
 (
   row_id       NUMBER not null,
   master_row   NUMBER not null,
@@ -875,57 +458,23 @@ create table VTU.PARTNER_ACTIVITY_DETAIL
   lastediton   DATE default sysdate not null,
   createdbyacc NUMBER default 0 not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY_DETAIL
-  add constraint PK_PARTNER_ACTIVITY_DETAIL primary key (ROW_ID, MASTER_ROW)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY_DETAIL
-  add constraint UQ_PARTNER_ACTIVITY_DETAIL unique (MASTER_ROW, DEST_ROLE_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_ACTIVITY_DETAIL
+;
+alter table PARTNER_ACTIVITY_DETAIL
+  add constraint PK_PARTNER_ACTIVITY_DETAIL primary key (ROW_ID, MASTER_ROW);
+alter table PARTNER_ACTIVITY_DETAIL
+  add constraint UQ_PARTNER_ACTIVITY_DETAIL unique (MASTER_ROW, DEST_ROLE_ID);
+alter table PARTNER_ACTIVITY_DETAIL
   add constraint FK1_PARTNER_ACTIVITY_DETAIL foreign key (MASTER_ROW)
-  references VTU.PARTNER_ACTIVITY (ROW_ID) on delete cascade;
-alter table VTU.PARTNER_ACTIVITY_DETAIL
+  references PARTNER_ACTIVITY (ROW_ID) on delete cascade;
+alter table PARTNER_ACTIVITY_DETAIL
   add constraint FK2_PARTNER_ACTIVITY_DETAIL foreign key (DEST_ROLE_ID)
-  references VTU.APPROLE (ROLEID);
+  references APPROLE (ROLEID);
 
 prompt
 prompt Creating table PARTNER_REQUEST
 prompt ==============================
 prompt
-create table VTU.PARTNER_REQUEST
+create table PARTNER_REQUEST
 (
   req_row_no       NUMBER not null,
   createdon        DATE default sysdate not null,
@@ -939,72 +488,28 @@ create table VTU.PARTNER_REQUEST
   error            NVARCHAR2(300),
   accesschannel    VARCHAR2(100)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.PARTNER_REQUEST
-  add constraint PK_PARTNER_REQUEST primary key (REQ_ROW_NO)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table PARTNER_REQUEST
+  add constraint PK_PARTNER_REQUEST primary key (REQ_ROW_NO);
 
 prompt
 prompt Creating table REQUEST
 prompt ======================
 prompt
-create table VTU.REQUEST
+create table REQUEST
 (
   req_id   NUMBER not null,
   req_name NVARCHAR2(200)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.REQUEST
-  add constraint PK_REQUEST primary key (REQ_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table REQUEST
+  add constraint PK_REQUEST primary key (REQ_ID);
 
 prompt
 prompt Creating table SMS_IN
 prompt =====================
 prompt
-create table VTU.SMS_IN
+create table SMS_IN
 (
   in_no     NUMBER not null,
   reciever  VARCHAR2(9),
@@ -1014,37 +519,15 @@ create table VTU.SMS_IN
   ref_no    NUMBER,
   lang      VARCHAR2(10)
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.SMS_IN
-  add constraint PK_SMS_IN primary key (IN_NO)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table SMS_IN
+  add constraint PK_SMS_IN primary key (IN_NO);
 
 prompt
 prompt Creating table SMS_OUT
 prompt ======================
 prompt
-create table VTU.SMS_OUT
+create table SMS_OUT
 (
   row_id    NUMBER not null,
   sender    VARCHAR2(9) not null,
@@ -1052,60 +535,30 @@ create table VTU.SMS_OUT
   receiver  VARCHAR2(9) not null,
   createdon DATE default sysdate not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
-alter table VTU.SMS_OUT
-  add constraint PK_SMS_OUT primary key (ROW_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255
-  storage
-  (
-    initial 64K
-    next 1M
-    minextents 1
-    maxextents unlimited
-  );
+;
+alter table SMS_OUT
+  add constraint PK_SMS_OUT primary key (ROW_ID);
 
 prompt
 prompt Creating table SYS_ITEM
 prompt =======================
 prompt
-create table VTU.SYS_ITEM
+create table SYS_ITEM
 (
   item_id    VARCHAR2(100) not null,
   item_name  NVARCHAR2(100) not null,
   item_order NUMBER default 0 not null,
   createdon  DATE default sysdate not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255;
-alter table VTU.SYS_ITEM
-  add constraint PK_SYS_ITEM primary key (ITEM_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255;
+;
+alter table SYS_ITEM
+  add constraint PK_SYS_ITEM primary key (ITEM_ID);
 
 prompt
 prompt Creating table SYS_SUBITEM
 prompt ==========================
 prompt
-create table VTU.SYS_SUBITEM
+create table SYS_SUBITEM
 (
   item_id       VARCHAR2(100) not null,
   subitem_id    VARCHAR2(100) not null,
@@ -1113,26 +566,18 @@ create table VTU.SYS_SUBITEM
   subitem_order NUMBER default 0 not null,
   createdon     DATE default sysdate not null
 )
-tablespace USERS
-  pctfree 10
-  initrans 1
-  maxtrans 255;
-alter table VTU.SYS_SUBITEM
-  add constraint PK_SYS_SUBITEM primary key (ITEM_ID, SUBITEM_ID)
-  using index 
-  tablespace USERS
-  pctfree 10
-  initrans 2
-  maxtrans 255;
-alter table VTU.SYS_SUBITEM
+;
+alter table SYS_SUBITEM
+  add constraint PK_SYS_SUBITEM primary key (ITEM_ID, SUBITEM_ID);
+alter table SYS_SUBITEM
   add constraint FK_SYS_SUBITEM foreign key (ITEM_ID)
-  references VTU.SYS_ITEM (ITEM_ID) on delete cascade;
+  references SYS_ITEM (ITEM_ID) on delete cascade;
 
 prompt
 prompt Creating sequence SEQ_ADJUSTEMENT_ID
 prompt ====================================
 prompt
-create sequence VTU.SEQ_ADJUSTEMENT_ID
+create sequence SEQ_ADJUSTEMENT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1143,7 +588,7 @@ prompt
 prompt Creating sequence SEQ_CITY_ID
 prompt =============================
 prompt
-create sequence VTU.SEQ_CITY_ID
+create sequence SEQ_CITY_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 41
@@ -1154,7 +599,7 @@ prompt
 prompt Creating sequence SEQ_COLLECTION_DRAFT_ID
 prompt =========================================
 prompt
-create sequence VTU.SEQ_COLLECTION_DRAFT_ID
+create sequence SEQ_COLLECTION_DRAFT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1165,7 +610,7 @@ prompt
 prompt Creating sequence SEQ_COLLECTION_ID
 prompt ===================================
 prompt
-create sequence VTU.SEQ_COLLECTION_ID
+create sequence SEQ_COLLECTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1176,7 +621,7 @@ prompt
 prompt Creating sequence SEQ_DATA_AUDIT_ID
 prompt ===================================
 prompt
-create sequence VTU.SEQ_DATA_AUDIT_ID
+create sequence SEQ_DATA_AUDIT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 61
@@ -1187,7 +632,7 @@ prompt
 prompt Creating sequence SEQ_DISTRICT_ID
 prompt =================================
 prompt
-create sequence VTU.SEQ_DISTRICT_ID
+create sequence SEQ_DISTRICT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 341
@@ -1198,7 +643,7 @@ prompt
 prompt Creating sequence SEQ_EXCEPTION_ID
 prompt ==================================
 prompt
-create sequence VTU.SEQ_EXCEPTION_ID
+create sequence SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 121
@@ -1209,7 +654,7 @@ prompt
 prompt Creating sequence SEQ_MONEY_TRANSFER_ID
 prompt =======================================
 prompt
-create sequence VTU.SEQ_MONEY_TRANSFER_ID
+create sequence SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 101
@@ -1220,7 +665,7 @@ prompt
 prompt Creating sequence SEQ_PARTNER_ACC
 prompt =================================
 prompt
-create sequence VTU.SEQ_PARTNER_ACC
+create sequence SEQ_PARTNER_ACC
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1231,10 +676,10 @@ prompt
 prompt Creating sequence SEQ_PARTNER_ACIVITY_ROWID
 prompt ===========================================
 prompt
-create sequence VTU.SEQ_PARTNER_ACIVITY_ROWID
+create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 161
+start with 181
 increment by 1
 cache 20;
 
@@ -1242,7 +687,7 @@ prompt
 prompt Creating sequence SEQ_PARTNER_REQ_ID
 prompt ====================================
 prompt
-create sequence VTU.SEQ_PARTNER_REQ_ID
+create sequence SEQ_PARTNER_REQ_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1253,7 +698,7 @@ prompt
 prompt Creating sequence SEQ_ROLE_ID
 prompt =============================
 prompt
-create sequence VTU.SEQ_ROLE_ID
+create sequence SEQ_ROLE_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1264,7 +709,7 @@ prompt
 prompt Creating sequence SEQ_SMS_IN_ID
 prompt ===============================
 prompt
-create sequence VTU.SEQ_SMS_IN_ID
+create sequence SEQ_SMS_IN_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 81
@@ -1275,7 +720,7 @@ prompt
 prompt Creating sequence SEQ_SMS_OUT_ID
 prompt ================================
 prompt
-create sequence VTU.SEQ_SMS_OUT_ID
+create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 181
@@ -1286,7 +731,7 @@ prompt
 prompt Creating view V_ADJUSTMENT
 prompt ==========================
 prompt
-create or replace force view vtu.v_adjustment as
+create or replace force view v_adjustment as
 select
 ad.adj_id,
 ad.createon,
@@ -1337,7 +782,7 @@ prompt
 prompt Creating view V_COLLECTION
 prompt ==========================
 prompt
-create or replace force view vtu.v_collection as
+create or replace force view v_collection as
 select
 c.cl_id,
 c.createdon,
@@ -1369,7 +814,7 @@ prompt
 prompt Creating view V_DATA_AUDIT
 prompt ==========================
 prompt
-create or replace force view vtu.v_data_audit as
+create or replace force view v_data_audit as
 select
 d.row_id,
 d.partner_id,
@@ -1402,7 +847,7 @@ prompt
 prompt Creating view V_MONEY_TRANSFER
 prompt ==============================
 prompt
-create or replace force view vtu.v_money_transfer as
+create or replace force view v_money_transfer as
 select
 rownum seq,
 tr.trans_id,
@@ -1451,7 +896,7 @@ prompt
 prompt Creating view V_PARTNER
 prompt =======================
 prompt
-create or replace force view vtu.v_partner as
+create or replace force view v_partner as
 select
 partner_id,
 partner_name,
@@ -1503,7 +948,7 @@ prompt
 prompt Creating view V_PARTNER_ACTIVITY
 prompt ================================
 prompt
-create or replace force view vtu.v_partner_activity as
+create or replace force view v_partner_activity as
 Select
 part.row_id,
 part.act_id,
@@ -1542,7 +987,7 @@ prompt
 prompt Creating view V_PARTNER_ACTIVITY_DETAIL
 prompt =======================================
 prompt
-create or replace force view vtu.v_partner_activity_detail as
+create or replace force view v_partner_activity_detail as
 Select
 part.row_id,
 part.act_id,
@@ -1597,7 +1042,7 @@ prompt
 prompt Creating view V_PENDING_RECHARGE_REQ
 prompt ====================================
 prompt
-create or replace force view vtu.v_pending_recharge_req as
+create or replace force view v_pending_recharge_req as
 select
 d.row_id,
 d.queue_no,
@@ -1627,7 +1072,7 @@ prompt
 prompt Creating package PK_FINANCIAL
 prompt =============================
 prompt
-create or replace package vtu.pk_financial is
+create or replace package pk_financial is
 
   -- Public type declarations
 
@@ -1696,7 +1141,7 @@ prompt
 prompt Creating package PK_INFRA
 prompt =========================
 prompt
-create or replace package vtu.pk_infra is
+create or replace package pk_infra is
 
   -- Author  : MBESHR
   -- Created : 27/11/2020 20:18:22 20:18:22 
@@ -1756,7 +1201,8 @@ v_ref_partner   partner.ref_partner%type
    
   ) return number;
 
-function fn_deletePartner(v_partner_acc partner.partner_acc%type) return number;
+function fn_deletePartner(  v_partner_acc partner.partner_acc%type, 
+  v_createdby partner.partner_id%type) return number;
 
 
 function fn_createOutSMS(
@@ -1767,7 +1213,8 @@ v_receiver  sms_out.receiver%type) return number;
 function fn_ResetPassword(
   v_partner_acc               partner.partner_acc%type,
   v_pwd                       partner.pwd%type, 
-   v_extra                     partner.extra%type
+   v_extra                     partner.extra%type,
+   v_createdby   partner.partner_id%type
   ) return number;
   
   
@@ -1797,7 +1244,7 @@ prompt
 prompt Creating package PK_SETTINGS
 prompt ============================
 prompt
-create or replace package vtu.pk_Settings is
+create or replace package pk_Settings is
 
   -- Author  : MBESHR
   -- Created : 23/11/2020 20:18:31 20:18:31 
@@ -1858,7 +1305,7 @@ prompt
 prompt Creating package PK_UTILITY
 prompt ===========================
 prompt
-create or replace package vtu.pk_Utility is
+create or replace package pk_Utility is
 
   -- Author  : MBESHR
   -- Created : 28/11/2020 17:16:31 17:16:31 
@@ -1898,7 +1345,7 @@ prompt
 prompt Creating procedure SP_ADD_EXCEPTION
 prompt ===================================
 prompt
-create or replace procedure vtu.sp_add_exception(
+create or replace procedure sp_add_exception(
  v_exp_code operation_exception.exp_code%type,
  v_exp_message operation_exception.exp_message%type, 
  v_exp_operation operation_exception.exp_operation%type,
@@ -1916,7 +1363,7 @@ prompt
 prompt Creating package body PK_FINANCIAL
 prompt ==================================
 prompt
-create or replace package body vtu.pk_financial is
+create or replace package body pk_financial is
 
 function fn_MoneyTransfer (
   v_part_id money_transfer.part_id%type,
@@ -1995,7 +1442,7 @@ function fn_MoneyTransfer (
      select partner.roleid into v_part_role_id from partner where partner_acc = v_part_acc;
      select partner.roleid into v_creator_role_id from partner where partner_acc =v_creator_acc;
      
-     v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Money.Transfer',
+     v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'MoneyTransfer.Create',
                                                     v_fromroleid => v_creator_role_id,
                                                     v_toroleid => v_part_role_id);
                                                     
@@ -2006,12 +1453,12 @@ function fn_MoneyTransfer (
        end;
       end if;
      
-     select nvl(taxper,0) into v_tax_per from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
-     select nvl(bonus_per,0) into v_bonus_per from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
-     select nvl(bonus_tax,0) into v_bonus_tax from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
-     select nvl(Min_Value,0) into v_Min_Value from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
-     select nvl(Max_Value,0) into v_Max_Value from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
-     select nvl(check_bal,0) into v_check_bal from v_partner_activity_detail where act_id = 'Money.Transfer' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(taxper,0) into v_tax_per from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_per,0) into v_bonus_per from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(bonus_tax,0) into v_bonus_tax from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Min_Value,0) into v_Min_Value from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(Max_Value,0) into v_Max_Value from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
+     select nvl(check_bal,0) into v_check_bal from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
      
        
        
@@ -2238,7 +1685,7 @@ BEGIN
 BEGIN
     select * into v_MasterParam 
     from Partner_Activity 
-    where act_id = 'Money.Transfer'
+    where act_id = 'MoneyTransfer.Create'
     and fromroleid = v_SrcPartner.Roleid;
     EXCEPTION
     when no_data_found then
@@ -2515,13 +1962,13 @@ prompt
 prompt Creating package body PK_INFRA
 prompt ==============================
 prompt
-create or replace package body vtu.pk_infra is
+create or replace package body pk_infra is
 
   
 function fn_CreatePartner (
-v_partner_id                partner.partner_id%type, 
-v_partner_name              partner.partner_name%type,
-v_brandname                 partner.brandname%type,
+v_partner_id           partner.partner_id%type, 
+v_partner_name      partner.partner_name%type,
+v_brandname          partner.brandname%type,
 v_roleid                    partner.roleid%type, 
 v_id_no                     partner.id_no%type, 
 v_id_type                   partner.id_type%type, 
@@ -2540,23 +1987,63 @@ v_fax                       partner.fax%type,
 v_email                     partner.email%type, 
 v_pwd                       partner.pwd%type, 
 v_extra                     partner.extra%type, 
-v_ip_address                partner.ip_address%type,
-v_ref_partner   partner.ref_partner%type
+v_ip_address            partner.ip_address%type,
+v_ref_partner            partner.ref_partner%type
    
   ) return number is
-  
+    v_partnerActivityFound number := 0;
     v_partner_acc               partner.partner_acc%type;
+    v_creator_acc               partner.partner_acc%type;
+    v_creator_role               partner.roleid%type;
+    v_Permission                partner_activity%rowtype;
+    v_PermissionDetail       partner_activity_detail%rowtype;
     v_Id_exists   number := 0;
+    v_lastRef_partner            partner.ref_partner%type;
   BEGIN
     
-     select nvl(count(*),0) into v_Id_exists from partner where partner_id = v_partner_id and (status <> 3);
-     
+     select nvl(count(*),0) into v_Id_exists from partner where partner_id = v_partner_id and (status < 3);
      if (v_Id_exists > 0) then
        begin
            --message := 'Duplicated';
           return -504;
        end;
       end if;  
+      v_creator_acc := pk_utility.fn_getactiveaccount(v_partner_id => v_createdby);
+       if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+      v_creator_role := pk_utility.fn_getpartnerrole(v_partner_acc => v_creator_acc);
+      if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+       v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Partner.Create',
+                                                    v_fromroleid => v_creator_role,
+                                                    v_toroleid => v_roleid);
+        if (v_partnerActivityFound <> 1) then
+       begin
+           --message := 'Unauthrized';
+          return -513;
+       end;
+      end if;
+     v_lastRef_partner := v_ref_partner;
+     select * into v_permission from partner_activity  p where p.act_id =  'Partner.Create' and p.fromroleid = v_creator_role;
+     select * into v_PermissionDetail from partner_activity_detail  p where p.master_row =  v_permission.row_id and p.dest_role_id = v_roleid;
+     if (v_permission.act_scope = 'CurOpOnly') then
+       begin
+            return -513;
+       end;
+     else if  (v_permission.act_scope = 'Exclusive') then
+       begin
+         v_lastRef_partner := v_createdby;
+       end;
+       end if;
+     end if;
   
      v_partner_acc := seq_partner_acc.nextval() + 1000;
      
@@ -2567,7 +2054,7 @@ v_ref_partner   partner.ref_partner%type
    values
       (v_partner_id, v_partner_name, v_brandname, 0, 0, 1, null, v_roleid, v_id_no, v_id_type, v_id_place
        , v_id_issued, 1, sysdate, v_createdby, sysdate, v_createdby, v_cityid, v_districtid, v_street, v_zone, v_extra_address, v_pair_mobile, v_mobile
-       , v_fixed, v_fax, v_email, v_pwd, v_extra, 0, null, v_ip_address, v_partner_acc, v_ref_partner);
+       , v_fixed, v_fax, v_email, v_pwd, v_extra, 0, null, v_ip_address, v_partner_acc, v_lastRef_partner);
        
        return v_partner_acc;
        
@@ -2604,13 +2091,45 @@ v_partner_acc               partner.partner_acc%type,
 v_ref_partner   partner.ref_partner%type
    
   ) return number is
-  
+    v_partnerActivityFound number := 0;
+    v_creator_acc               partner.partner_acc%type;
+    v_creator_role               partner.roleid%type;
     v_Id_exists   number := 0;
     v_old_role_id partner.roleid%type;
+    v_Permission                partner_activity%rowtype;
+    v_PermissionDetail       partner_activity_detail%rowtype;
+     v_editPartner partner%rowtype;
   BEGIN
-    
-     select nvl(count(*),0) into v_Id_exists from partner where partner_acc = v_partner_acc and status = 1;
-     select roleid into v_old_role_id from partner where partner_acc = v_partner_acc and status = 1;
+    --------------------------------------------------------------------------
+    -- check permission
+    v_creator_acc := pk_utility.fn_getactiveaccount(v_partner_id => v_createdby);
+       if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+      v_creator_role := pk_utility.fn_getpartnerrole(v_partner_acc => v_creator_acc);
+      if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+       v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Partner.Edit',
+                                                    v_fromroleid => v_creator_role,
+                                                    v_toroleid => v_roleid);
+        if (v_partnerActivityFound <> 1) then
+       begin
+           --message := 'Unauthrized';
+          return -513;
+       end;
+      end if;
+    ---------------------------------------------------------------------------  
+  
+  
+     select nvl(count(*),0) into v_Id_exists from partner where partner_acc = v_partner_acc;
+     select roleid into v_old_role_id from partner where partner_acc = v_partner_acc;
      
      if (v_Id_exists = 0 or v_old_role_id = 0 or v_old_role_id is null) then
        begin
@@ -2624,7 +2143,21 @@ v_ref_partner   partner.ref_partner%type
           return -505;
        end;
        end if;
- 
+        select * into v_editPartner from partner where partner_acc = v_partner_acc;
+     select * into v_permission from partner_activity  p where p.act_id =  'Partner.Edit' and p.fromroleid = v_creator_role;
+     select * into v_PermissionDetail from partner_activity_detail  p where p.master_row =  v_permission.row_id and p.dest_role_id = v_roleid;
+     if (v_permission.act_scope = 'CurOpOnly' and v_editPartner.Partner_Id <> v_createdby) then
+       begin
+            return -513;
+       end;
+     else if  (v_permission.act_scope = 'Exclusive'  and v_editPartner.Ref_Partner <> v_createdby ) then
+       begin
+          return -513;
+       end;
+       end if;
+     end if;
+
+
 
 update partner
    set  partner_name = v_partner_name,
@@ -2657,9 +2190,44 @@ EXCEPTION
          return SQLCODE;
   END;
 
-function fn_deletePartner(v_partner_acc partner.partner_acc%type) return number is
+function fn_deletePartner(
+  v_partner_acc partner.partner_acc%type, 
+  v_createdby partner.partner_id%type
+  ) return number is
   v_IsIdle number;
+   v_partnerActivityFound number := 0;
+    v_creator_acc               partner.partner_acc%type;
+    v_creator_role               partner.roleid%type;
+    v_deletedPartner partner%rowtype;
   begin
+    select * into v_deletedPartner from partner where partner_acc = v_partner_acc;
+   --------------------------------------------------------------------------
+    -- check permission
+    v_creator_acc := pk_utility.fn_getactiveaccount(v_partner_id => v_createdby);
+       if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+      v_creator_role := pk_utility.fn_getpartnerrole(v_partner_acc => v_creator_acc);
+      if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+       v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Partner.Delete',
+                                                    v_fromroleid => v_creator_role,
+                                                    v_toroleid => v_deletedPartner.Roleid);
+      if (v_partnerActivityFound <> 1) then
+       begin
+           --message := 'Unauthrized';
+          return -513;
+       end;
+      end if;
+    ---------------------------------------------------------------------------  
+  
       v_IsIdle := pk_utility.fn_isidlepartner(v_partner_acc => v_partner_acc);
       if (v_IsIdle <> 1) then
         begin
@@ -2667,6 +2235,8 @@ function fn_deletePartner(v_partner_acc partner.partner_acc%type) return number 
            return -505;
         end;
       end if;
+      
+      
       delete from partner where partner_acc = v_partner_acc;
       return 1;
    EXCEPTION
@@ -2705,9 +2275,43 @@ end;
 function fn_ResetPassword(
   v_partner_acc               partner.partner_acc%type,
   v_pwd                       partner.pwd%type, 
-   v_extra                     partner.extra%type
+   v_extra                     partner.extra%type,
+   v_createdby   partner.partner_id%type
   ) return number is 
+      v_partnerActivityFound number := 0;
+       v_creator_acc               partner.partner_acc%type;
+        v_creator_role               partner.roleid%type;
+          v_targetPartner partner%rowtype;
   Begin
+    
+   --------------------------------------------------------------------------
+    -- check permission
+    v_creator_acc := pk_utility.fn_getactiveaccount(v_partner_id => v_createdby);
+       if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+      select * into v_targetPartner from partner where partner_acc = v_creator_acc;
+      v_creator_role := pk_utility.fn_getpartnerrole(v_partner_acc => v_creator_acc);
+      if (v_creator_acc < 0) then
+       begin
+           --message := 'Not Found';
+          return -500;
+       end;
+      end if;  
+       v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Partner.ResetPassword',
+                                                    v_fromroleid => v_creator_role,
+                                                    v_toroleid => v_targetPartner.Roleid);
+        if (v_partnerActivityFound <> 1) then
+       begin
+           --message := 'Unauthrized';
+          return -513;
+       end;
+      end if;
+    ---------------------------------------------------------------------------  
+  
     update partner 
     set pwd = v_pwd,   extra = v_extra
     where partner_acc = v_partner_acc;
@@ -2781,7 +2385,7 @@ prompt
 prompt Creating package body PK_SETTINGS
 prompt =================================
 prompt
-create or replace package body vtu.pk_Settings is
+create or replace package body pk_Settings is
 
 function fn_CreatePartnerActivity (
   v_act_id partner_activity.act_id%type, 
@@ -2910,7 +2514,7 @@ prompt
 prompt Creating package body PK_UTILITY
 prompt ================================
 prompt
-create or replace package body vtu.pk_Utility is
+create or replace package body pk_Utility is
 
  procedure sp_Create_Audit(
 v_partner_id    data_audit.partner_id%type,
@@ -3018,7 +2622,7 @@ prompt
 prompt Creating trigger TR_CITY_BI
 prompt ===========================
 prompt
-create or replace trigger vtu.TR_City_BI
+create or replace trigger TR_City_BI
   before insert
   on City 
   for each row
@@ -3033,7 +2637,7 @@ prompt
 prompt Creating trigger TR_DATA_AUDIT_BI
 prompt =================================
 prompt
-create or replace trigger vtu.TR_data_audit_BI
+create or replace trigger TR_data_audit_BI
   before insert
   on  data_audit
   for each row
@@ -3048,7 +2652,7 @@ prompt
 prompt Creating trigger TR_DISTRICT_BI
 prompt ===============================
 prompt
-create or replace trigger vtu.TR_District_BI
+create or replace trigger TR_District_BI
   before insert
   on District
   for each row
@@ -3063,7 +2667,7 @@ prompt
 prompt Creating trigger TR_OPERATION_EXCEPTION_BI
 prompt ==========================================
 prompt
-create or replace trigger vtu.TR_operation_exception_BI
+create or replace trigger TR_operation_exception_BI
 
   before insert
   on operation_exception 
@@ -3079,7 +2683,7 @@ prompt
 prompt Creating trigger TR_ROLE_BI
 prompt ===========================
 prompt
-create or replace trigger vtu.TR_Role_BI
+create or replace trigger TR_Role_BI
   before insert
   on AppRole 
   for each row

@@ -29,6 +29,12 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult Index()
         {
+            var currentRoleId = partner.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Recharge.Query", currentRoleId);
+            if (permission == null)
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new RechargeQuery();
             model.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
             model.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");

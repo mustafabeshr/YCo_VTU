@@ -35,10 +35,26 @@ namespace Yvtu.Infra.Data
                     role.Code = row["rolecode"] == DBNull.Value ? string.Empty : row["rolecode"].ToString();
                     role.Weight = row["weight"] == DBNull.Value ? 0 : int.Parse(row["weight"].ToString());
                     role.Order = row["roleorder"] == DBNull.Value ? byte.MinValue : byte.Parse(row["roleorder"].ToString());
+                    role.IsActive = row["isactive"] == DBNull.Value ? false : row["isactive"].ToString() == "1" ? true : false;
                     roles.Add(role);
                 }
             }
             return roles;
+        }
+
+        public int GetPartnerCount(int roleId)
+        {
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "Role_Id", OracleDbType = OracleDbType.Int32,  Value = roleId },
+            };
+            var roleDataTable = this.db.GetData("Select nvl(count(*), 0) cnt from partner where roleid = :Role_Id", parameters);
+            int count = 0;
+            if (roleDataTable != null)
+            {
+                DataRow row = roleDataTable.Rows[0];
+                count = row["cnt"] == DBNull.Value ? 0 : int.Parse(row["cnt"].ToString());
+            }
+            return count;
         }
         public List<Role> GetAuthorizedRoles(string actId,int roleId)
         {

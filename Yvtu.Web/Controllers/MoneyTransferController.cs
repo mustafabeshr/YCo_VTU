@@ -45,7 +45,7 @@ namespace Yvtu.Web.Controllers
             var model = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetSingleOrDefault(id);
             if (model == null) return Ok("غير موجود");
             var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
-            var permission = _partnerActivity.GetPartAct("Money.Transfer.Print", int.Parse(roleId));
+            var permission = _partnerActivity.GetPartAct("MoneyTransfer.Print", int.Parse(roleId));
             var currUserId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.MobilePhone).Value;
             if (permission == null) return LocalRedirect("/Account/AccessDenied");
             if (permission.Scope.Id != "Everyone" && model.CreatedBy.Id != currUserId) return LocalRedirect("/Account/AccessDenied");
@@ -204,7 +204,7 @@ namespace Yvtu.Web.Controllers
             {
                 var partner = validateResult.Partner;
                 var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
-                var moneyTransferSettings = _partnerActivity.GetDetail("Money.Transfer", int.Parse(roleId), partner.Role.Id, true);
+                var moneyTransferSettings = _partnerActivity.GetDetail("MoneyTransfer.Create", int.Parse(roleId), partner.Role.Id, true);
                 if (moneyTransferSettings == null) 
                     return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
                 
@@ -275,6 +275,12 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult MoneyTranferQuery()
         {
+            var currentRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partnerActivity.GetPartAct("MoneyTransfer.Query", currentRoleId);
+            if (permission == null)
+            {
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new MoneyTransferQueryDto();
             model.PageNo = 0;
             model.NoPerPage = 10;
@@ -293,7 +299,7 @@ namespace Yvtu.Web.Controllers
             var currRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
             var currAccountId = _partnerManager.GetCurrentUserAccount(this.HttpContext);
 
-            var permission = _partnerActivity.GetPartAct("Money.Transfer.Query", currRoleId);
+            var permission = _partnerActivity.GetPartAct("MoneyTransfer.Query", currRoleId);
             if (permission == null || permission.Details == null)
             {
                 model.Error = "ليس لديك الصلاحيات الكافية";
