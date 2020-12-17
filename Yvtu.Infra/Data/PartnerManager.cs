@@ -41,7 +41,7 @@ namespace Yvtu.Infra.Data
                 };
 
                 #endregion
-                db.ExecuteStoredProc("pk_infra.fn_resetpassword", parameters);
+                db.ExecuteStoredProc("pk_infra.fn_ChangePassword", parameters);
                 var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)
@@ -59,7 +59,7 @@ namespace Yvtu.Infra.Data
                     return false;
                 }
             }
-            catch
+            catch (Exception ex)
             {
                 return false;
             }

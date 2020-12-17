@@ -23,7 +23,7 @@
         var OBounsAmount = document.getElementById('txtOBounsAmount').value;
         var OBounsTaxAmount = document.getElementById('txtOBounsTaxAmount').value;
 
-         
+
 
         var netAmount = (amount / ((taxPer / 100) + 1));
         var taxAmount = netAmount * (taxPer / 100);
@@ -50,7 +50,7 @@
         document.getElementById('lblExpBounsTaxAmount').innerHTML = numberWithCommas(ExpBounsTaxAmount.toFixed(2));
         document.getElementById('lblExpNetAmount').innerHTML = numberWithCommas(ExpNetAmount.toFixed(2));
         document.getElementById('lblExpReceivedAmount').innerHTML = numberWithCommas(ExpReceiveAmount.toFixed(2));
-        
+
         if (ExpAmount < 0 || isNaN(ExpAmount)) {
             document.getElementById('lblExpAmount').style = "font-size:18px;font-weight:bold;color:white;background-color:red;";
             document.getElementById('lblExpTaxAmount').style = "font-size:18px;font-weight:bold;color:white;background-color:red;";

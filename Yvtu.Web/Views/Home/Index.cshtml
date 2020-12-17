@@ -1,8 +1,8 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-
+@await Component.InvokeAsync("NToastNotify")
 <div class="row">
     <div class="col-md-12">
         <div id="accordion">
@@ -30,7 +30,7 @@
                                     </div>
                                 </a>
 
-                               
+
 
                                 <a asp-action="Create" asp-controller="MoneyTransfer" style="text-decoration:none;" class="mr-2">
                                     <div class="pt-2  text-center MainLink">
@@ -41,14 +41,14 @@
                                 </a>
 
                                 <a asp-action="Create" asp-controller="Adjust" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-sliders-h fa-3x" style="color:chocolate;"></i>
                                         <br /> تسويات
                                     </div>
                                 </a>
 
                                 <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fa fa-bullhorn fa-3x"></i>
                                         <br /> التعاميم
                                     </div>
@@ -79,9 +79,9 @@
                     <div class="card-body">
                         <div class="row">
                             <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
-                                <a  asp-action="RoleList" asp-controller="Account"  style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="width:135px;">
-                                        <i class="fas fa-crown fa-3x"  style="color:rebeccapurple;"></i>
+                                <a asp-action="RoleList" asp-controller="Account" style="text-decoration:none;" class="mr-2">
+                                    <div class="pt-2  text-center MainLink" style="width:135px;">
+                                        <i class="fas fa-crown fa-3x" style="color:rebeccapurple;"></i>
                                         <br /> المستويات و انواع الجهات
                                     </div>
                                 </a>
@@ -115,7 +115,7 @@
                                 </a>
 
                                 <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-bell fa-3x" style="color:goldenrod;"></i>
 
                                         <br /> الاشعارات
@@ -123,7 +123,7 @@
                                 </a>
 
                                 <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-book-reader fa-3x" style="color:orchid;"></i>
 
                                         <br /> كشف حساب
@@ -159,14 +159,14 @@
                                 </a>
 
                                 <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
                                         <br /> نصوص الرسائل
                                     </div>
                                 </a>
 
                                 <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <span class="fa-stack fa-2x">
 
                                             <i class="fas fa-comment-alt fa-stack-2x fa-2x" style="color:green"></i>
@@ -199,12 +199,12 @@
                         <div class="row">
                             <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
                                 <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع الحركة
                                     </div>
                                 </a>
                                 <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-bug fa-3x" style="color:darkred;"></i> <br /> الاخطاء
                                     </div>
                                 </a>
@@ -233,7 +233,7 @@
                         <div class="row">
                             <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
                                 <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink"  style="background-color:#c2c5c7;cursor:not-allowed;">
+                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-chart-line fa-3x" style="color:black;"></i> <br /> حركة التحصيلات
                                     </div>
                                 </a>

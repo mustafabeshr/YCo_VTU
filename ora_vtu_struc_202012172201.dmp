@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 15/12/2020, 21:48:21 21:48:21  --
+-- Created by mbeshr on 17/12/2020, 22:02:01 22:02:01  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012152147.log
+spool ora_vtu_struc_202012172201.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -723,7 +723,7 @@ prompt
 create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 181
+start with 201
 increment by 1
 cache 20;
 
@@ -1217,6 +1217,11 @@ function fn_ResetPassword(
    v_createdby   partner.partner_id%type
   ) return number;
   
+  function fn_ChangePassword(
+  v_partner_acc               partner.partner_acc%type,
+  v_pwd                       partner.pwd%type, 
+   v_extra                     partner.extra%type
+  ) return number;
   
    function fn_create_in_sms(
     v_reciever sms_in.reciever%type, 
@@ -2326,6 +2331,46 @@ function fn_ResetPassword(
                  v_exp_object => 'sms_Out');
          return SQLCODE;
   end;
+  
+  
+  function fn_ChangePassword(
+  v_partner_acc               partner.partner_acc%type,
+  v_pwd                       partner.pwd%type, 
+   v_extra                     partner.extra%type
+  ) return number is 
+      v_partnerActivityFound number := 0;
+       v_creator_acc               partner.partner_acc%type;
+        v_creator_role               partner.roleid%type;
+          v_targetPartner partner%rowtype;
+  Begin
+   
+/* 
+      v_partnerActivityFound := pk_utility.fn_ispartneractivitydefined(v_act_id => 'Partner.ResetPassword',
+                                                    v_fromroleid => v_creator_role,
+                                                    v_toroleid => v_targetPartner.Roleid);
+        if (v_partnerActivityFound <> 1) then
+       begin
+           --message := 'Unauthrized';
+          return -513;
+       end;
+      end if;
+    ---------------------------------------------------------------------------  
+  */
+    update partner 
+    set pwd = v_pwd,   extra = v_extra
+    where partner_acc = v_partner_acc;
+    return 1;
+  
+  
+    EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Change Pass',
+                 v_exp_object => 'Change');
+         return SQLCODE;
+  end;
+
   
  function fn_create_in_sms(
     v_reciever sms_in.reciever%type, 

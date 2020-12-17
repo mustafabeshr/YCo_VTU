@@ -16,7 +16,7 @@ using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
-    
+    [Authorize]
     public class AccountController : Controller
     {
         private readonly IAppDbContext db;
@@ -120,6 +120,7 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Login()
         {
@@ -139,6 +140,10 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("AppRole.Query", currentRoleId);
             if (permission == null)
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                      Title = "تنبيه"
+                });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
@@ -161,7 +166,7 @@ namespace Yvtu.Web.Controllers
         }
 
 
-
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto model)
         {
@@ -173,12 +178,12 @@ namespace Yvtu.Web.Controllers
                 {
                     if (partnerResult.Partner.Status.Id > 2)
                     {
-                        model.Error = "عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا";
+                        toastNotification.AddInfoToastMessage("عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا");
                         return View(model);
                     }
                     if (partnerResult.Partner.LockTime > DateTime.Now)
                     {
-                        model.Error = "عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(partnerResult.Partner.LockTime);
+                        toastNotification.AddInfoToastMessage("عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(partnerResult.Partner.LockTime));
                         toastNotification.AddErrorToastMessage("حسابك متوقف مؤقتا");
                         return View(model);
                     }
@@ -186,26 +191,25 @@ namespace Yvtu.Web.Controllers
                         byte[] salt = Convert.FromBase64String(partnerResult.Partner.Extra);
                         string hash = Pbkdf2Hasher.ComputeHash(model.Pwd, salt);
 
-
                         if (partnerResult.Partner.Pwd != hash)
                         {
                             bool lockAccount = false;
                             if (partnerResult.Partner.WrongPwdAttempts >= 2) lockAccount = true;
                             partner.IncreaseWrongPwdAttempts(partnerResult.Partner.Id, lockAccount);
-                            model.Error = "عذرا ، رمز المستخدم او كلمة المرور غير صحيح" + Environment.NewLine +"(" + partnerResult.Partner.WrongPwdAttempts + ")";
+                            toastNotification.AddInfoToastMessage("عذرا ، رمز المستخدم او كلمة المرور غير صحيح" + Environment.NewLine +"(" + partnerResult.Partner.WrongPwdAttempts + ")");
                             return View(model);
                         }
 
-                            partner.PreSuccessLogin(partnerResult.Partner.Id);
+                        partner.PreSuccessLogin(partnerResult.Partner.Id);
 
-                            ClaimsIdentity identity = new ClaimsIdentity(partner.GetUserClaims(partnerResult.Partner)
-                                , CookieAuthenticationDefaults.AuthenticationScheme);
-                            ClaimsPrincipal principal = new ClaimsPrincipal(identity);
+                        ClaimsIdentity identity = new ClaimsIdentity(partner.GetUserClaims(partnerResult.Partner)
+                            , CookieAuthenticationDefaults.AuthenticationScheme);
+                        ClaimsPrincipal principal = new ClaimsPrincipal(identity);
 
-                            await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal
-                                , new AuthenticationProperties() { IsPersistent = model.RememberMe });
+                        await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal
+                            , new AuthenticationProperties() { IsPersistent = model.RememberMe });
 
-                            return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Home");
                     
                 }
             }
@@ -227,6 +231,10 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("Partner.Create", currentRoleId);
             if (permission == null)
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreatePartnerDto();
