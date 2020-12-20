@@ -27,7 +27,7 @@
                     <img src="~/images/Y-Logo2.png" alt="YCo Logo" class="brand-image" width="70" height="70" style="opacity: .8">
                     <span class="brand-text font-weight-light" style="font-family: 'ArefRuqaa-Bold'; font-size:1.5em;color:purple;">إدارة الشاحن الفوري</span>
                 </a>
-
+               
                 @*<div style="font-size:20px;font-weight:bold;">
                         @{
                             var partId = UserManager.GetCurrentUserId(this.Context);
@@ -106,13 +106,13 @@
                 &copy; 2020 - Yvtu.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             </div>
         </footer>*@
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-   
-    @if (IsSectionDefined("Scripts"))
-    {
-        @RenderSection("Scripts", required: true)
-    }
+                <script src="~/lib/jquery/dist/jquery.min.js"></script>
+                <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+                <script src="~/js/site.js" asp-append-version="true"></script>
+
+                @if (IsSectionDefined("Scripts"))
+{
+                    @RenderSection("Scripts", required: true)
+}
 </body>
 </html>

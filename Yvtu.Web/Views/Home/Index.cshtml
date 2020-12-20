@@ -23,40 +23,39 @@
                      style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
                     <div class="card-body ">
                         <div class="row">
-                            <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
+                            <div class="col-md-2">
                                 <a asp-action="Create" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  text-center MainLink">
+                                    <div class="pt-2 m-auto text-center MainLink">
                                         <i class="fa fa-user-plus fa-3x" style="color:green;"></i> <br /> إنشاء جهة
                                     </div>
                                 </a>
-
-
-
-                                <a asp-action="Create" asp-controller="MoneyTransfer" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="MoneyTransfer" style="text-decoration:none;" >
+                                    <div class="pt-2  m-auto text-center MainLink">
                                         <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
-
                                         <br /> نقل رصيد
                                     </div>
                                 </a>
-
-                                <a asp-action="Create" asp-controller="Adjust" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="Adjust" style="text-decoration:none;" >
+                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-sliders-h fa-3x" style="color:chocolate;"></i>
                                         <br /> تسويات
                                     </div>
                                 </a>
-
-                                <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a href="#" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fa fa-bullhorn fa-3x"></i>
                                         <br /> التعاميم
                                     </div>
                                 </a>
-
-
-
                             </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
                         </div>
                     </div>
                 </div>
@@ -78,58 +77,87 @@
                      style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
-                                <a asp-action="RoleList" asp-controller="Account" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="width:135px;">
+                            <div class="col-md-2">
+                                <a asp-action="RoleList" asp-controller="Account" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink" style="width:135px;">
                                         <i class="fas fa-crown fa-3x" style="color:rebeccapurple;"></i>
                                         <br /> المستويات و انواع الجهات
                                     </div>
                                 </a>
-
-                                <a asp-action="Index" asp-controller="Account" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="width:125px;">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Index" asp-controller="Account" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink" style="width:125px;">
                                         <i class="fa fa-users fa-3x" style="color:black;"></i> <br /> الجهات و المستخدمين
                                     </div>
                                 </a>
-
-                                <a asp-action="Index" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Index" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
                                         <i class="fa fa-shield-alt fa-3x" style="color:dodgerblue;"></i> <br /> الصلاحيات
                                     </div>
                                 </a>
+                            </div>
+                            <div class="col-md-2">
 
-                                <a asp-action="MoneyTranferQuery" asp-controller="MoneyTransfer" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink">
+                                <a asp-action="MoneyTranferQuery" asp-controller="MoneyTransfer" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
                                         <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
 
                                         <br /> نقل رصيد
                                     </div>
                                 </a>
-
-                                <a asp-action="Index" asp-controller="Recharge" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Index" asp-controller="Recharge" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
                                         <i class="fas fa-money-bill-wave fa-3x" style="color:darkcyan;"></i>
 
                                         <br /> التحصيل
                                     </div>
                                 </a>
-
-                                <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a href="#" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-bell fa-3x" style="color:goldenrod;"></i>
 
                                         <br /> الاشعارات
                                     </div>
                                 </a>
-
-                                <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                        </div>
+                        <div class="row  mt-2">
+                            <div class="col-md-2">
+                                <a href="#" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-book-reader fa-3x" style="color:orchid;"></i>
 
                                         <br /> كشف حساب
                                     </div>
                                 </a>
                             </div>
+                            <div class="col-md-2">
+                                <a asp-action="Index" asp-controller="msg" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
+                                        <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
+                                        <br /> نصوص الرسائل
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Index" asp-controller="Activity" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
+                                        <i class="far fa-dot-circle fa-3x" style="color:blue;"></i>
+                                        <br /> الاجراءات
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+
                         </div>
                     </div>
                 </div>
@@ -151,22 +179,24 @@
                      style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
-                                <a asp-action="CreateRule" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink">
+                            <div class="col-md-2">
+                                <a asp-action="CreateRule" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink">
                                         <i class="fa fa-user-shield fa-3x" style="color:dodgerblue;"></i> <br /> إنشاء صلاحية جديدة
                                     </div>
                                 </a>
-
-                                <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="msg" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink">
                                         <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
                                         <br /> نصوص الرسائل
                                     </div>
                                 </a>
-
-                                <a href="#" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a href="#" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <span class="fa-stack fa-2x">
 
                                             <i class="fas fa-comment-alt fa-stack-2x fa-2x" style="color:green"></i>
@@ -176,6 +206,9 @@
                                     </div>
                                 </a>
                             </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
                         </div>
                     </div>
                 </div>
@@ -197,19 +230,24 @@
                      style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
-                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع الحركة
                                     </div>
                                 </a>
-                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-bug fa-3x" style="color:darkred;"></i> <br /> الاخطاء
                                     </div>
                                 </a>
-
                             </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
                         </div>
                     </div>
                 </div>
@@ -231,19 +269,22 @@
                      style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
                     <div class="card-body">
                         <div class="row">
-                            <div class="m-auto" style="display:inline-flex;flex-wrap:wrap;">
-                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;" class="mr-2">
-                                    <div class="pt-2  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                            <div class="col-md-2">
+                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
                                         <i class="fas fa-chart-line fa-3x" style="color:black;"></i> <br /> حركة التحصيلات
                                     </div>
                                 </a>
                             </div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
+                            <div class="col-md-2"></div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
-
     </div>
 </div>

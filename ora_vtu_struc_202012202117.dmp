@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 17/12/2020, 22:02:01 22:02:01  --
+-- Created by mbeshr on 20/12/2020, 21:18:30 21:18:30  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012172201.log
+spool ora_vtu_struc_202012202117.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -16,7 +16,8 @@ create table ACTIVITIES
   act_name     NVARCHAR2(200) not null,
   act_type     VARCHAR2(100) not null,
   act_order    NUMBER default 0 not null,
-  internal_use NUMBER(1) default 0 not null
+  internal_use NUMBER(1) default 0 not null,
+  act_desc     NVARCHAR2(300)
 )
 ;
 alter table ACTIVITIES
@@ -342,6 +343,24 @@ alter table GLOGALSETTINGS
   add constraint PK_GLOGALSETTINGS primary key (SETT_CODE);
 
 prompt
+prompt Creating table MESSAGE_TEMPLATE
+prompt ===============================
+prompt
+create table MESSAGE_TEMPLATE
+(
+  msg_id       NUMBER not null,
+  msg_name     NVARCHAR2(200) not null,
+  msg_text     NVARCHAR2(500) not null,
+  createdon    DATE default sysdate not null,
+  createdby    VARCHAR2(9) not null,
+  createdbyacc NUMBER not null,
+  lastupdateon DATE
+)
+;
+alter table MESSAGE_TEMPLATE
+  add constraint PK_MESSAGE_TEMPLATE primary key (MSG_ID);
+
+prompt
 prompt Creating table MONEY_TRANSFER
 prompt =============================
 prompt
@@ -390,6 +409,20 @@ alter table MONEY_TRANSFER
 alter table MONEY_TRANSFER
   add constraint FK3_MONEY_TRANSFER foreign key (CREATOR_ACC)
   references PARTNER (PARTNER_ACC);
+
+prompt
+prompt Creating table MSG_DICTIONARY
+prompt =============================
+prompt
+create table MSG_DICTIONARY
+(
+  word_id    VARCHAR2(100) not null,
+  word_name  NVARCHAR2(100) not null,
+  word_order NUMBER default 1 not null
+)
+;
+alter table MSG_DICTIONARY
+  add constraint PK_MESSAGE_WORDS primary key (WORD_ID);
 
 prompt
 prompt Creating table OPERATION_EXCEPTION
@@ -624,7 +657,7 @@ prompt
 create sequence SEQ_DATA_AUDIT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 61
+start with 81
 increment by 1
 cache 20;
 
@@ -1303,6 +1336,21 @@ function fn_CreatePartnerActivityDetail (
   v_bonus_tax partner_activity_detail.bonus_tax%type,
   v_createdby partner_activity.createdby%type
   ) return number;
+  
+  function fn_Create_Message_Template(
+    v_msg_name message_template.msg_name%type, 
+    v_msg_text message_template.msg_text%type, 
+    v_createdby message_template.createdby%type, 
+    v_createdbyacc message_template.createdbyacc%type
+    ) return number;
+  
+  
+    function fn_Update_Message_Template(
+    v_msg_id message_template.msg_id%type,
+    v_msg_name message_template.msg_name%type, 
+    v_msg_text message_template.msg_text%type
+    ) return number;
+    
 end pk_Settings;
 /
 
@@ -1318,6 +1366,7 @@ create or replace package pk_Utility is
   
 procedure sp_Create_Audit(
 v_partner_id    data_audit.partner_id%type,
+v_partner_acc    data_audit.partner_acc%type,
 v_act_id        data_audit.act_id%type,
 v_action_id     data_audit.action_id%type,
 v_note          data_audit.note%type,
@@ -2552,6 +2601,56 @@ EXCEPTION
          return SQLCODE;
   END;  
   
+  
+    function fn_Create_Message_Template(
+    v_msg_name message_template.msg_name%type, 
+    v_msg_text message_template.msg_text%type, 
+    v_createdby message_template.createdby%type, 
+    v_createdbyacc message_template.createdbyacc%type
+    ) return number is
+    v_msg_id message_template.msg_id%type;
+    begin
+        select nvl(max(msg_id), 0) + 1 into v_msg_id from message_template;
+        
+        insert into message_template
+            (msg_id, msg_name, msg_text, createdon, createdby, createdbyacc)
+          values
+            (v_msg_id, v_msg_name, v_msg_text, sysdate, v_createdby, v_createdbyacc);
+            return v_msg_id;
+     EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Message Template');
+         return SQLCODE;
+            
+    end;
+    
+     function fn_Update_Message_Template(
+    v_msg_id message_template.msg_id%type,
+    v_msg_name message_template.msg_name%type, 
+    v_msg_text message_template.msg_text%type
+    ) return number is
+   
+    begin
+       update message_template
+        set   msg_name = v_msg_name,
+                msg_text = v_msg_text,
+                lastupdateon = sysdate
+        where msg_id = v_msg_id;
+        return 1;
+     EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Update',
+                 v_exp_object => 'Message Template');
+         return SQLCODE;
+            
+    end;
+      
+      
 end pk_Settings;
 /
 
@@ -2563,6 +2662,7 @@ create or replace package body pk_Utility is
 
  procedure sp_Create_Audit(
 v_partner_id    data_audit.partner_id%type,
+v_partner_acc    data_audit.partner_acc%type,
 v_act_id        data_audit.act_id%type,
 v_action_id     data_audit.action_id%type,
 v_note          data_audit.note%type,

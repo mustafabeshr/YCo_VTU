@@ -34,14 +34,15 @@ namespace Yvtu.Infra.Data.Interfaces
                 };
                 #endregion
                 var result =  db.ExecuteStoredProc("pk_utility.sp_create_audit", parameters);
-                if (result > 0)
-                {
-                    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
-                }
-                else
-                {
-                    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
-                }
+                return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                //if (result > 0)
+                //{
+                //    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                //}
+                //else
+                //{
+                //    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
+                //}
             }
             catch (Exception ex)
             {

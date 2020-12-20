@@ -11,6 +11,6 @@ namespace Yvtu.Core.Entities
         public string Type { get; set; }
         public int Order { get; set; }
         public bool Internal { get; set; }
-
+        public string Description { get; set; }
     }
 }

@@ -1,0 +1,110 @@
+﻿@model Yvtu.Core.Queries.MessageTemplateQuery
+
+@{
+    ViewData["Title"] = "Message Query";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الرسائل و الاشعارات </p>
+        </div>
+        <form asp-controller="msg" asp-action="Index" method="post">
+            @await Component.InvokeAsync("NToastNotify")
+            <div class="form-row">
+                <div class="form-group col-11  row">
+                    <label asp-for="QMessage" class="FormLabel pt-2">نص الرسالة:</label>
+                    <div class="col-9">
+                        <input asp-for="QMessage" class="form-control text-center" />
+                    </div>
+                </div>
+                <div class="form-group col-1 row">
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@if (Model != null && Model.Results != null)
+{
+    <div class="row bg-white">
+        <div class="col-12">
+            @foreach (var item in Model.Results)
+            {
+                <div class="row p-1">
+                    <div class="col-8">
+                        <div class="row">
+                            <div class="col-12 text-right" style="color:gray;"
+                                 data-toggle="tooltip" data-placement="top" title="عنوان الرسالة :@item.Title">
+                                <span style="font-size:20px;font-weight:bold;color:maroon;"><i class="fas fa-chevron-right"></i>@item.Id<i class="fas fa-chevron-left"></i></span>
+                                @item.Title
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-12 text-right" style="color:darkgreen;"
+                                 data-toggle="tooltip" data-placement="top" title="نص الرسالة :@item.Message">
+                                @item.Message
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="row">
+                            <div class="col-6  text-center" style="color:gray;font-size:11px;"
+                                 data-toggle="tooltip" data-placement="top" title="انشئ بواسطة الرقم">
+                                @item.CreatedBy.Id
+                            </div>
+                            <div class="col-6 text-center" style="color:gray;font-size:11px;"
+                                 data-toggle="tooltip" data-placement="top" title="انشئ بواسطة رقم الحساب">
+                                @item.CreatedBy.Account
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-center" style="color:gray;font-size:11px;"
+                                 data-toggle="tooltip" data-placement="top" title="تاريخ الانشاء">
+                                @item.CreatedOn.ToShortDateString()
+                            </div>
+                            <div class="col-6 text-center" style="color:gray;font-size:11px;"
+                                  data-toggle="tooltip" data-placement="top" title="تاريخ اخر تعديل">
+                                @item.LastUpdatedOn.ToShortDateString()
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 text-center" style="color:gray;font-size:11px;"
+                                 data-toggle="tooltip" data-placement="top" title="انشئ بواسطة">
+                                @item.CreatedBy.Name
+                            </div>
+                            <div class="col-6 text-center">
+                                <a asp-action="Edit" asp-controller="msg" asp-route-id="@item.Id">
+                                    <i class="fa fa-edit"  style="color:blue;" data-toggle="tooltip" data-placement="top" title="تعديل"></i>
+                                </a>
+                                <a href="#">
+                                    <i class="fa fa-trash-alt" style="color:red;" data-toggle="tooltip" data-placement="top" title="حذف"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <hr />
+            }
+        </div>
+    </div>
+}
+
+
+@section Scripts{
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip()
+        })
+    </script>
+
+    <script src="~/js/CustomScript.js"></script>
+
+}

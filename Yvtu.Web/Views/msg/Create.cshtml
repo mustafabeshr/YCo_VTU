@@ -1,0 +1,70 @@
+﻿@model Yvtu.Web.Dto.CreateMessageTemplateDto
+
+@{
+    ViewData["Title"] = "Create Message";
+    int i = 0;
+    string itemId = string.Empty;
+    int templateId = ViewData["Id"] == null ? 0 : int.Parse(ViewData["Id"].ToString());
+}
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">إنشاء رسالة جديدة</p>
+        </div>
+        @await Component.InvokeAsync("NToastNotify")
+    <form method="post">
+        @Html.HiddenFor(m => m.Id)
+        <div class="form-row">
+            <div class="form-group col-12">
+                <label asp-for="Title" class="FormLabel">العنوان :</label>
+                <label asp-for="Title" class="FormLabel float-left" style="font-size:18px;">( @templateId )</label>
+                <input asp-for="Title" class="form-control RequiredInput" style="color:darkgreen;" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12">
+                <div class="row">
+                    <table class="table table-responsive">
+                        <tr>
+                            @foreach (var item in Model.Dictionary)
+                            {
+                                itemId = "'" + item.Id + "'";
+                                <td class="p-0">
+                                    <button type="button" onclick="wordClicked(@itemId)" id="btnWord" class="btn btn-outline-info" style="border:none;font-size:10px;height:100px;">@item.Name</button>
+                                </td>
+                            }
+                        </tr>
+                    </table>
+                </div>
+                <div class="form-group col-12">
+                    <label asp-for="Message" class="FormLabel">نص الرسالة :</label> <label id="lblMessageCount" class="FormLabel" style="font-size:20px;">0</label>
+                    <textarea id="txtMessage" asp-for="Message" class="form-control RequiredInput" style="height:200px;color:blue;"></textarea>
+                    <span asp-validation-for="Message" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success" asp-route-id="@Model.Id"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+        </div>
+
+    </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function wordClicked(data) {
+        var cursorPos = $('#txtMessage').prop('selectionStart');
+        var v = $('#txtMessage').val();
+        var textBefore = v.substring(0, cursorPos);
+        var textAfter = v.substring(cursorPos, v.length);
+        $('#txtMessage').val(textBefore + data + textAfter);
+    }
+    $("#txtMessage").keyup(function () {
+        $("#lblMessageCount").text($(this).val().length);
+        //console.log($("#txtMessage").val().length);
+    }); 
+    
+</script>
+}
