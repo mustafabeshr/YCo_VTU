@@ -36,7 +36,7 @@ namespace Yvtu.Web.Controllers
           
              var  model = new ListPartnerActivityDto();
 
-            model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
+            model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
             model.FromRoles =  new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
             return View(model);
@@ -50,7 +50,7 @@ namespace Yvtu.Web.Controllers
                 model = new ListPartnerActivityDto();
             }
 
-            model.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
+            model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
             model.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
             if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0 )
@@ -90,7 +90,7 @@ namespace Yvtu.Web.Controllers
 
             }
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            var activities = new ActivityRepo(db).GetActivities();
+            var activities = new ActivityRepo(db, _PartnerManager).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
@@ -137,7 +137,7 @@ namespace Yvtu.Web.Controllers
                 }
             }
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            var activities = new ActivityRepo(db).GetActivities();
+            var activities = new ActivityRepo(db, _PartnerManager).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
@@ -169,7 +169,7 @@ namespace Yvtu.Web.Controllers
             var model = new CreatePartnerActivityDto();
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            var activities = new ActivityRepo(db).GetActivities();
+            var activities = new ActivityRepo(db, _PartnerManager).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
@@ -189,7 +189,7 @@ namespace Yvtu.Web.Controllers
             var detailModel = new List<CreatePartnerActivityDetailDto>();
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
             var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            var activities = new ActivityRepo(db).GetActivities();
+            var activities = new ActivityRepo(db, _PartnerManager).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 
@@ -226,7 +226,7 @@ namespace Yvtu.Web.Controllers
                 if (result.Success)
                 {
                     var listModel = new ListPartnerActivityDto();
-                    listModel.Activities = new SelectList(new ActivityRepo(db).GetActivities(), "Id", "Name");
+                    listModel.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
                     listModel.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
                     return View("Index", listModel);
                 }
@@ -237,7 +237,7 @@ namespace Yvtu.Web.Controllers
             }
 
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            var activities = new ActivityRepo(db).GetActivities();
+            var activities = new ActivityRepo(db, _PartnerManager).GetActivities();
             var maxQueryDuration = new CommonCodeRepo(db).GetCodesByType("queryduration");
             var scopes = new CommonCodeRepo(db).GetCodesByType("activity.scope");
 

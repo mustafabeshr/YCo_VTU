@@ -1,0 +1,157 @@
+﻿@model Yvtu.Web.Dto.AssignActivityMessageDto;
+
+@{
+    ViewData["Title"] = "Assign Message To Activity";
+}
+
+
+<div class="row">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تحديد رسائل التنبيهات  التابعة للاجراء</p>
+        </div>
+    </div>
+</div>
+<form method="post">
+    <div class="row bg-white p-2">
+        <div class="col-md-10">
+            <div class="col-12 text-right" style="color:gray;font-weight:bold;text-shadow:4px 4px 7px rgba(150, 150, 150, 1);"
+                 data-toggle="tooltip" data-placement="top" title="اسم الاجراء">
+                @Model.Activity.Name
+            </div>
+            <p class="text-muted" style="font-size:12px;margin-top:8px;">@Model.Activity.Description</p>
+        </div>
+        <div class="col-md-2">
+            <!-- Button trigger modal -->
+            <div class="row"><label> </label></div>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalLong" style="font-size:13px;">
+                اضافة رسالة
+            </button>
+        </div>
+    </div>
+
+    <!-- Start Last Activity Messages -->
+
+
+    @if (Model != null && Model.ActivityMessages != null)
+    {
+        <div class="row mt-1">
+            <div class="col-12  p-0">
+                @foreach (var item in Model.ActivityMessages)
+                {
+                    <div class="col-12 bg-white mt-4 p-5 shadow-sm">
+                        <div class="row">
+                            <div class="col-md-11">
+                                <div class="row">
+                                    <div class="col-12 text-right" style="color:gray;">
+                                        <span style="font-size:16px;font-weight:bold;color:maroon;">@item.Message.Id</span>
+                                        @item.Message.Title
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-12 text-right" style="color:darkgreen;font-size:11px;">
+                                        @item.Message.Message
+                                    </div>
+                                </div>
+                                <a asp-action="DeleteMessage" asp-controller="Activity" asp-route-actId="@item.Activity.Id"
+                                   asp-route-msgId="@item.Message.Id"><i class="far fa-trash-alt  text-danger"></i></a>
+                            </div>
+
+                            <div class="col-md-1">
+                                <div class="row">
+                                    @if (item.MessageOrder > 1)
+                                    {
+                                        <a asp-action="OrderUp" asp-controller="Activity" asp-route-actId="@item.Activity.Id" 
+                                           asp-route-msgId="@item.Message.Id" class="btn btn-light">
+                                            <i class="fas fa-angle-up"></i>
+                                        </a>
+                                    }
+                                </div>
+                                <div class="row">
+                                    @if (item.MessageOrder < Model.ActivityMessages.Count)
+                                    {
+                                        <a asp-action="OrderDown" asp-controller="Activity" asp-route-actId="@item.Activity.Id"
+                                           asp-route-msgId="@item.Message.Id" class="btn btn-light">
+                                            <i class="fas fa-angle-down"></i>
+                                        </a>
+                                    }
+                                </div>
+                            </div>
+                            </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+    <!-- End Last Activity Messages -->
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModalLong" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width:1000px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>*@
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" style="color:red;font-weight:bold;">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @if (Model != null && Model.Messages != null && Model.Messages.Count > 0)
+                    {
+                        <div class="row bg-white">
+                            <div class="col-12">
+                                @foreach (var item in Model.Messages)
+                                {
+                                    <div class="row p-1">
+                                        <div class="col-11">
+                                            <div class="row">
+                                                <div class="col-12 text-right" style="color:gray;">
+                                                    <span style="font-size:16px;font-weight:bold;color:maroon;">@item.Message.Id</span>
+                                                    @item.Message.Title
+                                                </div>
+                                            </div>
+                                            <br />
+                                            <div class="row">
+                                                <div class="col-12 text-right" style="color:darkgreen;font-size:11px;">
+                                                    @item.Message.Message
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="submit" asp-action="AssignMessage" asp-controller="Activity"
+                                                    asp-route-msgid="@item.Message.Id"
+                                                    class="btn btn-light float-left">
+                                                <i class="fas fa-plus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.ActivityId)
+</form>
+
+@section Scripts{
+    <script>
+        function confirmDelete(isDeleteClicked) {
+            var deleteSpan = 'deleteSpan';
+            var confirmDeleteSpan = 'deleteConfirmSpan';
+
+            if (isDeleteClicked) {
+                $('#' + deleteSpan).hide();
+                $('#' + confirmDeleteSpan).show();
+            } else {
+                $('#' + deleteSpan).show();
+                $('#' + confirmDeleteSpan).hide();
+            }
+        }
+    </script>
+
+ }

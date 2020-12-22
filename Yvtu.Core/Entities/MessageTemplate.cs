@@ -9,6 +9,7 @@ namespace Yvtu.Core.Entities
         public MessageTemplate()
         {
             CreatedBy = new AppUser();
+            Activities = new List<Activity>();
         }
 
         public int Id { get; set; }
@@ -17,6 +18,8 @@ namespace Yvtu.Core.Entities
         public AppUser CreatedBy { get; set; }
         public DateTime  CreatedOn { get; set; }
         public DateTime  LastUpdatedOn { get; set; }
+
+        public virtual List<Activity> Activities { get; set; }
 
         public override string ToString()
         {

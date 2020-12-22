@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 20/12/2020, 21:18:30 21:18:30  --
+-- Created by mbeshr on 22/12/2020, 21:16:36 21:16:36  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012202117.log
+spool ora_vtu_struc_202012222116.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -22,6 +22,48 @@ create table ACTIVITIES
 ;
 alter table ACTIVITIES
   add constraint FK_ACTIVITIES primary key (ACT_ID);
+
+prompt
+prompt Creating table MESSAGE_TEMPLATE
+prompt ===============================
+prompt
+create table MESSAGE_TEMPLATE
+(
+  msg_id       NUMBER not null,
+  msg_name     NVARCHAR2(200) not null,
+  msg_text     NVARCHAR2(500) not null,
+  createdon    DATE default sysdate not null,
+  createdby    VARCHAR2(9) not null,
+  createdbyacc NUMBER not null,
+  lastupdateon DATE
+)
+;
+alter table MESSAGE_TEMPLATE
+  add constraint PK_MESSAGE_TEMPLATE primary key (MSG_ID);
+
+prompt
+prompt Creating table ACTIVITY_MESSAGE
+prompt ===============================
+prompt
+create table ACTIVITY_MESSAGE
+(
+  act_id       VARCHAR2(100) not null,
+  msg_id       NUMBER not null,
+  sending_time VARCHAR2(100) not null,
+  createdon    DATE default sysdate not null,
+  createdby    VARCHAR2(9) not null,
+  createdbyacc NUMBER not null,
+  msg_order    NUMBER default 1 not null
+)
+;
+alter table ACTIVITY_MESSAGE
+  add constraint PK_ACTIVITY_MESSAGE primary key (ACT_ID, MSG_ID);
+alter table ACTIVITY_MESSAGE
+  add constraint FK2_ACTIVITY_MESSAGE foreign key (MSG_ID)
+  references MESSAGE_TEMPLATE (MSG_ID) on delete cascade;
+alter table ACTIVITY_MESSAGE
+  add constraint FK_ACTIVITY_MESSAGE foreign key (ACT_ID)
+  references ACTIVITIES (ACT_ID) on delete cascade;
 
 prompt
 prompt Creating table APPROLE
@@ -341,24 +383,6 @@ create table GLOGALSETTINGS
 ;
 alter table GLOGALSETTINGS
   add constraint PK_GLOGALSETTINGS primary key (SETT_CODE);
-
-prompt
-prompt Creating table MESSAGE_TEMPLATE
-prompt ===============================
-prompt
-create table MESSAGE_TEMPLATE
-(
-  msg_id       NUMBER not null,
-  msg_name     NVARCHAR2(200) not null,
-  msg_text     NVARCHAR2(500) not null,
-  createdon    DATE default sysdate not null,
-  createdby    VARCHAR2(9) not null,
-  createdbyacc NUMBER not null,
-  lastupdateon DATE
-)
-;
-alter table MESSAGE_TEMPLATE
-  add constraint PK_MESSAGE_TEMPLATE primary key (MSG_ID);
 
 prompt
 prompt Creating table MONEY_TRANSFER
@@ -1351,6 +1375,22 @@ function fn_CreatePartnerActivityDetail (
     v_msg_text message_template.msg_text%type
     ) return number;
     
+    function fn_Create_Activity_Message(
+      v_act_id Activity_Message.act_id%type, 
+      v_msg_id Activity_Message.msg_id%type, 
+      v_sending_time Activity_Message.Sending_Time%type, 
+      v_createdby Activity_Message.createdby%type, 
+      v_createdbyacc Activity_Message.createdbyacc%type,
+      v_msg_order Activity_Message.Msg_Order%type
+      ) return number;
+      
+       function fn_Delete_Activity_Message(
+      v_act_id Activity_Message.act_id%type, 
+      v_msg_id Activity_Message.msg_id%type)
+      return number;
+      
+       function fn_Reorder_Activity_Message(
+      v_act_id Activity_Message.act_id%type)return number;
 end pk_Settings;
 /
 
@@ -2649,7 +2689,99 @@ EXCEPTION
          return SQLCODE;
             
     end;
+  
+  
+  function fn_Create_Activity_Message(
+      v_act_id Activity_Message.act_id%type, 
+      v_msg_id Activity_Message.msg_id%type, 
+      v_sending_time Activity_Message.Sending_Time%type, 
+      v_createdby Activity_Message.createdby%type, 
+      v_createdbyacc Activity_Message.createdbyacc%type,
+      v_msg_order Activity_Message.Msg_Order%type
+      ) return number is
       
+      v_count number := 0;
+      v_tmp_order number;
+      begin
+          select nvl(count(*), 0) into v_count from activity_message where act_id = v_act_id and msg_id = v_msg_id;
+            if (v_count > 0) then
+                 begin
+                     --message := 'Duplicated';
+                    return -504;
+                 end;
+                end if; 
+                
+           if (v_msg_order <= 0) then
+             begin
+               select nvl(max(msg_order), 0)+1 into v_tmp_order from activity_message where act_id = v_act_id;
+             end;
+           else 
+             begin
+                v_tmp_order := v_msg_order;
+             end;
+             end if;
+
+              insert into activity_message
+                (act_id, msg_id, sending_time, createdon, createdby, createdbyacc, msg_order)
+              values
+                (v_act_id, v_msg_id, v_sending_time, sysdate, v_createdby, v_createdbyacc,v_tmp_order);
+
+             return 1;
+      
+      
+            EXCEPTION
+               WHEN OTHERS THEN
+                  sp_add_exception(v_exp_code => SQLCODE,
+                     v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                    v_exp_operation => 'Create',
+                     v_exp_object => 'Activity Message');
+                    return SQLCODE; 
+      end;     
+      
+  function fn_Delete_Activity_Message(
+      v_act_id Activity_Message.act_id%type, 
+      v_msg_id Activity_Message.msg_id%type)
+      return number is
+         reorderResult number;
+      begin
+          delete from activity_message where act_id = v_act_id and msg_id = v_msg_id;
+          reorderResult := pk_settings.fn_reorder_activity_message(v_act_id => v_act_id);
+          return 1;
+      
+        EXCEPTION
+               WHEN OTHERS THEN
+                  sp_add_exception(v_exp_code => SQLCODE,
+                     v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                    v_exp_operation => 'Delete',
+                     v_exp_object => 'Activity Message');
+                    return SQLCODE; 
+      end;     
+      
+      function fn_Reorder_Activity_Message(v_act_id Activity_Message.act_id%type)
+      return number is
+        CURSOR curMessages is 
+                   SELECT * FROM activity_message where act_id = v_act_id order by msg_order; 
+        v_ActivityMsgRow activity_message%ROWTYPE;
+        v_seq number := 1;
+      begin
+          
+         OPEN curMessages;
+         LOOP
+            FETCH curMessages into v_ActivityMsgRow;
+            EXIT WHEN curMessages%notfound;  
+            update activity_message set msg_order = v_seq where act_id = v_ActivityMsgRow.Act_Id and msg_id = v_ActivityMsgRow.Msg_Id;
+            v_seq := v_seq + 1 ;
+       END LOOP;
+       return 1;
+      
+        EXCEPTION
+               WHEN OTHERS THEN
+                  sp_add_exception(v_exp_code => SQLCODE,
+                     v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                    v_exp_operation => 'Reorder',
+                     v_exp_object => 'Activity Message');
+                    return SQLCODE; 
+      end;     
       
 end pk_Settings;
 /

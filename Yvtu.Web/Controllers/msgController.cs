@@ -33,7 +33,7 @@ namespace Yvtu.Web.Controllers
         [HttpPost]
         public IActionResult Index(MessageTemplateQuery model)
         {
-            model.Results = new MessageTemplateRepo(db, partnerManager).GetByPartTitle(model.QMessage);
+            model.Results = new MessageTemplateRepo(db, partnerManager).GetByPartTitle(model.QMessage, true);
             return View(model);
         }
         public IActionResult Create()

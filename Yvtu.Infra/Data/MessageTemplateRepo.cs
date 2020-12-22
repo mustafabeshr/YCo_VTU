@@ -91,10 +91,17 @@ namespace Yvtu.Infra.Data
             }
         }
 
-        public List<MessageTemplate> GetAll()
+        public List<MessageTemplate> GetAll(string NotInActivity = "")
         {
-            
-            var masterDataTable = db.GetData("Select * from message_template t  order by createdon", null);
+            DataTable masterDataTable;
+            if (NotInActivity == "")
+            {
+                masterDataTable = db.GetData("Select * from message_template t  order by createdon", null);
+            }else
+            {
+                masterDataTable = db.GetData("Select * from message_template t where not exists (select 1 from activity_message a where a.act_id='"+NotInActivity+"'"
+                    + "and a.msg_id = t.msg_id) order by createdon", null);
+            }
 
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
@@ -108,6 +115,39 @@ namespace Yvtu.Infra.Data
                 obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["createdon"].ToString());
                 obj.LastUpdatedOn = row["lastupdateon"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["lastupdateon"].ToString());
+                var createdAccount = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
+                var partner = partnerManager.GetPartnerByAccount(createdAccount);
+                obj.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                obj.CreatedBy.Name = partner.Name;
+                obj.CreatedBy.Account = partner.Account;
+                results.Add(obj);
+            }
+            return results;
+        }
+
+        public List<MessageTemplate> GetRelatedToActivity(string actId)
+        {
+            #region Parameters
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "actId",OracleDbType = OracleDbType.Varchar2,  Value = actId }
+                };
+            #endregion
+            DataTable masterDataTable;
+            masterDataTable = db.GetData("select * from message_template where exists (select 1 from activity_message" +
+                "  where activity_message.msg_id = message_template.msg_id and activity_message.act_id = :actId )  order by createdon", parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new List<MessageTemplate>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = new MessageTemplate();
+                obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+                obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
+                obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
+                obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                obj.LastUpdatedOn = row["lastupdateon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastupdateon"].ToString());
                 var createdAccount = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                 var partner = partnerManager.GetPartnerByAccount(createdAccount);
                 obj.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
@@ -173,7 +213,7 @@ namespace Yvtu.Infra.Data
 
             return obj;
         }
-        public List<MessageTemplate> GetByPartTitle(string title)
+        public List<MessageTemplate> GetByPartTitle(string title, bool relatedActivities = false)
         {
             #region Parameters
             var parameters = new List<OracleParameter> {
@@ -198,6 +238,19 @@ namespace Yvtu.Infra.Data
                 obj.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
                 obj.CreatedBy.Name = partner.Name;
                 obj.CreatedBy.Account = partner.Account;
+                //  get activities 
+                if (relatedActivities)
+                {
+                    var activities = new ActivityMessageRepo(db, partnerManager).GetList(string.Empty, obj.Id);
+                    if (activities != null)
+                    {
+                        foreach (var item in activities)
+                        {
+                            obj.Activities.Add(item.Activity);
+                        }
+                    }
+                }
+                //--------------------------------------------------
                 results.Add(obj);
             }
             return results;
