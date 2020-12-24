@@ -13,6 +13,7 @@ namespace Yvtu.Core.Queries
         //[MaxLength(9)]
         [StringLength(9)]
         public string QPartnerId { get; set; }
+        public string QCreatorId { get; set; }
         //[MaxLength(100)]
         public string QPartnerName { get; set; }
         [StringLength(9)]

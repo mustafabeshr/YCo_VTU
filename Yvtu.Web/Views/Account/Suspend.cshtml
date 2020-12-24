@@ -1,0 +1,98 @@
+﻿@model Yvtu.Web.Dto.CreateChangeStatusDto
+
+
+@{
+    ViewData["Title"] = "Suspend";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+<form method="post">
+
+    <div class="row">
+        <div class="col-md-12 shadow-sm bg-white pb-3">
+            <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+                <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">ايقاف نشاط جهة</p>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-2">
+                    <label asp-for="PartnerId" class="FormLabel float-left pt-2">الرقم:</label>
+                </div>
+                <div class="col-md-10">
+                    <input asp-for="PartnerId" class="form-control text-center" id="txtId" style="font-size:22px;font-weight:bold;width:20%;" />
+                </div>
+               
+            </div>
+            <div id="lblError" asp-for="Error" class="alert alert-danger" style="font-size:12px;display:none;"></div>
+        </div>
+    </div>
+
+    <div class="row bg-white mt-2">
+        <div class="col-md-12">
+            <table class="table mt-2">
+                <tr style="color:#adabab;border-top:none;">
+                    <td class="DetailLabel">الرقم</td>
+                    <td colspan="2" class="DetailLabel">الاسم</td>
+                    <td class="DetailLabel">الحساب</td>
+                </tr>
+                <tr style="border-bottom:none;">
+                    <td><label id="lblId"></label></td>
+                    <td colspan="2"><label id="lblName"></label></td>
+                    <td><label id="lblAccount"></label></td>
+
+                </tr>
+                <tr style="color:#adabab;border-top:none;">
+                    <td class="DetailLabel">النوع</td>
+                    <td class="DetailLabel">الحالة</td>
+                    <td class="DetailLabel">اخر دخول</td>
+                    <td class="DetailLabel">الرصيد</td>
+                </tr>
+                <tr style="border-bottom:none;">
+                    <td><label id="lblRole"></label></td>
+                    <td><label id="lblStatus"></label></td>
+                    <td><label id="lblLastLogin"></label></td>
+                    <td><label id="lblBalance"></label></td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+
+    <div class="row  shadow-sm mt-2 p-3" style="background-color:#fcf3c2;">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <div class="row mb-3">
+                <label asp-for="NewStatus.Name" class="col-sm-2 col-form-label FormLabel">الحالة الجديدة:</label>
+                <div class="col-sm-10">
+                    <input asp-for="NewStatus.Name" readonly class="form-control" style="font-size:22px;font-weight:bold;">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label asp-for="Note" class="col-sm-2 col-form-label FormLabel">ملاحظات:</label>
+                <div class="col-sm-10" style="width:100%;">
+                    <input asp-for="Note" class="form-control" style="font-size:13px;width:100%;">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label asp-for="NewStatusExpireOn" class="col-sm-2 col-form-label FormLabel">ينتهي في:</label>
+                <div class="col-sm-10" style="width:100%;">
+                    <input asp-for="NewStatusExpireOn" type="date" class="form-control" style="font-size:20px;">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-10">
+                    <button id="btnSave" type="submit" disabled class="btn btn-success"
+                            style="width:100%;border-radius:10px;">
+                        <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2"></div>
+    </div>
+    @Html.HiddenFor(m => m.PartnerId)
+    @Html.HiddenFor(m => m.Note)
+</form>
+@section Scripts {
+    <script src="~/js/Suspend.js"></script>
+} 

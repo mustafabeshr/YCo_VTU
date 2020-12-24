@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 22/12/2020, 21:16:36 21:16:36  --
+-- Created by mbeshr on 24/12/2020, 21:05:35 21:05:35  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012222116.log
+spool ora_vtu_struc_202012242105.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -550,6 +550,33 @@ alter table PARTNER_REQUEST
   add constraint PK_PARTNER_REQUEST primary key (REQ_ROW_NO);
 
 prompt
+prompt Creating table PARTNER_STATUS_LOG
+prompt =================================
+prompt
+create table PARTNER_STATUS_LOG
+(
+  log_id             NUMBER not null,
+  createdon          DATE default sysdate not null,
+  createdby          VARCHAR2(9) not null,
+  createdbyacc       NUMBER not null,
+  partner_id         VARCHAR2(9) not null,
+  partner_acc        NUMBER not null,
+  old_status         NUMBER not null,
+  new_status         NUMBER not null,
+  note               NVARCHAR2(400) not null,
+  newstatus_expireon DATE
+)
+;
+alter table PARTNER_STATUS_LOG
+  add constraint PK_PARTNER_STATUS_LOG primary key (LOG_ID);
+alter table PARTNER_STATUS_LOG
+  add constraint FK2_PARTNER_STATUS_LOG foreign key (PARTNER_ACC)
+  references PARTNER (PARTNER_ACC);
+alter table PARTNER_STATUS_LOG
+  add constraint FK_PARTNER_STATUS_LOG foreign key (CREATEDBYACC)
+  references PARTNER (PARTNER_ACC);
+
+prompt
 prompt Creating table REQUEST
 prompt ======================
 prompt
@@ -745,6 +772,17 @@ prompt Creating sequence SEQ_PARTNER_REQ_ID
 prompt ====================================
 prompt
 create sequence SEQ_PARTNER_REQ_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 21
+increment by 1
+cache 20;
+
+prompt
+prompt Creating sequence SEQ_PARTNER_STATUS_LOG_ID
+prompt ===========================================
+prompt
+create sequence SEQ_PARTNER_STATUS_LOG_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
 start with 21
@@ -1299,6 +1337,19 @@ function fn_ResetPassword(
   v_error partner_request.error%type,
   v_accesschannel partner_request.accesschannel%type
   ) return number;
+  
+  
+  function fn_Create_PartnerStatus_log(
+    v_createdby           PARTNER_STATUS_LOG.createdby%type,         
+  v_createdbyacc        PARTNER_STATUS_LOG.createdbyacc%type,      
+  v_partner_id          PARTNER_STATUS_LOG.partner_id%type,        
+  v_partner_acc         PARTNER_STATUS_LOG.partner_acc%type,       
+  v_old_status          PARTNER_STATUS_LOG.old_status%type,        
+  v_new_status          PARTNER_STATUS_LOG.new_status%type,        
+  v_note                PARTNER_STATUS_LOG.note%type,              
+  v_newstatus_expireon  PARTNER_STATUS_LOG.newstatus_expireon%type
+  ) return number;  
+  
 end pk_infra;
 /
 
@@ -2095,7 +2146,7 @@ v_ref_partner            partner.ref_partner%type
     v_lastRef_partner            partner.ref_partner%type;
   BEGIN
     
-     select nvl(count(*),0) into v_Id_exists from partner where partner_id = v_partner_id and (status < 3);
+     select nvl(count(*),0) into v_Id_exists from partner where partner_id = v_partner_id and (status < 4);
      if (v_Id_exists > 0) then
        begin
            --message := 'Duplicated';
@@ -2510,6 +2561,38 @@ function fn_ResetPassword(
                  v_exp_message => SUBSTR(SQLERRM, 1 , 500),
                  v_exp_operation => 'Create',
                  v_exp_object => 'Partner Request');
+         return SQLCODE;    
+  end;
+  
+    function fn_Create_PartnerStatus_log(
+    v_createdby           PARTNER_STATUS_LOG.createdby%type,         
+  v_createdbyacc        PARTNER_STATUS_LOG.createdbyacc%type,      
+  v_partner_id          PARTNER_STATUS_LOG.partner_id%type,        
+  v_partner_acc         PARTNER_STATUS_LOG.partner_acc%type,       
+  v_old_status          PARTNER_STATUS_LOG.old_status%type,        
+  v_new_status          PARTNER_STATUS_LOG.new_status%type,        
+  v_note                PARTNER_STATUS_LOG.note%type,              
+  v_newstatus_expireon  PARTNER_STATUS_LOG.newstatus_expireon%type
+  ) return number is
+  v_log_id PARTNER_STATUS_LOG.LOG_ID%type;
+  begin
+    v_log_id := seq_partner_status_log_id.nextval();
+    insert into partner_status_log
+        (log_id, createdon, createdby, createdbyacc, partner_id, partner_acc, old_status, new_status, note, newstatus_expireon)
+      values
+        (v_log_id, sysdate, v_createdby, v_createdbyacc, v_partner_id, v_partner_acc, v_old_status, v_new_status, v_note, v_newstatus_expireon);
+        
+        update partner set status = v_new_status, statuson = sysdate, statusby = v_createdby
+        where partner_acc = v_partner_acc;
+        
+     return v_log_id;
+  
+  EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Partner Status Change');
          return SQLCODE;    
   end;
 end pk_infra;

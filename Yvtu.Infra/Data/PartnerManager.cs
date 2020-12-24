@@ -265,8 +265,11 @@ namespace Yvtu.Infra.Data
             basicInfo.Id = partner.Id;
             basicInfo.Account = partner.Account;
             basicInfo.Name = partner.Name;
+            basicInfo.RefPartnerId = partner.RefPartner.Id;
             basicInfo.Role = partner.Role;
             basicInfo.Balance = partner.Balance;
+            basicInfo.Status = partner.Status;
+            basicInfo.LastLoginOn = partner.LastLoginOn ;
             return basicInfo;
         }
         public ValidatePartnerResult Validate(string partnerId)
@@ -377,7 +380,7 @@ namespace Yvtu.Infra.Data
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "partnerId", OracleDbType = OracleDbType.Varchar2,  Value = Id },
             };
-            var partnerDataTable = db.GetData("select * from partner where partner_id=:partnerId and (status <> 3)", parameters);
+            var partnerDataTable = db.GetData("select * from partner where partner_id=:partnerId and (status < 4)", parameters);
             if (partnerDataTable == null || partnerDataTable.Rows.Count == 0) return null;
 
             var partner = new Partner();
@@ -408,11 +411,11 @@ namespace Yvtu.Infra.Data
             string sql = string.Empty;
             if (lockAccount)
             {
-                sql = "Update partner set WRONG_PWD_ATTEMPTS = WRONG_PWD_ATTEMPTS + 1, status = 2, statuson=sysdate, locktime = sysdate + 1/24 where partner_id = :PartnerId";
+                sql = "Update partner set WRONG_PWD_ATTEMPTS = WRONG_PWD_ATTEMPTS + 1, status = 2, statuson=sysdate, locktime = sysdate + 1/24 where partner_id = :PartnerId and status = 1";
             }
             else
             {
-                sql = "Update partner set WRONG_PWD_ATTEMPTS = WRONG_PWD_ATTEMPTS + 1 where partner_id = :PartnerId";
+                sql = "Update partner set WRONG_PWD_ATTEMPTS = WRONG_PWD_ATTEMPTS + 1 where partner_id = :PartnerId and status = 1";
             }
             return db.ExecuteSqlCommand(sql, parameters) > 0;
         }
