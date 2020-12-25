@@ -121,5 +121,36 @@ namespace Yvtu.Web.Controllers
             model.Message = string.Empty;
             return View(model);
         }
+        public IActionResult SendSMSOne()
+        {
+            var model = new SMSOneDto();
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult SendSMSOne(SMSOneDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                var inserted = new SMSOne();
+                inserted.Message = model.Message;
+                inserted.Note = model.Note;
+                inserted.Receiver = model.Receiver;
+                inserted.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
+                inserted.CreatedBy.Account = partnerManager.GetCurrentUserAccount(this.HttpContext);
+                var result = new SMSOneRepo(db, partnerManager).Create(inserted);
+                if (result.Success)
+                {
+                    ModelState.Clear();
+                    model.Receiver = string.Empty;
+                    toastNotification.AddSuccessToastMessage("تم حفظ الرسالة بنجاح وسيتم ارساله فورا ");
+                }
+                else
+                {
+                    toastNotification.AddInfoToastMessage("فشل عملية حفظ الرسالة ");
+                }
+            }
+            return View(model);
+        }
     }
+
 }

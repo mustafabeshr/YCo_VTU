@@ -477,6 +477,19 @@ namespace Yvtu.Web.Controllers
             return partner;
         }
 
+        public PartBasicInfo GetBasicInfo4Co(string id)
+        {
+            if (!Utility.ValidYMobileNo(id)) return new PartBasicInfo { Error = "رقم غير صحيح" };
+            var partner = partnerManager.GetPartnerBasicInfo(id);
+            if (partner == null) return new PartBasicInfo { Error = "البيانات غير متوفرة" };
+            var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = new PartnerActivityRepo(db).GetPartAct("Partner.Confiscate", currentRole);
+            if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            partner.Error = "N/A";
+            return partner;
+        }
+
         public IActionResult Cancel()
         {
             var model = new CreateChangeStatusDto();
@@ -635,5 +648,126 @@ namespace Yvtu.Web.Controllers
             model.NewStatus = new PartnerStatusRepo(db).GetStatus(1);
             return View(model);
         }
+
+
+        public IActionResult Confiscate()
+        {
+            var model = new ConfiscationDto();
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult Confiscate(ConfiscationDto model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (!Utility.ValidYMobileNo(model.PartnerId))
+                {
+                    toastNotification.AddErrorToastMessage("الرقم غير صحيح");
+                }
+                else
+                {
+                    var partner = partnerManager.GetPartnerBasicInfo(model.PartnerId);
+                    if (partner == null)
+                    {
+                        toastNotification.AddErrorToastMessage("البيانات غير متوفرة");
+                    }
+                    else if (partner.Status.Id > 2)
+                    {
+                        toastNotification.AddErrorToastMessage("لا يمكن مصادرة رصيد هذه الجهة بسبب حالتها الحالية");
+                    }
+                    else if (partner.Balance == 0)
+                    {
+                        toastNotification.AddErrorToastMessage("لا يوجد رصيد للجهة يمكن مصادرته");
+                    }
+                    else
+                    {
+                        var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
+                        var permission = new PartnerActivityRepo(db).GetPartAct("Partner.Confiscate", currentRole);
+                        if (permission == null)
+                        {
+                            toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                        }
+                        else if (permission.Details == null || permission.Details.Count == 0)
+                        {
+                            toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                        }
+                        else if (permission.Scope.Id == "CurOpOnly")
+                        {
+                            toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                        }
+                        else if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != partnerManager.GetCurrentUserId(this.HttpContext))
+                        {
+                            toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                        }
+                        else
+                        {
+                            var insObj = new Confiscation();
+                            insObj.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
+                            insObj.CreatedBy.Account = partnerManager.GetCurrentUserAccount(this.HttpContext);
+                            insObj.Partner.Id = partner.Id;
+                            insObj.Partner.Account = partner.Account;
+                            insObj.Note = model.Note;
+                            var result = new ConfiscationRepo(db, partnerManager).Create(insObj);
+                            if (result.Success)
+                            {
+                                toastNotification.AddSuccessToastMessage("تم مصاردة الرصيد بنجاح");
+                                return RedirectToAction("Index", "Home");
+                            }
+                            else
+                            {
+                                toastNotification.AddErrorToastMessage("فشلت عملية مصادرة الرصيد");
+                            }
+                        }
+                    }
+                }
+
+            }
+            return View(model);
+        }
+
+
+        public IActionResult ChgStateQuery()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.ChangeStateQuery", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var model = new PartnerStatusLogQueryDto();
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult ChgStateQuery(PartnerStatusLogQueryDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.ChangeStateQuery", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var results = new PartnerStatusLogRepo(db, partnerManager).GetList(new PartnerStatusLogRepo.GetListParam
+            {
+                 CreatedByAccount = model.CreatedByAccount,
+                 CreatedById = model.CreatedById,
+                 PartnerId = model.PartnerId,
+                 PartnerAccount = model.PartnerAccount,
+                 StartDate = model.StartDate,
+                 EndDate = model.EndDate
+            });
+            model.results = results;
+            return View(model);
+        }
+
+
     }
 }

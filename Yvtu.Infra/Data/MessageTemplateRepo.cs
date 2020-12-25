@@ -150,7 +150,7 @@ namespace Yvtu.Infra.Data
                 obj.LastUpdatedOn = row["lastupdateon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastupdateon"].ToString());
                 var createdAccount = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                 var partner = partnerManager.GetPartnerByAccount(createdAccount);
-                obj.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                obj.CreatedBy.Id = partner.Id;
                 obj.CreatedBy.Name = partner.Name;
                 obj.CreatedBy.Account = partner.Account;
                 results.Add(obj);

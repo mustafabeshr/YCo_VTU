@@ -268,6 +268,7 @@ namespace Yvtu.Infra.Data
             basicInfo.RefPartnerId = partner.RefPartner.Id;
             basicInfo.Role = partner.Role;
             basicInfo.Balance = partner.Balance;
+            basicInfo.Reserved = partner.Reserved;
             basicInfo.Status = partner.Status;
             basicInfo.LastLoginOn = partner.LastLoginOn ;
             return basicInfo;
