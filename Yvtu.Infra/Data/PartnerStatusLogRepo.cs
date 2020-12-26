@@ -19,6 +19,7 @@ namespace Yvtu.Infra.Data
             public int CreatedByAccount { get; set; }
             public string PartnerId { get; set; }
             public int PartnerAccount { get; set; }
+            public bool IncludeDates { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
         }
@@ -123,34 +124,37 @@ namespace Yvtu.Infra.Data
                 }
                 if (!string.IsNullOrEmpty(param.CreatedById))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdby = :CreatedById" : " AND createdby = :CreatedById");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdby = :CreatedById" : " WHERE createdby = :CreatedById");
                     var p = new OracleParameter { ParameterName = "CreatedById", OracleDbType = OracleDbType.Varchar2, Value = param.CreatedById };
                     parameters.Add(p);
                 }
 
                 if (param.CreatedByAccount > 0)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdbyacc = :CreatedByAccount" : " AND createdbyacc = :CreatedByAccount");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdbyacc = :CreatedByAccount" : " WHERE createdbyacc = :CreatedByAccount");
                     var p = new OracleParameter { ParameterName = "CreatedByAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatedByAccount };
                     parameters.Add(p);
                 }
                 if (param.PartnerAccount > 0)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :PartnerAccount" : " AND partner_acc = :PartnerAccount");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND partner_acc = :PartnerAccount" : " WHERE partner_acc = :PartnerAccount");
                     var p = new OracleParameter { ParameterName = "PartnerAccount", OracleDbType = OracleDbType.Int32, Value = param.PartnerAccount };
                     parameters.Add(p);
                 }
-                if (param.StartDate > DateTime.MinValue && param.StartDate != null)
+                if (param.IncludeDates)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon >= :StartDate" : " AND createdon >= :StartDate");
-                    var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
-                    parameters.Add(p);
-                }
-                if (param.EndDate > DateTime.MinValue && param.EndDate != null)
-                {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon <= :EndDate" : " AND createdon <= :EndDate");
-                    var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
-                    parameters.Add(p);
+                    if (param.StartDate > DateTime.MinValue && param.StartDate != null)
+                    {
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon >= :StartDate" : " WHERE createdon >= :StartDate");
+                        var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
+                        parameters.Add(p);
+                    }
+                    if (param.EndDate > DateTime.MinValue && param.EndDate != null)
+                    {
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon <= :EndDate" : " WHERE createdon <= :EndDate");
+                        var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate.AddDays(1) };
+                        parameters.Add(p);
+                    }
                 }
             }
 

@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 25/12/2020, 21:32:29 21:32:29  --
+-- Created by mbeshr on 26/12/2020, 22:27:25 22:27:25  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012252132.log
+spool ora_vtu_struc_202012262227.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -617,7 +617,7 @@ create table PFINREC
   amount       NUMBER(18,2) default 0 not null,
   act_id       VARCHAR2(100) not null,
   act_no       NUMBER not null,
-  createdbyacc NUMBER not null,
+  createdbyacc NUMBER,
   act_time     DATE not null
 )
 ;
@@ -825,7 +825,7 @@ prompt
 create sequence SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 101
+start with 121
 increment by 1
 cache 20;
 
@@ -880,7 +880,7 @@ prompt
 create sequence SEQ_PFR_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 1
+start with 21
 increment by 1
 cache 20;
 
@@ -1268,6 +1268,28 @@ c.debug_info
 from collection_draft d, collection c
 where d.ref_no = c.cl_id
 order by d.row_id;
+
+prompt
+prompt Creating view V_PFR
+prompt ===================
+prompt
+create or replace force view v_pfr as
+select
+pfr.pfr_id,
+pfr.createdon,
+pfr.partner_acc,
+p.partner_id,
+pfr.amount,
+pfr.act_id,
+act.act_name,
+pfr.act_no,
+pfr.createdbyacc,
+(select partner_id from partner p where p.partner_acc = pfr.createdbyacc) creatorbyid ,
+(select partner_name from partner p where p.partner_acc = pfr.createdbyacc) creatorbyname ,
+pfr.act_time
+from pfinrec pfr, partner p, activities act
+where pfr.partner_acc = p.partner_acc
+and pfr.act_id = act.act_id;
 
 prompt
 prompt Creating package PK_FINANCIAL
@@ -1776,6 +1798,12 @@ function fn_MoneyTransfer (
       , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal, v_creator_role_id, v_part_acc, v_creator_acc);
     
      update partner set balance = balance + v_amount where partner_acc = v_part_acc;
+       pk_infra.sp_create_pfr(v_act_time => sysdate,
+                         v_partner_acc => v_part_acc,
+                         v_amount => v_amount,
+                         v_act_id => 'MoneyTransfer.Create',
+                         v_act_no => v_trans_id,
+                         v_createdbyacc => v_creator_acc);
      -- build SMS -------------------------------------------------------------
       v_result := pk_infra.fn_createoutsms(v_message => 
       N'Êã ÇÖÇÝÉ ãÈáÛ ' 
@@ -1791,6 +1819,12 @@ function fn_MoneyTransfer (
      if (v_check_bal = 1) then
        begin
          update partner set balance = balance - v_amount where partner_acc = v_creator_acc;
+         pk_infra.sp_create_pfr(v_act_time => sysdate,
+                         v_partner_acc => v_creator_acc,
+                         v_amount => -1 * v_amount,
+                         v_act_id => 'MoneyTransfer.Create',
+                         v_act_no => v_trans_id,
+                         v_createdbyacc => v_part_acc);
          -- build SMS -------------------------------------------------------------
          v_result := pk_infra.fn_createoutsms(v_message => 
          N'Êã ÎÝÖ ÑÕíÏ ÇáÔÇÍä ÇáÝæÑí ÇáÎÇÕ Èß ÈãÈáÛ ' 
@@ -2046,12 +2080,24 @@ v_src_bal := pk_utility.fn_getpartnerbalance(v_partner_acc => v_SrcPartner.Partn
                         v_net_amount, v_access_channel, v_note, v_ActualPeriod, v_Creator.Partner_Acc, v_AdjustmentMaxDays);
                     
                       update partner set balance = balance - v_amount where partner_acc = v_DestPartner.Partner_Acc;
+                      pk_infra.sp_create_pfr(v_act_time => sysdate,
+                         v_partner_acc => v_DestPartner.Partner_Acc,
+                         v_amount => -1 * v_amount,
+                         v_act_id => 'Adjustment',
+                         v_act_no => v_adj_id,
+                         v_createdbyacc => v_createdbyacc);
                       
                       update money_transfer set adjusted = 1, adjust_id = v_adj_id where trans_id = v_MoneyTranfer.Trans_Id;
                       
                       if (v_Params.Check_Bal = 1) then
                         begin
                             update partner set balance = balance + v_amount where partner_acc = v_SrcPartner.Partner_Acc;
+                            pk_infra.sp_create_pfr(v_act_time => sysdate,
+                                       v_partner_acc => v_SrcPartner.Partner_Acc,
+                                       v_amount => v_amount,
+                                       v_act_id => 'Adjustment',
+                                       v_act_no => v_adj_id,
+                                       v_createdbyacc => v_createdbyacc);
                         end ;
                       end if;
                       return v_adj_id;
@@ -2209,6 +2255,12 @@ begin
    if (v_update_bal = 1 and v_status = 1) then
      begin
         update partner set balance = balance - v_CollectionRow.Amount, reserved = reserved - v_CollectionRow.Amount where partner_acc= v_CollectionRow.Pos_Acc;
+          pk_infra.sp_create_pfr(v_act_time => sysdate,
+                         v_partner_acc => v_CollectionRow.Pos_Acc,
+                         v_amount => -1 * v_CollectionRow.Amount,
+                         v_act_id => 'Recharge.Create',
+                         v_act_no => v_cl_id,
+                         v_createdbyacc => v_CollectionRow.Subs_No);
      end;
    else if (v_update_bal = 1 and v_status = 2) then
      begin
@@ -2249,7 +2301,12 @@ begin
       values
         (v_con_id, sysdate, v_createdby, v_createdbyacc, v_partner_id, v_partner_acc, v_currBalance, v_note);
      update partner set balance = balance - v_currBalance where partner_acc = v_partner_acc;
-     
+     pk_infra.sp_create_pfr(v_act_time => sysdate,
+                                       v_partner_acc => v_partner_acc,
+                                       v_amount => -1 * v_currBalance,
+                                       v_act_id => 'Partner.Confiscate',
+                                       v_act_no => v_con_id,
+                                       v_createdbyacc => v_createdbyacc);
      return v_con_id;
      
 
@@ -2819,19 +2876,19 @@ function fn_ResetPassword(
       
       if (v_act_id = 'MoneyTransfer.Create') then
         begin
-          update money_transfer  set  pfr = v_pfr_id    where trans_id = v_act_no;
+          update money_transfer  set   pfr = pfr + 1    where trans_id = v_act_no;
         end;
       else  if (v_act_id = 'Recharge.Create') then
         begin
-            update collection set pfr = v_pfr_id    where  cl_id = v_act_no;
+            update collection set  pfr = pfr + 1   where  cl_id = v_act_no;
         end;
       else  if (v_act_id = 'MoneyTransfer.Adjustment') then
         begin
-            update adjustment  set pfr = v_pfr_id    where adj_id  = v_act_no;
+            update adjustment  set  pfr = pfr + 1    where adj_id  = v_act_no;
         end;
        else  if (v_act_id = 'Partner.Confiscate') then
         begin
-            update confiscation  set pfr = v_pfr_id    where con_id  = v_act_no;
+            update confiscation  set pfr = pfr + 1    where con_id  = v_act_no;
         end;
       end if;  end if; end if; end if; 
       

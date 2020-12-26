@@ -1,0 +1,48 @@
+﻿
+body {
+    direction: rtl;
+    font-family: 'ArefRuqaa-Bold';
+}
+
+.header {
+    text-align: center;
+    color: green;
+    padding-bottom: 35px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid gray;
+    padding: 15px;
+    font-size: 20px;
+    text-align: center;
+}
+
+table th {
+    background-color: #EDF0F2;
+    color: black;
+    font-size:16px;
+}
+
+.header_table {
+    width: 100%;
+    /* border-bottom: 0.5px solid #cbcdcf;*/
+    margin-bottom: 40px;
+}
+
+    .header_table tr, td {
+        border: none;
+    }
+
+
+.detail_table {
+    border:1px solid gray;
+}
+    .detail_table tr td {
+        border: 0.5px solid gray;
+        
+    }

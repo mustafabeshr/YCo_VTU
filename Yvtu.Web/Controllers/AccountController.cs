@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using DinkToPdf;
+using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
@@ -13,6 +17,7 @@ using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Web.Dto;
+using Yvtu.Web.Reports;
 
 namespace Yvtu.Web.Controllers
 {
@@ -23,16 +28,21 @@ namespace Yvtu.Web.Controllers
         private readonly IPartnerManager partnerManager;
         private readonly IPartnerActivityRepo partnerActivity;
         private readonly IToastNotification toastNotification;
+        private readonly IConverter converter;
+        private readonly IWebHostEnvironment environment;
 
         public AccountController(IAppDbContext db
             ,IPartnerManager partner
             ,IPartnerActivityRepo partnerActivity
-            , IToastNotification toastNotification)
+            , IToastNotification toastNotification
+            , IConverter converter, IWebHostEnvironment environment)
         {
             this.db = db;
             this.partnerManager = partner;
             this.partnerActivity = partnerActivity;
             this.toastNotification = toastNotification;
+            this.converter = converter;
+            this.environment = environment;
         }
         public IActionResult Index()
         {
@@ -740,6 +750,8 @@ namespace Yvtu.Web.Controllers
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new PartnerStatusLogQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(30));
+            model.EndDate = DateTime.Today;
             return View(model);
         }
         [HttpPost]
@@ -761,6 +773,7 @@ namespace Yvtu.Web.Controllers
                  CreatedById = model.CreatedById,
                  PartnerId = model.PartnerId,
                  PartnerAccount = model.PartnerAccount,
+                 IncludeDates = model.IncludeDates,
                  StartDate = model.StartDate,
                  EndDate = model.EndDate
             });
@@ -768,6 +781,86 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
 
+        public IActionResult PFR()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.PFR.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var model = new PFRQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(30));
+            model.EndDate = DateTime.Today;
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult PFR(PFRQueryDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.PFR.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var results = new PFRRepo(db).GetList(model.PartnerAccount, model.PartnerId, model.IncludeDates, model.StartDate, model.EndDate);
+            model.results = results;
+            return View(model);
+        }
 
+        public IActionResult CreatePFRReportPDF(int account, string id, bool includeDates, string startDate, string endDate)
+        {
+            var sDate = DateTime.Parse(startDate);
+            var eDate = DateTime.Parse(endDate);
+            var model = new PFRRepo(db).GetList(account, id, includeDates, sDate, eDate);
+            if (model == null) return Ok("غير موجود");
+            var roleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.PFR.Print", roleId);
+            var currUserId = partnerManager.GetCurrentUserId(this.HttpContext);
+            if (permission == null) return LocalRedirect("/Account/AccessDenied");
+            //if (permission.Scope.Id != "Everyone" && model.CreatedBy.Id != currUserId) return LocalRedirect("/Account/AccessDenied");
+
+
+            var globalSettings = new GlobalSettings
+            {
+                ColorMode = ColorMode.Color,
+                Orientation = Orientation.Landscape,
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
+                DocumentTitle = "PFR"
+
+            };
+            var objectSettings = new ObjectSettings
+            {
+                PagesCount = true,
+                HtmlContent = new PFRTemplate(db,partnerManager, environment, partnerActivity).GetHTMLString(account, id, includeDates, sDate, eDate),
+                WebSettings =
+                {
+                    DefaultEncoding = "utf-8",UserStyleSheet=Path.Combine(environment.WebRootPath, "css","Reports","PFR.css")
+                },
+                //HeaderSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true},
+                FooterSettings = { FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]", Line = true, Center = "Y Company" },
+
+
+            };
+
+            var pdf = new HtmlToPdfDocument
+            {
+                GlobalSettings = globalSettings,
+                Objects = { objectSettings }
+            };
+
+            var file = converter.Convert(pdf);
+
+            return File(file, "application/pdf");
+        }
     }
 }
