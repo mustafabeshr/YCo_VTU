@@ -522,6 +522,65 @@ namespace Yvtu.Infra.Data
             return partners;
         }
 
+        public async Task<OpertionResult> EditAsync(Partner newPartner)
+        {
+            
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_partner_name", OracleDbType = OracleDbType.Varchar2,  Value = newPartner.Name },
+                 new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.Varchar2,  Value = newPartner.BrandName },
+                 new OracleParameter{ ParameterName = "v_roleid",OracleDbType = OracleDbType.Int32,  Value = newPartner.Role.Id },
+                 new OracleParameter{ ParameterName = "v_id_no", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PersonalId.Id },
+                 new OracleParameter{ ParameterName = "v_id_type", OracleDbType = OracleDbType.Int32, Value = newPartner.PersonalId.IdType.Id },
+                 new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PersonalId.Place },
+                 new OracleParameter{ ParameterName = "v_id_issued", OracleDbType = OracleDbType.Date, Value = newPartner.PersonalId.Issued },
+                 new OracleParameter{ ParameterName = "v_createdby", OracleDbType = OracleDbType.Varchar2, Value = newPartner.CreatedBy.Id },
+                 new OracleParameter{ ParameterName = "v_cityid", OracleDbType = OracleDbType.Int32, Value = newPartner.Address.City.Id},
+                 new OracleParameter{ ParameterName = "v_districtid", OracleDbType = OracleDbType.Int32, Value = newPartner.Address.District.Id },
+                 new OracleParameter{ ParameterName = "v_street", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.Street },
+                 new OracleParameter{ ParameterName = "v_zone", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.Zone },
+                 new OracleParameter{ ParameterName = "v_extra_address", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.ExtraInfo },
+                 new OracleParameter{ ParameterName = "v_pair_mobile", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PairMobile },
+                 new OracleParameter{ ParameterName = "v_mobile", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Mobile },
+                 new OracleParameter{ ParameterName = "v_fixed", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Fixed },
+                 new OracleParameter{ ParameterName = "v_fax", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Fax },
+                 new OracleParameter{ ParameterName = "v_email", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Email },
+                 new OracleParameter{ ParameterName = "v_ip_address", OracleDbType = OracleDbType.Varchar2, Value = newPartner.IPAddress},
+                 new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32, Value = newPartner.IPAddress},
+                 new OracleParameter{ ParameterName = "v_ref_partner", OracleDbType = OracleDbType.Varchar2, Value = newPartner.RefPartner.Id}
+            };
+
+                #endregion
+                var oldPartner = GetActivePartner(newPartner.Id);
+                await db.ExecuteStoredProcAsync("pk_infra.fn_updatepartner", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    newPartner = GetActivePartner(newPartner.Id);
+                    var audit = new DataAudit();
+                    audit.Activity.Id = "Partner.Edit";
+                    audit.PartnerId = newPartner.CreatedBy.Id;
+                    audit.Action.Id = "Update";
+                    audit.Success = true;
+                    audit.OldValue = oldPartner.ToString();
+                    audit.NewValue = newPartner.ToString();
+                    new DataAuditRepo(db).Create(audit);
+                    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                }
+                else
+                {
+                    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
+            }
+        }
 
     }
 }

@@ -1,0 +1,377 @@
+﻿@model Yvtu.Web.Dto.EditPartnerDto
+
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+
+@await Component.InvokeAsync("NToastNotify")
+<form method="post">
+
+    <div class="row">
+        <div class="col-md-12 shadow-sm bg-white pb-3">
+            <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+                <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">تعديل بيانات جهة</p>
+            </div>
+            <div class="row mt-2">
+                <div class="col-md-3"></div>
+                <div class="col-md-2">
+                    <label asp-for="Id" class="FormLabel float-left pt-2">الرقم:</label>
+                </div>
+                <div class="col-md-2">
+                    <input asp-for="Id" class="form-control text-center" id="txtId" style="font-size:22px;font-weight:bold;" />
+                </div>
+                <div class="col-md-5"></div>
+            </div>
+            <div id="lblError" asp-for="Error" class="alert alert-danger" style="font-size:12px;display:none;"></div>
+        </div>
+    </div>
+    <div class="row shadow-sm bg-white mt-2 p-2">
+
+        @*البيانات القديمة*@
+
+        <div class="col-md-6">
+            <fieldset class="box-border">
+                <legend class="box-border">بيانات الجهة</legend>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="FormLabel float-left pt-2">الاسم:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtName" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">الاحتياطي:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtPairMobile" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">التجاري:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtBrandName" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">نوع الهوية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtPersonalIdTypeName" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">رقمها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtPersonalIdNo" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">تاريخها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" type="date"   id="txtPersonalIssued" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">مكانها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtPersonalIdPlace" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">المدينة:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtCityName" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">المديرية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input class="form-control text-center" id="txtDistrictName" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">الشارع:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtStreet" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label class="FormLabel float-left pt-2" style="font-size:11px;">الحي:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtZone" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">الموبايل:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtMobileNo" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">ثابت:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtFixed" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">فاكس:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtFax" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label class="FormLabel float-left pt-2" style="font-size:11px;">ايميل:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtEmail" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">المرجع:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtRefPartnerId" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">IP:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtIPAddress" />
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label  class="FormLabel float-left pt-2" style="font-size:11px;">اضافية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input  class="form-control text-center" id="txtExtraAddressInfo" />
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+        @*البيانات الجديدة*@
+
+        <div class="col-md-6">
+            <fieldset class="box-border">
+                <legend class="box-border">بيانات الجهة</legend>
+                <div class="row">
+                    <div class="col-md-2">
+                        <label asp-for="Id" class="FormLabel float-left pt-2">الاسم:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Name" class="form-control text-center" id="txtName2" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="PairMobile" class="FormLabel float-left pt-2" style="font-size:11px;">الاحتياطي:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="PairMobile" class="form-control text-center" id="txtPairMobile2" />
+                        <span asp-validation-for="PairMobile" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="BrandName" class="FormLabel float-left pt-2" style="font-size:11px;">التجاري:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="BrandName" class="form-control text-center" id="txtBrandName2" />
+                        <span asp-validation-for="BrandName" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="PersonalIdType" class="FormLabel float-left pt-2" style="font-size:11px;">نوع الهوية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <select id="selIdType" asp-for="PersonalIdType" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.IdTypes,"Id","Name"))">
+                        </select>
+                        <span asp-validation-for="PersonalIdType" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="PersonalIdNo" class="FormLabel float-left pt-2" style="font-size:11px;">رقمها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="PersonalIdNo" class="form-control text-center" id="txtPersonalIdNo2" />
+                        <span asp-validation-for="PersonalIdNo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="PersonalIssued" class="FormLabel float-left pt-2" style="font-size:11px;">تاريخها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="PersonalIssued" asp-format="{0:yyyy-MM-dd}" type="date" class="form-control text-center" id="txtPersonalIssued2" />
+                        <span asp-validation-for="PersonalIssued" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="PersonalIdPlace" class="FormLabel float-left pt-2" style="font-size:11px;">مكانها:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="PersonalIdPlace" class="form-control text-center" id="txtPersonalIdPlace2" />
+                        <span asp-validation-for="PersonalIdPlace" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="CityId" class="FormLabel float-left pt-2" style="font-size:11px;">المدينة:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <select id="citySelect" asp-for="CityId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.Cities,"Id","Name"))">
+                        </select>
+                        <span asp-validation-for="CityId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="DistrictId" class="FormLabel float-left pt-2" style="font-size:11px;">المديرية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <select id="districtSelect" asp-for="DistrictId" class="form-control RequiredInput" style="padding:0px;"
+                                asp-items="@(new SelectList(Model.Districts,"Id","Name"))">
+                        </select>
+                        <span asp-validation-for="DistrictId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="Street" class="FormLabel float-left pt-2" style="font-size:11px;">الشارع:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Street" class="form-control text-center" id="txtStreet2" />
+                        <span asp-validation-for="Street" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="Zone" class="FormLabel float-left pt-2" style="font-size:11px;">الحي:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Zone" class="form-control text-center" id="txtZone2" />
+                        <span asp-validation-for="Zone" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="MobileNo" class="FormLabel float-left pt-2" style="font-size:11px;">الموبايل:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="MobileNo" class="form-control text-center" id="txtMobileNo2" />
+                        <span asp-validation-for="MobileNo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="Fixed" class="FormLabel float-left pt-2" style="font-size:11px;">ثابت:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Fixed" class="form-control text-center" id="txtFixed2" />
+                        <span asp-validation-for="Fixed" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="Fax" class="FormLabel float-left pt-2" style="font-size:11px;">فاكس:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Fax" class="form-control text-center" id="txtFax2" />
+                        <span asp-validation-for="Fax" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="Email" class="FormLabel float-left pt-2" style="font-size:11px;">ايميل:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="Email" class="form-control text-center" id="txtEmail2" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="RefPartnerId" class="FormLabel float-left pt-2" style="font-size:11px;">المرجع:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="RefPartnerId" class="form-control text-center" id="txtRefPartnerId2" />
+                        <span asp-validation-for="RefPartnerId" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="IPAddress" class="FormLabel float-left pt-2" style="font-size:11px;">IP:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="IPAddress" class="form-control text-center" id="txtIPAddress2" />
+                        <span asp-validation-for="IPAddress" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2">
+                        <label asp-for="ExtraAddressInfo" class="FormLabel float-left pt-2" style="font-size:11px;">اضافية:</label>
+                    </div>
+                    <div class="col-md-10">
+                        <input asp-for="ExtraAddressInfo" class="form-control text-center" id="txtExtraAddressInfo2" />
+                        <span asp-validation-for="ExtraAddressInfo" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="row mt-1">
+                    <div class="col-md-2"></div>
+                        <div class="col-md-10">
+                            <button id="btnSave" type="submit" disabled class="btn btn-success"
+                                    style="width:100%;border-radius:10px;">
+                                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                            </button>
+                        </div>
+                    </div>
+
+</fieldset>
+        </div>
+
+
+    </div>
+</form>
+
+
+@section Scripts {
+    <script src="~/js/EditPart.js"></script>
+} 

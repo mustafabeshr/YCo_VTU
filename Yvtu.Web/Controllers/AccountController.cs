@@ -499,6 +499,25 @@ namespace Yvtu.Web.Controllers
             partner.Error = "N/A";
             return partner;
         }
+        public Partner GetP(string id)
+        {
+            if (!Utility.ValidYMobileNo(id)) return new Partner { Extra = "رقم غير صحيح" };
+            var getResult = partnerManager.Validate(id);
+            if (getResult.Success)
+            {
+                var partner = getResult.Partner;
+                var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = new PartnerActivityRepo(db).GetPartAct("Partner.Edit", currentRole);
+                if (permission == null) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
+                if (permission.Details == null || permission.Details.Count == 0) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
+                partner.Extra = "N/A";
+                return partner;
+            }
+            else
+            {
+                return new Partner { Extra = "رقم غير صحيح" };
+            }
+        }
 
         public IActionResult Cancel()
         {
@@ -862,5 +881,94 @@ namespace Yvtu.Web.Controllers
 
             return File(file, "application/pdf");
         }
+
+
+        public IActionResult Edit()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Edit", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var idTypes = new IdTypeRepo(db).GetTypes();
+            var cities = new CityRepo(db).GetCities();
+            var model = new EditPartnerDto();
+            model.IdTypes = idTypes;
+            model.Cities = cities;
+            model.Districts = new List<District>();
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult Edit(EditPartnerDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Edit", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            if (permission.Details == null || permission.Details.Count == 0)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var target = partnerManager.Validate(model.Id);
+            if (!target.Success || target.Partner == null)
+            {
+                toastNotification.AddErrorToastMessage("لم يتم العثور على البيانات", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var allowEdit = permission.Details.Exists(m => m.ToRole.Id == target.Partner.Role.Id);
+            if (!allowEdit)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            if (permission.Scope.Id == "CurOpOnly" && model.Id != partnerManager.GetCurrentUserId(this.HttpContext))
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            if (permission.Scope.Id == "Exclusive" && model.Id != target.Partner.RefPartner.Id)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+
+            var idTypes = new IdTypeRepo(db).GetTypes();
+            var cities = new CityRepo(db).GetCities();
+            model.IdTypes = idTypes;
+            model.Cities = cities;
+            model.Districts = new List<District>();
+            return View(model);
+        }
     }
 }
+

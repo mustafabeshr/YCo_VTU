@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 26/12/2020, 22:27:25 22:27:25  --
+-- Created by mbeshr on 27/12/2020, 21:14:36 21:14:36  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012262227.log
+spool ora_vtu_struc_202012272114.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -1409,7 +1409,6 @@ v_ref_partner   partner.ref_partner%type
 function fn_UpdatePartner (
 v_partner_name              partner.partner_name%type,
 v_brandname                 partner.brandname%type,
-v_roleid                    partner.roleid%type, 
 v_id_no                     partner.id_no%type, 
 v_id_type                   partner.id_type%type, 
 v_id_place                  partner.id_place%type,
@@ -2412,7 +2411,7 @@ v_ref_partner            partner.ref_partner%type
        end if;
      end if;
   
-     v_partner_acc := seq_partner_acc.nextval() + 1000;
+     v_partner_acc := seq_partner_acc.nextval() + 100;
      
     insert into partner
        (partner_id, partner_name, brandname, balance, reserved, verificationcodenext, locktime, roleid, id_no, id_type, id_place
@@ -2552,7 +2551,7 @@ EXCEPTION
       WHEN OTHERS THEN
          sp_add_exception(v_exp_code => SQLCODE,
                  v_exp_message => SUBSTR(SQLERRM, 1 , 500),
-                 v_exp_operation => 'Create',
+                 v_exp_operation => 'Update',
                  v_exp_object => 'Partner');
          return SQLCODE;
   END;
@@ -3255,6 +3254,22 @@ function fn_IsIdlePartner(v_partner_acc partner.partner_acc%type) return number 
       if (v_count > 0) then
         return 0;
       end if;
+      
+      select nvl(count(*), 0) into v_count from adjustment  where adjustment.dest_acc = v_partner_acc;
+        if (v_count > 0) then
+        return 0;
+      end if;
+      
+      select nvl(count(*), 0) into v_count from confiscation  where confiscation.partner_acc = v_partner_acc;
+        if (v_count > 0) then
+        return 0;
+      end if;
+      
+       select nvl(count(*), 0) into v_count from pfinrec  where pfinrec.partner_acc = v_partner_acc;
+        if (v_count > 0) then
+        return 0;
+      end if;
+      
       return 1;
       
   end;
