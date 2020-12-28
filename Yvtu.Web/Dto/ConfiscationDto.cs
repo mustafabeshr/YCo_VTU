@@ -18,7 +18,7 @@ namespace Yvtu.Web.Dto
         [Required(ErrorMessage = "يجب تحديد الجهة")]
         public string PartnerId { get; set; }
         public Partner Partner { get; set; }
-        public double Balance { get; set; }
+        public double Amount { get; set; }
         public double Reserved { get; set; }
         [Required(ErrorMessage = "يجب كتابة الملاحظات")]
         [StringLength(150, ErrorMessage = "يجب ان يكون طول الملاحظة من 10 الى 150 حرف", MinimumLength = 10)]

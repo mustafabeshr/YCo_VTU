@@ -15,6 +15,7 @@ namespace Yvtu.Core.Entities
         public int Id { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
+        public int ToWho { get; set; }
         public AppUser CreatedBy { get; set; }
         public DateTime  CreatedOn { get; set; }
         public DateTime  LastUpdatedOn { get; set; }
@@ -26,6 +27,7 @@ namespace Yvtu.Core.Entities
             return $"Id={Id}" + Environment.NewLine +
                 $"Title={Title}" + Environment.NewLine +
                 $"Message={Message}" + Environment.NewLine +
+                $"To WHo={ToWho}" + Environment.NewLine +
                 $"Created By={CreatedBy.Id} - {CreatedBy.Name} - {CreatedBy.Account}" + Environment.NewLine +
                 $"Created On={CreatedOn.ToString("yyyy/MM/dd H:mm:ss")}" + Environment.NewLine +
                 $"Last Updated On={LastUpdatedOn.ToString("yyyy/MM/dd H:mm:ss")}" + Environment.NewLine;
@@ -38,6 +40,6 @@ namespace Yvtu.Core.Entities
         public string Id { get; set; }
         public string Name { get; set; }
         public int Order { get; set; }
-
+        public string[] ObjectMember { get; set; }
     }
 }

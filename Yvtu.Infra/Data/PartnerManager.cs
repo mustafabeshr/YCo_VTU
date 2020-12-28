@@ -522,7 +522,7 @@ namespace Yvtu.Infra.Data
             return partners;
         }
 
-        public async Task<OpertionResult> EditAsync(Partner newPartner)
+        public async Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner)
         {
             
             try
@@ -549,12 +549,11 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_fax", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Fax },
                  new OracleParameter{ ParameterName = "v_email", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Email },
                  new OracleParameter{ ParameterName = "v_ip_address", OracleDbType = OracleDbType.Varchar2, Value = newPartner.IPAddress},
-                 new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32, Value = newPartner.IPAddress},
+                 new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32, Value = newPartner.Account},
                  new OracleParameter{ ParameterName = "v_ref_partner", OracleDbType = OracleDbType.Varchar2, Value = newPartner.RefPartner.Id}
             };
 
                 #endregion
-                var oldPartner = GetActivePartner(newPartner.Id);
                 await db.ExecuteStoredProcAsync("pk_infra.fn_updatepartner", parameters);
                 var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 

@@ -122,7 +122,7 @@ namespace Yvtu.Infra.Data
             {
                 var obj = new Confiscation();
                 obj.Id = row["con_id"] == DBNull.Value ? -1 : int.Parse(row["con_id"].ToString());
-                obj.Balance = row["balance"] == DBNull.Value ? -1 : double.Parse(row["balance"].ToString());
+                obj.Amount = row["balance"] == DBNull.Value ? -1 : double.Parse(row["balance"].ToString());
                 obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                 var createdAccount = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());

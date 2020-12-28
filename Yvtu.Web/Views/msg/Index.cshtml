@@ -40,10 +40,13 @@
                 <div class="row p-1">
                     <div class="col-8">
                         <div class="row">
-                            <div class="col-12 text-right" style="color:gray;"
+                            <div class="col-md-10 text-right" style="color:gray;"
                                  data-toggle="tooltip" data-placement="top" title="عنوان الرسالة :@item.Title">
                                 <span style="font-size:20px;font-weight:bold;color:maroon;"><i class="fas fa-chevron-right"></i>@item.Id<i class="fas fa-chevron-left"></i></span>
                                 @item.Title
+                            </div>
+                            <div class="col-md-2 text-center" style="border:1px solid blue;border-radius:10px;padding:8px;font-size:12px;">
+                               ترسل للطرف (@item.ToWho)
                             </div>
                         </div>
                         <br />

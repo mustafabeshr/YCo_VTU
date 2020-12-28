@@ -16,6 +16,7 @@ namespace Yvtu.Web.Controllers
     [Authorize(Roles = "Admin")]
     public class msgController : Controller
     {
+        
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IToastNotification toastNotification;
@@ -41,6 +42,7 @@ namespace Yvtu.Web.Controllers
             var model = new CreateMessageTemplateDto();
             model.Dictionary = new MessageTemplateRepo(db, partnerManager).GetDictionaryAll();
             model.Message = string.Empty;
+            model.ToWho = 1;
             return View(model);
         }
         [HttpGet]
@@ -56,6 +58,7 @@ namespace Yvtu.Web.Controllers
             model.Dictionary = new MessageTemplateRepo(db, partnerManager).GetDictionaryAll();
             model.Id = message.Id;
             model.Title = message.Title;
+            model.ToWho = message.ToWho;
             model.Message = message.Message;
             return View(model);
         }
@@ -73,6 +76,7 @@ namespace Yvtu.Web.Controllers
                 var param = new MessageTemplate();
                 param.Id = model.Id;
                 param.Title = model.Title;
+                param.ToWho = model.ToWho;
                 param.Message = model.Message;
                 param.CreatedBy.Id =  partnerManager.GetCurrentUserId(this.HttpContext);
                 param.CreatedBy.Account  = partnerManager.GetCurrentUserAccount(this.HttpContext);
@@ -99,6 +103,7 @@ namespace Yvtu.Web.Controllers
                     var insertedObj = new MessageTemplate();
                     insertedObj.Title = model.Title;
                     insertedObj.Message = model.Message;
+                    insertedObj.ToWho = model.ToWho;
                     insertedObj.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
                     insertedObj.CreatedBy.Account = partnerManager.GetCurrentUserAccount(this.HttpContext);
 

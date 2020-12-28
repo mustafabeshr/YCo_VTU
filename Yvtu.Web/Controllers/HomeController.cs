@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Yvtu.Infra.Data;
+using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Web.Models;
 
 namespace Yvtu.Web.Controllers
@@ -14,15 +16,23 @@ namespace Yvtu.Web.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IAppDbContext db;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IAppDbContext db)
         {
             _logger = logger;
+            this.db = db;
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public IActionResult globalparam()
+        {
+            var model = new AppGlobalSettingsRepo(db).GetAll();
+            return View(model);
         }
 
         public IActionResult Privacy()

@@ -904,63 +904,102 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public IActionResult Edit(EditPartnerDto model)
+        public async Task<IActionResult> EditAsync(EditPartnerDto model)
         {
-            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
-            var permission = partnerActivity.GetPartAct("Partner.Edit", currentRoleId);
-            if (permission == null)
+            if (ModelState.IsValid)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = partnerActivity.GetPartAct("Partner.Edit", currentRoleId);
+                if (permission == null)
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-            if (permission.Details == null || permission.Details.Count == 0)
-            {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+                if (permission.Details == null || permission.Details.Count == 0)
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-            var target = partnerManager.Validate(model.Id);
-            if (!target.Success || target.Partner == null)
-            {
-                toastNotification.AddErrorToastMessage("لم يتم العثور على البيانات", new ToastrOptions
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+                var target = partnerManager.Validate(model.Id);
+                if (!target.Success || target.Partner == null)
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
+                    toastNotification.AddErrorToastMessage("لم يتم العثور على البيانات", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
 
-            var allowEdit = permission.Details.Exists(m => m.ToRole.Id == target.Partner.Role.Id);
-            if (!allowEdit)
-            {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                var allowEdit = permission.Details.Exists(m => m.ToRole.Id == target.Partner.Role.Id);
+                if (!allowEdit)
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
 
-            if (permission.Scope.Id == "CurOpOnly" && model.Id != partnerManager.GetCurrentUserId(this.HttpContext))
-            {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                if (permission.Scope.Id == "CurOpOnly" && model.Id != partnerManager.GetCurrentUserId(this.HttpContext))
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
-            }
-            if (permission.Scope.Id == "Exclusive" && model.Id != target.Partner.RefPartner.Id)
-            {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+                if (permission.Scope.Id == "Exclusive" && model.Id != target.Partner.RefPartner.Id)
                 {
-                    Title = "تنبيه"
-                });
-                return Redirect(Request.Headers["Referer"].ToString());
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+                var oldResult = partnerManager.Validate(model.Id);
+                if (oldResult.Success)
+                {
+                    var newPartner = new Partner();
+                    newPartner = ObjectCopier.CloneJson<Partner>(oldResult.Partner);
+                    newPartner.Name = model.Name;
+                    newPartner.PairMobile = model.PairMobile;
+                    newPartner.BrandName = model.BrandName;
+                    newPartner.PersonalId.IdType.Id = model.PersonalIdType ?? 0;
+                    newPartner.PersonalId.Id = model.PersonalIdNo;
+                    newPartner.PersonalId.Issued = model.PersonalIssued ?? DateTime.MinValue;
+                    newPartner.PersonalId.Place = model.PersonalIdPlace;
+                    newPartner.Address.Street = model.Street;
+                    newPartner.Address.Zone = model.Zone;
+                    newPartner.Address.ExtraInfo = model.ExtraAddressInfo;
+                    newPartner.ContactInfo.Mobile = model.MobileNo;
+                    newPartner.ContactInfo.Fixed = model.Fixed;
+                    newPartner.ContactInfo.Fax = model.Fax;
+                    newPartner.ContactInfo.Email = model.Email;
+                    newPartner.RefPartner.Id = model.RefPartnerId;
+                    newPartner.IPAddress = model.IPAddress;
+                    var result = await partnerManager.EditAsync(oldResult.Partner, newPartner);
+                    if (result.Success)
+                    {
+                        toastNotification.AddSuccessToastMessage("تم تعديل البيانات بنجاح", new ToastrOptions
+                        {
+                            Title = "تنبيه"
+                        });
+                    }
+                    else
+                    {
+                        toastNotification.AddErrorToastMessage("فشلت عملية التعديل", new ToastrOptions
+                        {
+                            Title = "تنبيه"
+                        });
+                    }
+                }
             }
-
 
             var idTypes = new IdTypeRepo(db).GetTypes();
             var cities = new CityRepo(db).GetCities();

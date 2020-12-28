@@ -28,7 +28,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_msg_name",OracleDbType = OracleDbType.Varchar2,  Value = template.Title },
                  new OracleParameter{ ParameterName = "v_msg_text",OracleDbType = OracleDbType.Varchar2,  Value = template.Message },
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = template.CreatedBy.Id },
-                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = template.CreatedBy.Account }
+                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = template.CreatedBy.Account },
+                 new OracleParameter{ ParameterName = "v_towho",OracleDbType = OracleDbType.Int32,  Value = template.ToWho }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_settings.fn_create_message_template", parameters);
@@ -55,13 +56,15 @@ namespace Yvtu.Infra.Data
             {
                 var old = GetSingle(template.Id);
                 if (old == null) return new OpertionResult { AffectedCount = 0, Success = false, Error = "No Old Data" };
-                if (old.Title == template.Title && old.Message == template.Message) return new OpertionResult { AffectedCount = 0, Success = false, Error = "Nothing to update" };
+                if (old.Title == template.Title && old.Message == template.Message && old.ToWho == template.ToWho) 
+                    return new OpertionResult { AffectedCount = 0, Success = false, Error = "Nothing to update" };
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                      new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                      new OracleParameter{ ParameterName = "v_msg_id",OracleDbType = OracleDbType.Varchar2,  Value = template.Id },
                      new OracleParameter{ ParameterName = "v_msg_name",OracleDbType = OracleDbType.Varchar2,  Value = template.Title },
-                     new OracleParameter{ ParameterName = "v_msg_text",OracleDbType = OracleDbType.Varchar2,  Value = template.Message }
+                     new OracleParameter{ ParameterName = "v_msg_text",OracleDbType = OracleDbType.Varchar2,  Value = template.Message },
+                     new OracleParameter{ ParameterName = "v_towho",OracleDbType = OracleDbType.Int32,  Value = template.ToWho }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_settings.fn_update_message_template", parameters);
@@ -111,6 +114,7 @@ namespace Yvtu.Infra.Data
             {
                 var obj = new MessageTemplate();
                 obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+                obj.ToWho = row["towho"] == DBNull.Value ? -1 : int.Parse(row["towho"].ToString());
                 obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
                 obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["createdon"].ToString());
@@ -144,6 +148,7 @@ namespace Yvtu.Infra.Data
             {
                 var obj = new MessageTemplate();
                 obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+                obj.ToWho = row["towho"] == DBNull.Value ? -1 : int.Parse(row["towho"].ToString());
                 obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
                 obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
@@ -173,6 +178,7 @@ namespace Yvtu.Infra.Data
                   DataRow row = masterDataTable.Rows[0];
                 var obj = new MessageTemplate();
                 obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+                obj.ToWho = row["towho"] == DBNull.Value ? -1 : int.Parse(row["towho"].ToString());
                 obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
                 obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
@@ -201,6 +207,7 @@ namespace Yvtu.Infra.Data
             DataRow row = masterDataTable.Rows[0];
             var obj = new MessageTemplate();
             obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+            obj.ToWho = row["towho"] == DBNull.Value ? -1 : int.Parse(row["towho"].ToString());
             obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
             obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
             obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
@@ -229,6 +236,7 @@ namespace Yvtu.Infra.Data
             {
                 var obj = new MessageTemplate();
                 obj.Id = row["msg_id"] == DBNull.Value ? -1 : int.Parse(row["msg_id"].ToString());
+                obj.ToWho = row["towho"] == DBNull.Value ? -1 : int.Parse(row["towho"].ToString());
                 obj.Title = row["msg_name"] == DBNull.Value ? string.Empty : row["msg_name"].ToString();
                 obj.Message = row["msg_text"] == DBNull.Value ? string.Empty : row["msg_text"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
@@ -271,6 +279,7 @@ namespace Yvtu.Infra.Data
                 obj.Order = row["word_order"] == DBNull.Value ? -1 : int.Parse(row["word_order"].ToString());
                 obj.Id = row["word_id"] == DBNull.Value ? string.Empty : row["word_id"].ToString();
                 obj.Name = row["word_name"] == DBNull.Value ? string.Empty : row["word_name"].ToString();
+                obj.ObjectMember = row["obj_member"] == DBNull.Value ? null : row["obj_member"].ToString().Split('|');
                 results.Add(obj);
             }
             return results;
@@ -284,7 +293,7 @@ namespace Yvtu.Infra.Data
                 };
             #endregion
 
-            var masterDataTable = db.GetData("Select * from MSG_DICTIONARY t where word_id = :MsgId", null);
+            var masterDataTable = db.GetData("Select * from MSG_DICTIONARY t where word_id = :MsgId", parameters);
 
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
@@ -294,6 +303,7 @@ namespace Yvtu.Infra.Data
                 obj.Order = row["word_order"] == DBNull.Value ? -1 : int.Parse(row["word_order"].ToString());
                 obj.Id = row["word_id"] == DBNull.Value ? string.Empty : row["word_id"].ToString();
                 obj.Name = row["word_name"] == DBNull.Value ? string.Empty : row["word_name"].ToString();
+                obj.ObjectMember = row["obj_member"] == DBNull.Value ? null : row["obj_member"].ToString().Split('|');
             return obj;
         }
 
@@ -304,5 +314,72 @@ namespace Yvtu.Infra.Data
             };
             return db.ExecuteSqlCommand("Delete from message_template Where msg_id=:MsgId", parameters) > 0;
         }
+
+        public string TranslateMessage<T>(string rawMessage, T obj)
+        {
+            if (obj == null) return string.Empty;
+            var wordsList = ExtractDicWord(rawMessage);
+            var nextWord = false;
+            if (wordsList != null && wordsList.Count > 0)
+            {
+                foreach (var word in wordsList)
+                {
+                    nextWord = false;
+                    var members = GetDictionarySingle(word);
+                    if (members != null && members.ObjectMember != null && members.ObjectMember.Length > 0)
+                    {
+                        foreach (var member in members.ObjectMember)
+                        {
+                            if (nextWord) break;
+                            foreach (var prop in obj.GetType().GetProperties())
+                            {
+                                if (nextWord) break;
+                                if (prop.Name == member)
+                                {
+                                    var value = prop.GetValue(obj).ToString();
+                                    rawMessage = rawMessage.Replace(word, value);
+                                    nextWord = true;
+                                }
+                            }
+                        }
+                        if (!nextWord)
+                        {
+                            rawMessage = rawMessage.Replace(word, " ");
+                        }
+                    } 
+                }
+            }
+            return rawMessage;
+        }
+
+        private List<string> ExtractDicWord(string input)
+        {
+            var start = false;
+            var length = input.Length;
+            var words = new List<string>();
+            var currWord = string.Empty;
+            for(int i=0; i<length; i++)
+            {
+                var chr = input[i];
+                if (chr == '}')
+                {
+                    currWord += chr;
+                    words.Add(currWord);
+                    currWord = string.Empty;
+                    start = false;
+                }else  if (start)
+                {
+                    currWord += chr;
+                }
+                else if (chr == '{')
+                {
+                    currWord += chr;
+                    start = true;
+                }
+            }
+
+            return words;
+        }
+        
     }
 }

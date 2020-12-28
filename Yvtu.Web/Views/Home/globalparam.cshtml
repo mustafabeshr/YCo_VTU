@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Yvtu.Core.Entities.AppGlobalSettings>
+
+
+
+@{
+    ViewData["Title"] = "Settigs";
+}
+
+
+@if (Model != null)
+{
+    <div class="row shadow-sm p-1 bg-white">
+        <table class="table table-hover text-center">
+            <thead>
+                <tr style="font-size:12px;">
+                    <th>الرمز</th>
+                    <th>القيمة</th>
+                    <th>البيان</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr style="font-size:12px;">
+                        <td>@item.SettingCode</td>
+                        <td>@item.SettingValue</td>
+                        <td>@item.SettingName</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

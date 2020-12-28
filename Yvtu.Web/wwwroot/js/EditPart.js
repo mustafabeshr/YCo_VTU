@@ -106,24 +106,27 @@
                     document.getElementById('txtIPAddress').value = result.ipAddress;
                     document.getElementById('txtExtraAddressInfo').value = result.address.extraInfo;
 
-                    document.getElementById('txtName2').value = result.name;
-                    document.getElementById('txtPairMobile2').value = result.pairMobile;
-                    document.getElementById('txtBrandName2').value = result.brandName;
-                    document.getElementById('selIdType').value = result.personalId.idType.id;
-                    document.getElementById('txtPersonalIdNo2').value = result.personalId.id;
-                    document.getElementById('txtPersonalIssued2').value = formatDate(new Date(result.personalId.issued));
-                    document.getElementById('txtPersonalIdPlace2').value = result.personalId.place;
-                    document.getElementById('citySelect').value = result.address.city.id;
-                    document.getElementById('districtSelect').value = result.address.district.id;
-                    document.getElementById('txtStreet2').value = result.address.street;
-                    document.getElementById('txtZone2').value = result.address.zone;
-                    document.getElementById('txtMobileNo2').value = result.contactInfo.mobile;
-                    document.getElementById('txtFixed2').value = result.contactInfo.fixed;
-                    document.getElementById('txtFax2').value = result.contactInfo.fax;
-                    document.getElementById('txtEmail2').value = result.contactInfo.email;
-                    document.getElementById('txtRefPartnerId2').value = result.refPartner.id;
-                    document.getElementById('txtIPAddress2').value = result.ipAddress;
-                    document.getElementById('txtExtraAddressInfo2').value = result.address.extraInfo;
+                    if (document.getElementById('txtName2').value === '') {
+
+                        document.getElementById('txtName2').value = result.name;
+                        document.getElementById('txtPairMobile2').value = result.pairMobile;
+                        document.getElementById('txtBrandName2').value = result.brandName;
+                        document.getElementById('selIdType').value = result.personalId.idType.id;
+                        document.getElementById('txtPersonalIdNo2').value = result.personalId.id;
+                        document.getElementById('txtPersonalIssued2').value = formatDate(new Date(result.personalId.issued));
+                        document.getElementById('txtPersonalIdPlace2').value = result.personalId.place;
+                        document.getElementById('citySelect').value = result.address.city.id;
+                        document.getElementById('districtSelect').value = result.address.district.id;
+                        document.getElementById('txtStreet2').value = result.address.street;
+                        document.getElementById('txtZone2').value = result.address.zone;
+                        document.getElementById('txtMobileNo2').value = result.contactInfo.mobile;
+                        document.getElementById('txtFixed2').value = result.contactInfo.fixed;
+                        document.getElementById('txtFax2').value = result.contactInfo.fax;
+                        document.getElementById('txtEmail2').value = result.contactInfo.email;
+                        document.getElementById('txtRefPartnerId2').value = result.refPartner.id;
+                        document.getElementById('txtIPAddress2').value = result.ipAddress;
+                        document.getElementById('txtExtraAddressInfo2').value = result.address.extraInfo;
+                    }
                     //FreeUpAmountControls();
                 }
                 else {

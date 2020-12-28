@@ -15,7 +15,7 @@ namespace Yvtu.Core.Entities
         public AppUser CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public Partner Partner { get; set; }
-        public double Balance { get; set; }
+        public double Amount { get; set; }
         public string Note { get; set; }
     }
 }
