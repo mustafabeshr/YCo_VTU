@@ -1,0 +1,71 @@
+﻿@model Yvtu.Core.Queries.NotificationQuery
+
+
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الاشعارات</p>
+        </div>
+    </div>
+</div>
+
+<form method="post" asp-action="Index" asp-controller="Notification">
+    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
+            <div class="col-sm-1">
+                <label class="col-sm-2 col-form-label FormLabel">الرقم:</label>
+            </div>
+            <div class="col-sm-9">
+                <input asp-for="QPartnerId" class="form-control text-center">
+            </div>
+        <div class="col-sm-2">
+            
+                <button id="btnSave" type="submit" class="btn btn-outline-success">
+                    <i class="fa fa-search"></i>
+                </button>
+        </div>
+
+    </div>
+</form>
+
+@if (Model != null && Model.Results != null && Model.Results.Count > 0)
+{
+    <div class="row shadow-sm p-1 bg-white">
+
+        <table class="table table-hover text-center">
+            <thead>
+                <tr style="font-size:11px;">
+                    <th>الرسالة</th>
+                    <th>الرقم</th>
+                    <th>التاريخ</th>
+                    <th>م</th>
+                    <th>المرجع</th>
+                    <th>الاجراء</th>
+                    <th>اسم النقطة</th>
+                    <th>رقم الحساب</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr style="font-size:12px;">
+                        <td>@item.Message</td>
+                        <td>@item.Partner.Id</td>
+                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
+                        <td>@item.Id</td>
+                        <td>@item.RefNo</td>
+                        <td>@item.Activity.Name</td>
+                        <td>@item.Partner.Name</td>
+                        <td>@item.Partner.Account</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+

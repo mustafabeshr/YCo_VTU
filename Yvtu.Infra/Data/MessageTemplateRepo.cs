@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Reflection;
 using System.Text;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data.Interfaces;
@@ -331,15 +332,15 @@ namespace Yvtu.Infra.Data
                         foreach (var member in members.ObjectMember)
                         {
                             if (nextWord) break;
-                            foreach (var prop in obj.GetType().GetProperties())
+
+                            var res = ReflectionHelper.GetPropValue(obj, member);
+                            if (res == null)
                             {
-                                if (nextWord) break;
-                                if (prop.Name == member)
-                                {
-                                    var value = prop.GetValue(obj).ToString();
-                                    rawMessage = rawMessage.Replace(word, value);
-                                    nextWord = true;
-                                }
+                                rawMessage = rawMessage.Replace(word, " ");
+                            } else
+                            {
+                                rawMessage = rawMessage.Replace(word, Convert.ToString(res));
+                                nextWord = true;
                             }
                         }
                         if (!nextWord)
@@ -351,6 +352,7 @@ namespace Yvtu.Infra.Data
             }
             return rawMessage;
         }
+    
 
         private List<string> ExtractDicWord(string input)
         {
@@ -382,4 +384,6 @@ namespace Yvtu.Infra.Data
         }
         
     }
+
+    
 }

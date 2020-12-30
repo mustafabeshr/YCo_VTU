@@ -39,8 +39,8 @@ namespace Yvtu.Core.Entities
         public bool VerificationCodeNext { get; set; }
         public string Pwd { get; set; }
         public string Extra { get; set; }
-        public long Balance { get; set; }
-        public long Reserved { get; set; }
+        public double Balance { get; set; }
+        public double Reserved { get; set; }
         public int WrongPwdAttempts { get; set; }
         public string IPAddress { get; set; }
         public AppUser RefPartner { get; set; }

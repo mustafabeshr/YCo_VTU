@@ -10,8 +10,8 @@ namespace Yvtu.Core.Entities
         public int Account { get; set; }
         public string Name { get; set; }
         public Role Role { get; set; }
-        public long Balance { get; set; }
-        public long Reserved { get; set; }
+        public double Balance { get; set; }
+        public double Reserved { get; set; }
         public PartnerStatus Status { get; set; }
         public DateTime LastLoginOn { get; set; }
         public string Error { get; set; }

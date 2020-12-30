@@ -152,12 +152,12 @@ namespace Yvtu.Web.Controllers
                 return View(model);
             }
             var moneyTransfer = new MoneyTransfer();
-            moneyTransfer.Partner.Id = model.PartnerId;
+            moneyTransfer.Partner = _partnerManager.GetPartnerById(model.PartnerId);
             moneyTransfer.PayType.Id = model.PayTypeId;
             moneyTransfer.PayNo = model.PayNo;
             moneyTransfer.PayDate = model.PayDate;
             moneyTransfer.PayBank = model.PayBank;
-            moneyTransfer.CreatedBy.Id = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.MobilePhone).Value;
+            moneyTransfer.CreatedBy = _partnerManager.GetPartnerById(_partnerManager.GetCurrentUserId(this.HttpContext));
             moneyTransfer.AccessChannel.Id = "web";
             moneyTransfer.Amount = model.Amount;
             moneyTransfer.BillNo = model.BillNo;
@@ -171,9 +171,10 @@ namespace Yvtu.Web.Controllers
                 model.Id = result.AffectedCount;
                 ModelState.SetModelValue("Id", new ValueProviderResult("" + result.AffectedCount + "", CultureInfo.InvariantCulture));
                 //CreatePDF(model.Id);
+                moneyTransfer.Partner.Balance += moneyTransfer.Amount;
+                moneyTransfer.CreatedBy.Balance -= moneyTransfer.Amount;
+                new NotificationRepo(_db, _partnerManager).SendNotification<MoneyTransfer>("MoneyTransfer.Create", result.AffectedCount, moneyTransfer);
                 return View(model);
-                //return RedirectToAction("CreatePDF", new { id = model.Id });
-                //return RedirectToAction("Create");
             }
             else
             {

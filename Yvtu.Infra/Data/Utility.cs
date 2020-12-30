@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -334,5 +335,38 @@ namespace Yvtu.Infra.Data
 
             return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(source), deserializeSettings);
         }
+    }
+
+    public static class ReflectionHelper
+    {
+        public static dynamic GetPropValue(this Object obj, String propName)
+        {
+            string[] nameParts = propName.Split('.');
+            if (nameParts.Length == 1)
+            {
+                var found = obj.GetType().GetProperty(propName);
+                if (found != null)
+                {
+                    return obj.GetType().GetProperty(propName).GetValue(obj, null);
+                }else
+                {
+                    return null;
+                }
+                
+            }
+
+            foreach (String part in nameParts)
+            {
+                if (obj == null) { return null; }
+
+                Type type = obj.GetType();
+                PropertyInfo info = type.GetProperty(part);
+                if (info == null) { return null; }
+
+                obj = info.GetValue(obj, null);
+            }
+            return obj;
+        }
+
     }
 }

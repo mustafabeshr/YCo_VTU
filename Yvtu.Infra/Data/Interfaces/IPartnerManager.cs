@@ -52,6 +52,7 @@ namespace Yvtu.Infra.Data.Interfaces
         string GetCurrentUserRoleCode(HttpContext httpContext);
         List<Partner> GetPartners(PartnerQuery param);
         bool ResetPassword(Partner partner);
+        Partner GetPartnerById(string id);
         Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner);
     }
 }

@@ -257,6 +257,11 @@ namespace Yvtu.Infra.Data
             throw new NotImplementedException();
         }
 
+        public Partner GetPartnerById(string id)
+        {
+            var p = GetActivePartner(id);
+            return p;
+        }
         public PartBasicInfo GetPartnerBasicInfo(string partnerId)
         {
             var partner = GetActivePartner(partnerId);
@@ -295,8 +300,8 @@ namespace Yvtu.Infra.Data
             partner.Account = dataRow["partner_acc"] == DBNull.Value ? -1 : int.Parse(dataRow["partner_acc"].ToString());
             partner.Name = dataRow["partner_name"] == DBNull.Value ? string.Empty : dataRow["partner_name"].ToString();
             partner.BrandName = dataRow["brandname"] == DBNull.Value ? string.Empty : dataRow["brandname"].ToString();
-            partner.Balance = dataRow["balance"] == DBNull.Value ? long.MinValue : long.Parse(dataRow["balance"].ToString());
-            partner.Reserved = dataRow["reserved"] == DBNull.Value ? long.MinValue : long.Parse(dataRow["reserved"].ToString());
+            partner.Balance = dataRow["balance"] == DBNull.Value ? double.MinValue : double.Parse(dataRow["balance"].ToString());
+            partner.Reserved = dataRow["reserved"] == DBNull.Value ? double.MinValue : double.Parse(dataRow["reserved"].ToString());
             partner.VerificationCodeNext = dataRow["verificationcodenext"] == DBNull.Value ? false : dataRow["verificationcodenext"].ToString() == "1" ? true : false;
             partner.LockTime = dataRow["locktime"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(dataRow["locktime"].ToString());
             partner.Role.Id = dataRow["roleid"] == DBNull.Value ? int.MinValue : int.Parse(dataRow["roleid"].ToString());

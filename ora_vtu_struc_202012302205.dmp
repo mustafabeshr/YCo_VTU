@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 28/12/2020, 22:24:41 22:24:41  --
+-- Created by mbeshr on 30/12/2020, 22:05:17 22:05:17  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012282224.log
+spool ora_vtu_struc_202012302205.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -480,6 +480,24 @@ alter table MSG_DICTIONARY
   add constraint PK_MESSAGE_WORDS primary key (WORD_ID);
 
 prompt
+prompt Creating table NOTIFICATION
+prompt ===========================
+prompt
+create table NOTIFICATION
+(
+  nf_id       NUMBER not null,
+  createdon   DATE default sysdate not null,
+  partner_id  VARCHAR2(9) not null,
+  partner_acc NUMBER not null,
+  notify_msg  NVARCHAR2(400) not null,
+  act_id      VARCHAR2(100) not null,
+  ref_no      NUMBER not null
+)
+;
+alter table NOTIFICATION
+  add constraint PK_NOTIFICATION primary key (NF_ID);
+
+prompt
 prompt Creating table OPERATION_EXCEPTION
 prompt ==================================
 prompt
@@ -832,6 +850,17 @@ increment by 1
 cache 20;
 
 prompt
+prompt Creating sequence SEQ_NOTIFICATION_ID
+prompt =====================================
+prompt
+create sequence SEQ_NOTIFICATION_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 21
+increment by 1
+cache 20;
+
+prompt
 prompt Creating sequence SEQ_PARTNER_ACC
 prompt =================================
 prompt
@@ -882,7 +911,7 @@ prompt
 create sequence SEQ_PFR_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -926,7 +955,7 @@ prompt
 create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 201
+start with 221
 increment by 1
 cache 20;
 
@@ -1504,6 +1533,12 @@ function fn_ResetPassword(
     v_act_no       PFINREC.act_no%type,
     v_createdbyacc PFINREC.createdbyacc%type
     );
+   function fn_Create_Notification(
+     v_partner_id  notification.partner_id%type ,
+      v_notify_msg  notification.notify_msg%type ,
+      v_act_id      notification.act_id%type     ,
+      v_ref_no      notification.ref_no%type   
+   ) return number;
 end pk_infra;
 /
 
@@ -1809,7 +1844,7 @@ function fn_MoneyTransfer (
                          v_act_no => v_trans_id,
                          v_createdbyacc => v_creator_acc);
      -- build SMS -------------------------------------------------------------
-      v_result := pk_infra.fn_createoutsms(v_message => 
+    /*  v_result := pk_infra.fn_createoutsms(v_message => 
       N'Êã ÇÖÇÝÉ ãÈáÛ ' 
       || v_amount 
       || N' Çáì ÑÕíÏß ÔÇÍä ÝæÑí ãä ' 
@@ -1818,7 +1853,7 @@ function fn_MoneyTransfer (
       || v_received_amt 
       || N' ÑÕíÏß ' 
       || (v_part_bal + v_received_amt),
-       v_receiver => v_part_id);
+       v_receiver => v_part_id);*/
      -----------------------------------------------------------------------------
      if (v_check_bal = 1) then
        begin
@@ -1830,14 +1865,14 @@ function fn_MoneyTransfer (
                          v_act_no => v_trans_id,
                          v_createdbyacc => v_part_acc);
          -- build SMS -------------------------------------------------------------
-         v_result := pk_infra.fn_createoutsms(v_message => 
+        /* v_result := pk_infra.fn_createoutsms(v_message => 
          N'Êã ÎÝÖ ÑÕíÏ ÇáÔÇÍä ÇáÝæÑí ÇáÎÇÕ Èß ÈãÈáÛ ' 
          || v_amount 
          || N' Ñ.í áÕÇáÍ ' 
          || v_part_id 
          || N' ÇáãÊÈÞí ' 
          || (v_creator_bal - v_amount)  
-          ,  v_receiver => v_createdby);
+          ,  v_receiver => v_createdby);*/
          -----------------------------------------------------------------------------
        end;
     else 
@@ -2904,6 +2939,42 @@ function fn_ResetPassword(
                  v_exp_operation => 'Create',
                  v_exp_object => 'PFR');
     end;
+    
+    
+  function fn_Create_Notification(
+     v_partner_id  notification.partner_id%type ,   
+      v_notify_msg  notification.notify_msg%type ,
+      v_act_id      notification.act_id%type     ,
+      v_ref_no      notification.ref_no%type   
+   ) return number is 
+   
+   v_nf_id       notification.nf_id%type;
+   v_partner_acc notification.partner_acc%type;
+   v_result number;
+   begin
+     
+     v_partner_acc :=  pk_utility.fn_getactiveaccount(v_partner_id => v_partner_id);
+   
+      
+   v_nf_id := seq_notification_id.nextval();
+   insert into notification
+      (nf_id, createdon, partner_id, partner_acc, notify_msg, act_id, ref_no)
+    values
+      (v_nf_id, sysdate, v_partner_id, v_partner_acc, v_notify_msg, v_act_id, v_ref_no);
+
+     v_result := pk_infra.fn_createoutsms(v_message => v_notify_msg,
+                                      v_receiver => v_partner_id);
+    
+   return v_nf_id;
+   
+    EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'Notification');
+         return SQLCODE;    
+   end;
 end pk_infra;
 /
 

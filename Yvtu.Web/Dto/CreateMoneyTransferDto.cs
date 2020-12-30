@@ -20,7 +20,7 @@ namespace Yvtu.Web.Dto
         public string PartnerName { get; set; }
         public string PartnerRoleName { get; set; }
         public int PartnerRoleId { get; set; }
-        public long PartnerBalance { get; set; }
+        public double PartnerBalance { get; set; }
         [Required(ErrorMessage = "يجب تحديد طريقة الدفع")]
         public string PayTypeId { get; set; }
         public string PayTypeName { get; set; }
