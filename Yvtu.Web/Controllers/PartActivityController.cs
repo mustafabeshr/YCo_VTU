@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NToastNotify;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -19,16 +20,18 @@ namespace Yvtu.Web.Controllers
         private readonly IAppDbContext db;
         private readonly IPartnerActivityRepo _partActRepo;
         private readonly IDataAuditRepo _auditing;
+        private readonly IToastNotification toastNotification;
 
         public IPartnerManager _PartnerManager { get; }
 
         public PartActivityController(IAppDbContext db, IPartnerActivityRepo partActRepo
-            , IPartnerManager partnerManager, IDataAuditRepo auditing)
+            , IPartnerManager partnerManager, IDataAuditRepo auditing  ,IToastNotification toastNotification)
         {
             this.db = db;
             _partActRepo = partActRepo;
             _PartnerManager = partnerManager;
             _auditing = auditing;
+            this.toastNotification = toastNotification;
         }
         [HttpGet]
         public IActionResult Index()
@@ -387,5 +390,54 @@ namespace Yvtu.Web.Controllers
             }
             return RedirectToAction("Detail", new { id = parentId });
         }
+
+
+        public IActionResult AuditQuery()
+        {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("DataAudit.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var model = new DataAuditQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(10));
+            model.EndDate = DateTime.Today.AddDays(1);
+            model.Activities = new ActivityRepo(db, _PartnerManager).GetDataAuditActivities();
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult AuditQuery(DataAuditQueryDto model)
+        {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("DataAudit.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var results = _auditing.GetAuditig(new IDataAuditRepo.GetListParam
+            {
+                ActivityId = model.ActivityId,
+                CreatorId = model.CreatedById,
+                CreatorAccount = model.CreatedByAccount,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                IncludeDates = model.IncludeDates
+            });
+            model.Results = results;
+            model.Activities = new ActivityRepo(db, _PartnerManager).GetDataAuditActivities();
+            return View(model);
+        }
+
     }
 }

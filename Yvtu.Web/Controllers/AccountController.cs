@@ -1008,6 +1008,52 @@ namespace Yvtu.Web.Controllers
             model.Districts = new List<District>();
             return View(model);
         }
+
+        public IActionResult ConfiscationQuery()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Confiscate.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var model = new ConfiscationQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(30));
+            model.EndDate = DateTime.Today.AddDays(1);
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult ConfiscationQuery(ConfiscationQueryDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Partner.Confiscate.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var results = new ConfiscationRepo(db, partnerManager).GetList(new ConfiscationRepo.GetListParam
+            {
+                PartnerId = model.PartnerId,
+                PartnerAccount = model.PartnerAccount,
+                CreatorId = model.CreatedById,
+                CreatorAccount = model.CreatedByAccount,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                IncludeDates = model.IncludeDates
+            });
+            model.Results = results;
+            return View(model);
+        }
     }
 }
 

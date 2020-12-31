@@ -24,5 +24,7 @@ namespace Yvtu.Core.Entities
         public string NewValue { get; set; }
         public string Error { get; set; }
         public bool Success { get; set; }
+        public List<string> OldValueList { get; set; }
+        public List<string> NewValueList { get; set; }
     }
 }

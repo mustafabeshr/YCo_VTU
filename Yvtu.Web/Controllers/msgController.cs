@@ -20,12 +20,15 @@ namespace Yvtu.Web.Controllers
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IToastNotification toastNotification;
+        private readonly IPartnerActivityRepo partnerActivity;
 
-        public msgController(IAppDbContext db, IPartnerManager partnerManager,  IToastNotification toastNotification)
+        public msgController(IAppDbContext db, IPartnerManager partnerManager,  IToastNotification toastNotification,
+            IPartnerActivityRepo partnerActivity)
         {
             this.db = db;
             this.partnerManager = partnerManager;
             this.toastNotification = toastNotification;
+            this.partnerActivity = partnerActivity;
         }
         public IActionResult Index()
         {
@@ -154,6 +157,52 @@ namespace Yvtu.Web.Controllers
                     toastNotification.AddInfoToastMessage("فشل عملية حفظ الرسالة ");
                 }
             }
+            return View(model);
+        }
+
+        public IActionResult SendSMSOneQuery()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("SMS.SendOne.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var model = new SMSOneQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(10));
+            model.EndDate = DateTime.Today.AddDays(1);
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult SendSMSOneQuery(SMSOneQueryDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("SMS.SendOne.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var results = new SMSOneRepo(db, partnerManager).GetList(new SMSOneRepo.GetListParam  
+            {
+                Receiver = model.Receiver,
+                Message = model.Message,
+                CreatorId = model.CreatedById,
+                CreatorAccount = model.CreatedByAccount,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate,
+                IncludeDates = model.IncludeDates
+            });
+            model.Results = results;
             return View(model);
         }
     }

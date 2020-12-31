@@ -92,5 +92,21 @@ namespace Yvtu.Infra.Data
             activity.Internal = row["internal_use"] == DBNull.Value ? false : row["internal_use"].ToString() == "1" ? true : false;
             return activity;
         }
+
+        public List<Activity> GetDataAuditActivities()
+        {
+            var actDataTable = this.db.GetData("Select * from activities  a where exists (select 1 from DATA_AUDIT t where t.act_id = a.act_id) order by act_order", null);
+
+            var activities = new List<Activity>();
+            if (actDataTable != null)
+            {
+                foreach (DataRow row in actDataTable.Rows)
+                {
+                    var activity = ConvertDataRowToActivity(row);
+                    activities.Add(activity);
+                }
+            }
+            return activities;
+        }
     }
 }

@@ -1,0 +1,117 @@
+﻿@model Yvtu.Web.Dto.SMSOneQueryDto
+
+
+@{
+    ViewData["Title"] = "SMS One Query";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الرسائل الفردية</p>
+        </div>
+    </div>
+</div>
+<form method="post">
+    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
+        <div class="col-md-6">
+            
+                <div class="row mb-3">
+                    <label asp-for="Receiver" class="col-sm-2 col-form-label FormLabel">ر. المستلم:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="Receiver" class="form-control text-center">
+                    </div>
+                    <label asp-for="CreatedById" class="col-sm-2 col-form-label FormLabel">ر. المرسل:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="CreatedById" class="form-control text-center">
+                    </div>
+                </div>
+        </div>
+        <div class="col-md-6">
+                <div class="row mb-3">
+                    <label asp-for="Message" class="col-sm-2 col-form-label FormLabel">الرسالة:</label>
+                    <div class="col-sm-10">
+                        <input asp-for="Message" class="form-control text-center">
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <div class="row  shadow-sm p-1 bg-white">
+        <div class="col-md-9">
+            <fieldset class="box-border">
+                <legend class="box-border"><input id="chPeriod" type="checkbox" asp-for="IncludeDates" />&nbsp;الفترة</legend>
+                <div class="row mb-3" id="PeriodDiv">
+                    <label asp-for="StartDate" class="col-sm-2 col-form-label FormLabel">من:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="StartDate" min="2020-11-01" class="form-control text-center">
+                    </div>
+                    <label asp-for="EndDate" class="col-sm-2 col-form-label FormLabel">الى:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="EndDate" min="2020-11-01" class="form-control text-center">
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="col-md-3">
+            <div class="col-sm-10 text-center">
+                <button id="btnSave" type="submit" class="btn btn-outline-success mt-4">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+@if (Model.Results != null && Model.Results.Count > 0)
+{
+    <div class="row   shadow-sm p-1 bg-white">
+
+        <table class="table table-hover text-center">
+            <thead>
+                <tr style="font-size:11px;">
+                    <th>التاريخ</th>
+                    <th>الرسالة</th>
+                    <th>المستلم</th>
+                    <th>ملاحظات</th>
+                    <th>المستخدم</th>
+                    <th>#</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Results)
+                {
+                    <tr style="font-size:12px;">
+                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
+                        <td>@item.Message</td>
+                        <td>@item.Receiver</td>
+                        <td>@item.Note</td>
+                        <td>@item.CreatedBy.Id - @item.CreatedBy.Name</td>
+                        <td>@item.Id</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+
+@section Scripts {
+    <script>
+    $('#chPeriod').change(function () {
+        if ($(this).prop("checked")) {
+            $('#PeriodDiv').show();
+        } else {
+            $('#PeriodDiv').hide();
+        }
+    });
+
+    if ($('#chPeriod').prop("checked")) {
+        $('#PeriodDiv').show();
+    } else {
+        $('#PeriodDiv').hide();
+    }
+    </script>
+} 

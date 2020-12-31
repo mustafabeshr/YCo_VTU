@@ -1,0 +1,193 @@
+﻿@model Yvtu.Web.Dto.DataAuditQueryDto
+
+
+@{
+    ViewData["Title"] = "Data Audit Query";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الرسائل الفردية</p>
+        </div>
+    </div>
+</div>
+<form method="post">
+    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
+        <div class="col-md-6">
+
+            <div class="row mb-3">
+                <label asp-for="CreatedById" class="col-sm-2 col-form-label FormLabel">ر. المستلم:</label>
+                <div class="col-sm-4">
+                    <input asp-for="CreatedById" class="form-control text-center">
+                </div>
+                <label asp-for="CreatedByAccount" class="col-sm-2 col-form-label FormLabel">ر. الحساب:</label>
+                <div class="col-sm-4">
+                    <input asp-for="CreatedByAccount" class="form-control text-center">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row mb-3">
+                <label asp-for="CreatedByAccount" class="col-sm-2 col-form-label FormLabel">الاجراء:</label>
+                <div class="col-sm-10">
+                    <select asp-for="ActivityId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
+                            asp-items="@(new SelectList(Model.Activities,"Id","Name"))">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row  shadow-sm p-1 bg-white">
+        <div class="col-md-9">
+            <fieldset class="box-border">
+                <legend class="box-border"><input id="chPeriod" type="checkbox" asp-for="IncludeDates" />&nbsp;الفترة</legend>
+                <div class="row mb-3" id="PeriodDiv">
+                    <label asp-for="StartDate" class="col-sm-2 col-form-label FormLabel">من:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="StartDate" min="2020-11-01" class="form-control text-center">
+                    </div>
+                    <label asp-for="EndDate" class="col-sm-2 col-form-label FormLabel">الى:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="EndDate" min="2020-11-01" class="form-control text-center">
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="col-md-3">
+            <div class="col-sm-10 text-center">
+                <button id="btnSave" type="submit" class="btn btn-outline-success mt-4">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</form>
+    <div class="row   shadow-sm p-1 bg-white">
+
+        <table class="table table-hover text-center">
+            <thead>
+                <tr style="font-size:11px;">
+                    <th>التاريخ</th>
+                    <th>الاجراء</th>
+                    <th></th>
+                    <th>ملاحظات</th>
+                    <th>المستخدم</th>
+                    <th>#</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Results != null && Model.Results.Count > 0)
+                @foreach (var item in Model.Results)
+                {
+                    <tr style="font-size:12px;">
+                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
+                        <td>@item.Activity.Name</td>
+                        <td>@item.Action.Name</td>
+                        <td>@item.Note</td>
+                        <td>@item.PartnerId - @item.PartnerName</td>
+                        <td>@item.Id</td>
+                        <td>
+                            <div class="row">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne_@item.Id" aria-expanded="true" aria-controls="collapseOne"
+                                        style="text-decoration:none;color:black;">
+                                    مزيد
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr style="border-top:none;">
+                        <td colspan="7">
+                            <div class="row">
+                                <div id="collapseOne_@item.Id" class="collapse" aria-labelledby="headingOne"
+                                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;width:100%;">
+                                    <div class="card-body">
+                                        <table style="width:100%;">
+                                            <thead>
+                                                <tr>
+                                                    <th>القديمة</th>
+                                                    <th>الجديدة</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                
+                                                <tr>
+                                                    <td style="width:50%;">
+                                                        <table style="width:100%;">
+                                                            <tbody>
+                                                                @if (item.OldValueList != null && item.OldValueList.Count > 0)
+                                                                @foreach (var old in item.OldValueList)
+                                                                {
+                                                                    <tr>
+                                                                        <td style="text-align:left;font-size:12px;">@old</td>
+                                                                    </tr>
+                                                                }
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                    <td style="width:50%;">
+                                                        <table style="width:100%;">
+                                                            <tbody>
+                                                                @if (item.NewValueList != null && item.NewValueList.Count > 0)
+                                                                {
+                                                                    int indx = 0;
+                                                                    foreach (var n in item.NewValueList)
+                                                                    {
+                                                                        string foreColor = "black";
+
+                                                                        if (item.NewValueList[indx] != item.OldValueList[indx])
+                                                                        {
+                                                                            foreColor = "red";
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            foreColor = "black";
+                                                                        }
+                                                                        ++indx;
+                                                                        <tr>
+                                                                            <td style="text-align:left;font-size:12px;color:@foreColor;">@n</td>
+                                                                        </tr>
+                                                                    }
+                                                                }
+
+                                                            </tbody>
+                                                        </table>
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+
+@section Scripts {
+    <script>
+    $('#chPeriod').change(function () {
+        if ($(this).prop("checked")) {
+            $('#PeriodDiv').show();
+        } else {
+            $('#PeriodDiv').hide();
+        }
+    });
+
+    if ($('#chPeriod').prop("checked")) {
+        $('#PeriodDiv').show();
+    } else {
+        $('#PeriodDiv').hide();
+    }
+    </script>
+} 

@@ -218,8 +218,8 @@
                                 </a>
                             </div>
                             <div class="col-md-2">
-                                <a href="#" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                                <a  asp-action="ConfiscationQuery" asp-controller="Account"  style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
                                         <i class="fas fa-gavel fa-3x"  style="color:brown;"></i>
                                         <br /> مصادرة رصيد
                                     </div>
@@ -245,8 +245,8 @@
                                 </a>
                             </div>
                             <div class="col-md-2">
-                                <a href="#" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                                <a asp-action="SendSMSOneQuery" asp-controller="msg" style="text-decoration:none;">
+                                    <div class="pt-2  m-auto  text-center MainLink">
                                         <i class="fas fa-sms fa-3x" style="color:purple;"></i>
                                         <br /> إرسال رسالة
                                     </div>
@@ -263,6 +263,13 @@
                                 <a asp-action="globalparam" asp-controller="Home" style="text-decoration:none;">
                                     <div class="pt-2 m-auto text-center MainLink">
                                         <i class="fas fa-globe fa-3x" style="color:#15aabf;"></i> <br /> المتغيرات العامة
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-md-2">
+                                <a asp-action="AuditQuery" asp-controller="PartActivity" style="text-decoration:none;">
+                                    <div class="pt-2 m-auto text-center MainLink">
+                                        <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع التعديلات
                                     </div>
                                 </a>
                             </div>
@@ -308,45 +315,6 @@
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            @* الرقابة *@
-            <div class="card mt-0">
-                <div class="card-header p-1" id="heading4"
-                     style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
-                    <h6 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse4" aria-expanded="true" aria-controls="collapseOne"
-                                style="text-decoration:none;color:white;">
-                            الرقابة
-                        </button>
-                        <i class="fab fa-watchman-monitoring fa-2x float-left" style="color:gray;"></i>
-                    </h6>
-                </div>
-
-                <div id="collapse4" class="collapse show" aria-labelledby="heading4"
-                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
-                                        <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع الحركة
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Create" asp-controller="PartActivity" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
-                                        <i class="fas fa-bug fa-3x" style="color:darkred;"></i> <br /> الاخطاء
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2"></div>
                             <div class="col-md-2"></div>
                             <div class="col-md-2"></div>
                             <div class="col-md-2"></div>

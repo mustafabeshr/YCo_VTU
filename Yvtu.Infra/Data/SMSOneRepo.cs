@@ -16,6 +16,7 @@ namespace Yvtu.Infra.Data
             public int CreatorAccount { get; set; }
             public string Receiver { get; set; }
             public string Message { get; set; }
+            public bool IncludeDates { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
         }
@@ -77,33 +78,37 @@ namespace Yvtu.Infra.Data
                 }
                 if (!string.IsNullOrEmpty(param.CreatorId))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdby = :CreatorId" : " AND createdby = :CreatorId");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdby = :CreatorId" : " WHERE createdby = :CreatorId");
                     var p = new OracleParameter { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
                     parameters.Add(p);
                 }
-                
+
+
                 if (param.CreatorAccount > 0)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdbyacc = :createdbyacc" : " AND createdbyacc = :CreatorAccount");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdbyacc = :createdbyacc" : " WHERE createdbyacc = :CreatorAccount");
                     var p = new OracleParameter { ParameterName = "CreatorAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatorAccount };
                     parameters.Add(p);
                 }
-                if (param.StartDate > DateTime.MinValue && param.StartDate != null)
+                if (param.IncludeDates)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon >= :StartDate" : " AND createdon >= :StartDate");
-                    var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
-                    parameters.Add(p);
-                }
-                if (param.EndDate > DateTime.MinValue && param.EndDate != null)
-                {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon <= :EndDate" : " AND createdon <= :EndDate");
-                    var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
-                    parameters.Add(p);
+                    if (param.StartDate > DateTime.MinValue && param.StartDate != null)
+                    {
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon >= :StartDate" : " WHERE createdon >= :StartDate");
+                        var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
+                        parameters.Add(p);
+                    }
+                    if (param.EndDate > DateTime.MinValue && param.EndDate != null)
+                    {
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon <= :EndDate" : " WHERE createdon <= :EndDate");
+                        var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
+                        parameters.Add(p);
+                    }
                 }
                 if (!string.IsNullOrEmpty(param.Message))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE (msg LIKE '%' ||  :Message || '%') " : " AND (msg LIKE '%' ||  :Message || '%') ");
-                    var p = new OracleParameter { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND (msg LIKE '%' ||  :Message || '%') " : " WHERE (msg LIKE '%' ||  :Message || '%') ");
+                    var p = new OracleParameter { ParameterName = "Message", OracleDbType = OracleDbType.Varchar2, Value = param.Message };
                     parameters.Add(p);
                 }
             }
@@ -122,10 +127,11 @@ namespace Yvtu.Infra.Data
             foreach (DataRow row in masterDataTable.Rows)
             {
                 var obj = new SMSOne();
-                obj.Id = row["con_id"] == DBNull.Value ? -1 : int.Parse(row["con_id"].ToString());
+                obj.Id = row["sms_id"] == DBNull.Value ? -1 : int.Parse(row["sms_id"].ToString());
                 obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
                 obj.Shortcode = row["shortcode"] == DBNull.Value ? string.Empty : row["shortcode"].ToString();
                 obj.Receiver = row["receiver"] == DBNull.Value ? string.Empty : row["receiver"].ToString();
+                obj.Message = row["msg"] == DBNull.Value ? string.Empty : row["msg"].ToString();
                 obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
                 var createdAccount = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
                 var createdBy = partnerManager.GetPartnerByAccount(createdAccount);

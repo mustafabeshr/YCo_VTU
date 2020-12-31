@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 30/12/2020, 22:05:17 22:05:17  --
+-- Created by mbeshr on 31/12/2020, 22:18:52 22:18:52  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202012302205.log
+spool ora_vtu_struc_202012312218.log
 
 prompt
 prompt Creating table ACTIVITIES

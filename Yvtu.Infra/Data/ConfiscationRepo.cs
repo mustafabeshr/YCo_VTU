@@ -18,6 +18,7 @@ namespace Yvtu.Infra.Data
             public string CreatorId { get; set; }
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
+            public bool IncludeDates { get; set; }
         }
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
@@ -69,30 +70,32 @@ namespace Yvtu.Infra.Data
             if (param != null)
             {
 
-                    if (!string.IsNullOrEmpty(param.PartnerId))
-                    {
-                        whereCluase.Append(" WHERE partner_id = :PartnerId");
-                        var p = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.PartnerId };
-                        parameters.Add(p);
-                    }
-                    if (!string.IsNullOrEmpty(param.CreatorId))
-                    {
-                        whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdby = :CreatorId" : " AND createdby = :CreatorId");
-                        var p = new OracleParameter { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
-                        parameters.Add(p);
-                    }
-                    if (param.PartnerAccount > 0)
-                    {
-                        whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :PartnerAccount" : " AND partner_acc = :PartnerAccount");
-                        var p = new OracleParameter { ParameterName = "PartnerAccount", OracleDbType = OracleDbType.Int32, Value = param.PartnerAccount };
-                        parameters.Add(p);
-                    }
-                    if (param.CreatorAccount > 0)
-                    {
-                        whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :createdbyacc" : " AND createdbyacc = :CreatorAccount");
-                        var p = new OracleParameter { ParameterName = "CreatorAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatorAccount };
-                        parameters.Add(p);
-                    }
+                if (!string.IsNullOrEmpty(param.PartnerId))
+                {
+                    whereCluase.Append(" WHERE partner_id = :PartnerId");
+                    var p = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.PartnerId };
+                    parameters.Add(p);
+                }
+                if (!string.IsNullOrEmpty(param.CreatorId))
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdby = :CreatorId" : " AND createdby = :CreatorId");
+                    var p = new OracleParameter { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
+                    parameters.Add(p);
+                }
+                if (param.PartnerAccount > 0)
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :PartnerAccount" : " AND partner_acc = :PartnerAccount");
+                    var p = new OracleParameter { ParameterName = "PartnerAccount", OracleDbType = OracleDbType.Int32, Value = param.PartnerAccount };
+                    parameters.Add(p);
+                }
+                if (param.CreatorAccount > 0)
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :createdbyacc" : " AND createdbyacc = :CreatorAccount");
+                    var p = new OracleParameter { ParameterName = "CreatorAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatorAccount };
+                    parameters.Add(p);
+                }
+                if (param.IncludeDates)
+                {
                     if (param.StartDate > DateTime.MinValue && param.StartDate != null)
                     {
                         whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon >= :StartDate" : " AND createdon >= :StartDate");
@@ -105,6 +108,8 @@ namespace Yvtu.Infra.Data
                         var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
                         parameters.Add(p);
                     }
+
+                }
             }
 
             #endregion

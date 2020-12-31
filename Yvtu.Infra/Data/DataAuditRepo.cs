@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
+using static Yvtu.Infra.Data.Interfaces.IDataAuditRepo;
 
 namespace Yvtu.Infra.Data.Interfaces
 {
@@ -50,50 +52,53 @@ namespace Yvtu.Infra.Data.Interfaces
             }
         }
 
-        public List<DataAudit> GetAuditig(int partnerAccount, string partnerId, string activityId, string actionId, DateTime startDate, DateTime endDate)
+        public List<DataAudit> GetAuditig(GetListParam param)
         {
             string sql = "Select * from v_data_audit ";
             string whereClause = string.Empty;
 
             #region Build Parameters
             var parameters = new List<OracleParameter>();
-            if (!string.IsNullOrEmpty(partnerId))
+            if (!string.IsNullOrEmpty(param.CreatorId))
             {
-                var param1 = new OracleParameter() { ParameterName = "partnerId", OracleDbType = OracleDbType.Varchar2, Value = partnerId };
+                var param1 = new OracleParameter() { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
                 parameters.Add(param1);
-                whereClause = " WHERE partner_id=:partnerId ";
+                whereClause = " WHERE partner_id=:CreatorId ";
             }
 
-            if (partnerAccount > 0)
+            if (param.CreatorAccount > 0)
             {
-                var param1 = new OracleParameter() { ParameterName = "partnerAcc", OracleDbType = OracleDbType.Int32, Value = partnerAccount };
+                var param1 = new OracleParameter() { ParameterName = "CreatorAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatorAccount };
                 parameters.Add(param1);
-                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE partner_acc=:partnerAcc " : " AND partner_acc=:partnerAcc ";
+                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE partner_acc=:CreatorAccount " : " AND partner_acc=:CreatorAccount ";
             }
 
-            if (!string.IsNullOrEmpty(activityId))
+            if (!string.IsNullOrEmpty(param.ActivityId))
             {
-                var param1 = new OracleParameter() { ParameterName = "activityId", OracleDbType = OracleDbType.Varchar2, Value = activityId };
+                var param1 = new OracleParameter() { ParameterName = "ActivityId", OracleDbType = OracleDbType.Varchar2, Value = param.ActivityId };
                 parameters.Add(param1);
-                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE act_id=:activityId " : " AND act_id=:activityId ";
+                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE act_id=:ActivityId " : " AND act_id=:ActivityId ";
             }
-            if (!string.IsNullOrEmpty(actionId))
+            //if (!string.IsNullOrEmpty(actionId))
+            //{
+            //    var param1 = new OracleParameter() { ParameterName = "actionId", OracleDbType = OracleDbType.Varchar2, Value = actionId };
+            //    parameters.Add(param1);
+            //    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE action_id=:actionId " : " AND action_id=:actionId ";
+            //}
+            if (param.IncludeDates)
             {
-                var param1 = new OracleParameter() { ParameterName = "actionId", OracleDbType = OracleDbType.Varchar2, Value = actionId };
-                parameters.Add(param1);
-                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE action_id=:actionId " : " AND action_id=:actionId ";
-            }
-            if (startDate != null && startDate != DateTime.MinValue)
-            {
-                var param1 = new OracleParameter() { ParameterName = "startDate", OracleDbType = OracleDbType.Date, Value = startDate };
-                parameters.Add(param1);
-                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon>=:startDate " : " AND createdon>=:startDate ";
-            }
-            if (endDate != null && endDate != DateTime.MinValue)
-            {
-                var param1 = new OracleParameter() { ParameterName = "endDate", OracleDbType = OracleDbType.Date, Value = endDate };
-                parameters.Add(param1);
-                whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon<=:endDate " : " AND createdon<=:endDate ";
+                if (param.StartDate != null && param.StartDate != DateTime.MinValue)
+                {
+                    var param1 = new OracleParameter() { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
+                    parameters.Add(param1);
+                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate ";
+                }
+                if (param.EndDate != null && param.EndDate != DateTime.MinValue)
+                {
+                    var param1 = new OracleParameter() { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
+                    parameters.Add(param1);
+                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate ";
+                }
             }
 
             #endregion
@@ -135,6 +140,16 @@ namespace Yvtu.Infra.Data.Interfaces
                     currObj.SystemNote = row["system_note"] == DBNull.Value ? string.Empty : row["system_note"].ToString();
                     currObj.Error = row["error"] == DBNull.Value ? string.Empty : row["error"].ToString();
                     currObj.Success = row["success"] == DBNull.Value ? false : row["success"].ToString() == "1" ? true : false;
+                    if (!string.IsNullOrEmpty(currObj.OldValue))
+                    {
+                        var old = currObj.OldValue.Split('\n');
+                        currObj.OldValueList = old.OfType<string>().ToList();
+                    }
+                    if (!string.IsNullOrEmpty(currObj.NewValue))
+                    {
+                        var n = currObj.NewValue.Split('\n');
+                        currObj.NewValueList = n.OfType<string>().ToList();
+                    }
                     dataList.Add(currObj);
                 }
             }
