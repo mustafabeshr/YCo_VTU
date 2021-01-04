@@ -117,5 +117,21 @@ namespace Yvtu.Infra.Data
             }
         }
 
+        public async Task<DataTable> GetDataAsync(string sql, IEnumerable<OracleParameter> parameters)
+        {
+            using (var conn = GetConnection("DbConn"))
+            {
+                var ds = new DataSet();
+                await Task.Run(() =>
+               {
+                   var cmd = GetCommand(sql, parameters);
+                   cmd.Connection = conn;
+                   if (conn.State != ConnectionState.Open) conn.Open();
+                   var da = new OracleDataAdapter(cmd);
+                   da.Fill(ds);
+               });
+              return ds.Tables[0];
+            }
+        }
     }
 }

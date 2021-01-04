@@ -13,6 +13,7 @@ namespace Yvtu.Infra.Data.Interfaces
 
         int ExecuteSqlCommand(string sql, IEnumerable<OracleParameter> parameters);
         DataTable GetData(string sql, IEnumerable<OracleParameter> parameters);
+        Task<DataTable> GetDataAsync(string sql, IEnumerable<OracleParameter> parameters);
 
         Task<int> ExecuteSqlCommandAsync(string sql, IEnumerable<OracleParameter> parameters);
         int ExecuteStoredProc(string spName, IEnumerable<OracleParameter> parameters);

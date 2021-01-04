@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
+using Yvtu.Core.rpt;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.Infra.Data
@@ -275,6 +276,89 @@ namespace Yvtu.Infra.Data
             }
             param.Results = moneyTransfer;
             return param;
+        }
+
+
+        public async Task<List<MoneyTransferRpt>> GetStatReportAsync(MoneyTransferRptQueryParam param)
+        {
+            #region Parameters
+            param.Title = "تقرير احصائي يوضح اجمالي نقل ارصدة";
+            var parameters = new List<OracleParameter>();
+            var whereCluase = new StringBuilder();
+            if (param != null)
+            {
+                if (!string.IsNullOrEmpty(param.PosId))
+                {
+                    whereCluase.Append(param.TransTypeId == "debit" ? " WHERE part_id = :PosId" : " WHERE createdby = :PosId");
+                    var p = new OracleParameter { ParameterName = "PosId", OracleDbType = OracleDbType.Varchar2, Value = param.PosId };
+                    parameters.Add(p);
+                    param.Title += $"{Environment.NewLine} للرقم {param.PosId} ";
+                }
+                
+                if (!string.IsNullOrEmpty(param.ChannelId) && param.ChannelId != "-1")
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND access_channel = :ChannelId" : " WHERE access_channel = :ChannelId");
+                    var p = new OracleParameter { ParameterName = "ChannelId", OracleDbType = OracleDbType.Varchar2, Value = param.ChannelId };
+                    parameters.Add(p);
+                }
+                if (param.StartDate > DateTime.MinValue && param.StartDate != null)
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdon >= :StartDate" : " WHERE createdon >= :StartDate");
+                    var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
+                    parameters.Add(p);
+                }
+                if (param.EndDate > DateTime.MinValue && param.EndDate != null)
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdon <= :EndDate" : " WHERE createdon <= :EndDate");
+                    var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate.AddDays(1) };
+                    parameters.Add(p);
+                }
+            }
+
+            #endregion
+
+            string strSql = string.Empty;
+            if (param.LevelId == "pos")
+            {
+                param.Title += $"{Environment.NewLine} للفترة من {param.StartDate.ToShortDateString()} الى {param.EndDate.ToShortDateString()}  " + "على مستوى نقطة البيع";
+                strSql = $"select  t.access_channel,t.access_channel_name, "+ (param.TransTypeId == "debit" ? "t.part_id, t.part_name," : "t.createdby, t.creator_name,") 
+                    + " count(*) cnt, sum(t.amount) amt    from v_money_transfer t " +
+                    $"  {whereCluase}" +
+                    $" group by t.access_channel, "+ (param.TransTypeId == "debit" ? "t.part_id, t.part_name," : "t.createdby, t.creator_name,") + " t.access_channel_name ";
+            }
+            else
+            {
+                param.Title += $"{Environment.NewLine} للفترة من {param.StartDate.ToShortDateString()} الى {param.EndDate.ToShortDateString()}  " + "على مستوى اليوم";
+                strSql = $"select  t.access_channel,t.access_channel_name,to_char(createdon,'yyyy/mm/dd') d, count(*) cnt, sum(t.amount) amt    from v_money_transfer t " +
+                    $" {whereCluase}" +
+                    $" group by t.access_channel,t.access_channel_name, to_char(createdon,'yyyy/mm/dd')  ";
+            }
+
+            DataTable masterDataTable;
+            masterDataTable = await db.GetDataAsync(strSql, parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new List<MoneyTransferRpt>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = new MoneyTransferRpt();
+                obj.Amount = row["amt"] == DBNull.Value ? 0 : double.Parse(row["amt"].ToString());
+                obj.Count = row["cnt"] == DBNull.Value ? 0 : int.Parse(row["cnt"].ToString());
+                obj.Channel = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
+                if (param.LevelId == "pos")
+                {
+                    obj.Partner.Id = row[(param.TransTypeId == "debit" ? "part_id" : "createdby")] == DBNull.Value ? string.Empty : row[(param.TransTypeId == "debit" ? "part_id" : "createdby")].ToString();
+                    obj.Partner.Name = row[(param.TransTypeId == "debit" ? "part_name" : "creator_name")] == DBNull.Value ? string.Empty : row[(param.TransTypeId == "debit" ? "part_name" : "creator_name")].ToString();
+                }
+                else if (param.LevelId == "day")
+                {
+                    obj.CollDay = row["d"] == DBNull.Value ? string.Empty : row["d"].ToString();
+                }
+                results.Add(obj);
+            }
+            return results;
         }
     }
 }

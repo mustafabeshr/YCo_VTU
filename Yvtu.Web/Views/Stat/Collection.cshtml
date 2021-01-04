@@ -1,0 +1,152 @@
+﻿@model Yvtu.Core.rpt.CollectionRptQuery
+
+@{
+    ViewData["Title"] = "Collections";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">تقرير احصائي بالتحصيلات</p>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
+        <div class="col-md-12">
+            <fieldset class="box-border" style="padding:25px 5px 0px 5px!important;">
+                <div class="row mb-3">
+                    <label asp-for="Param.PosId" class="col-sm-1 col-form-label FormLabel">الرقم:</label>
+                    <div class="col-sm-2">
+                        <input asp-for="Param.PosId" class="form-control text-center">
+                    </div>
+                    <label asp-for="Param.ChannelId" class="col-sm-1 col-form-label FormLabel">القناة:</label>
+                    <div class="col-sm-2">
+                        <select asp-for="Param.ChannelId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
+                                asp-items="@(new SelectList(Model.Channels,"Id","Name"))">
+                            <option value="-1">الكل</option>
+                        </select>
+                    </div>
+                    <label asp-for="Param.StatusId" class="col-sm-1 col-form-label FormLabel">الحالة:</label>
+                    <div class="col-sm-2">
+                        <select asp-for="Param.StatusId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
+                                asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
+                            <option value="-1">الكل</option>
+                        </select>
+                    </div>
+                    <label asp-for="Param.LevelId" class="col-sm-1 col-form-label FormLabel">مستوى:</label>
+                    <div class="col-sm-2">
+                        <select asp-for="Param.LevelId" class="form-control RequiredInput" style="padding:0px;font-size:12px;">
+                            <option value="day">بحسب اليوم</option>
+                            <option value="pos">بحسب النقطة</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+
+    </div>
+
+    <div class="row  shadow-sm p-1 bg-white">
+        <div class="col-md-9">
+            <fieldset class="box-border">
+                <legend class="box-border">الفترة</legend>
+                <div class="row mb-3" id="PeriodDiv">
+                    <label asp-for="Param.StartDate" class="col-sm-2 col-form-label FormLabel">من:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="Param.StartDate" type="date" min="2020-11-01" class="form-control text-center">
+                    </div>
+                    <label asp-for="Param.EndDate" class="col-sm-2 col-form-label FormLabel">الى:</label>
+                    <div class="col-sm-4">
+                        <input asp-for="Param.EndDate" type="date" min="2020-11-01" class="form-control text-center">
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="col-md-3">
+            <div class="col-sm-10 text-center">
+                <button id="btnSave" type="submit" class="btn btn-outline-success mt-4">
+                    <i class="fa fa-search"></i>
+                </button>
+                <button asp-action="CollectionToExcel" asp-controller="Stat"  type="submit" class="btn btn-link mt-4">
+                    <i class="far fa-file-excel fa-2x" style="color:green;"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+@Html.HiddenFor(m => m.Param.ChannelId)
+@Html.HiddenFor(m => m.Param.PosId)
+@Html.HiddenFor(m => m.Param.StatusId)
+@Html.HiddenFor(m => m.Param.LevelId)
+@Html.HiddenFor(m => m.Param.StartDate)
+@Html.HiddenFor(m => m.Param.EndDate)
+
+</form>
+
+@if (Model.Results != null && Model.Results.Count > 0)
+{
+    if (Model.Param.LevelId == "pos")
+    {
+        <div class="row shadow-sm p-1 bg-white">
+            <table class="table table-hover text-center">
+                <thead>
+                    <tr style="font-size:11px;">
+                        <th>القناة</th>
+                        <th colspan="2">النقطة</th>
+                        <th>الحالة</th>
+                        <th>#العمليات</th>
+                        <th>المبلغ</th>
+                        <th>#النقاط</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                        <tr style="font-size:12px;">
+                            <td>@item.Channel</td>
+                            <td>@item.Partner.Id</td>
+                            <td>@item.Partner.Name</td>
+                            <td>@item.Status.Name</td>
+                            <td style="font-size:15px;">@item.Count.ToString("N0")</td>
+                            <td style="font-size:15px;">@item.Amount.ToString("N2")</td>
+                            <td style="font-size:15px;">@item.DistinctCount.ToString("N0")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="row shadow-sm p-1 bg-white">
+            <table class="table table-hover text-center">
+                <thead>
+                    <tr style="font-size:11px;">
+                        <th>القناة</th>
+                        <th>اليوم</th>
+                        <th>الحالة</th>
+                        <th>#العمليات</th>
+                        <th>المبلغ</th>
+                        <th>#النقاط</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Results)
+                    {
+                    <tr style="font-size:12px;">
+                        <td>@item.Channel</td>
+                        <td style="font-size:15px;">@item.CollDay</td>
+                        <td>@item.Status.Name</td>
+                        <td style="font-size:15px;">@item.Count.ToString("N0")</td>
+                        <td style="font-size:15px;">@item.Amount.ToString("N2")</td>
+                        <td style="font-size:15px;">@item.DistinctCount.ToString("N0")</td>
+                    </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
