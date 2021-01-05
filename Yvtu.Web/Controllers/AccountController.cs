@@ -499,6 +499,19 @@ namespace Yvtu.Web.Controllers
             partner.Error = "N/A";
             return partner;
         }
+
+        public async Task<List<IdName>> GetAccounts(string id)
+        {
+            if (!Utility.ValidYMobileNo(id)) return null;
+            var accounts = await partnerManager.GetAccountsAsync(id);
+            if (accounts == null) return null;
+            //var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
+            //var permission = new PartnerActivityRepo(db).GetPartAct("Partner.Confiscate", currentRole);
+            //if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            //if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            //accounts.Error = "N/A";
+            return accounts;
+        }
         public Partner GetP(string id)
         {
             if (!Utility.ValidYMobileNo(id)) return new Partner { Extra = "رقم غير صحيح" };
@@ -678,7 +691,6 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
 
-
         public IActionResult Confiscate()
         {
             var model = new ConfiscationDto();
@@ -754,8 +766,6 @@ namespace Yvtu.Web.Controllers
             }
             return View(model);
         }
-
-
         public IActionResult ChgStateQuery()
         {
             var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);

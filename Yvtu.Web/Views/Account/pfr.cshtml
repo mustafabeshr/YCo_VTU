@@ -16,52 +16,68 @@
 </div>
 <form method="post">
     <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
-        <div class="col-md-5">
+        <div class="col-md-12">
             <fieldset class="box-border">
                 <legend class="box-border">بيانات الجهة</legend>
                 <div class="row mb-3">
-                    <label asp-for="PartnerId" class="col-sm-2 col-form-label FormLabel">الرقم:</label>
-                    <div class="col-sm-4">
-                        <input asp-for="PartnerId" class="form-control text-center">
+                    <div class="col-md-3">
+                        <div class="row">
+                            <label asp-for="PartnerId" class="col-sm-2 col-form-label FormLabel">الرقم:</label>
+                            <div class="col-sm-10">
+                                <input id="txtId" asp-for="PartnerId" class="form-control text-center">
+                            </div>
+                        </div>
                     </div>
-                    <label asp-for="PartnerAccount" class="col-sm-2 col-form-label FormLabel">الحساب:</label>
-                    <div class="col-sm-4">
-                        <input asp-for="PartnerAccount" class="form-control text-center">
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-        <div class="col-md-5">
-            <fieldset class="box-border">
-                <legend class="box-border"><input id="chPeriod" type="checkbox" asp-for="IncludeDates" />&nbsp;الفترة</legend>
-                <div class="row mb-3" id="PeriodDiv" style="display:none;">
-                    <label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>
-                    <div class="col-sm-5">
-                        <input asp-for="StartDate" min="2020-11-01" class="form-control text-center" style="font-size:15px;">
-                    </div>
-                    <label asp-for="EndDate" class="col-sm-1 col-form-label FormLabel">الى:</label>
-                    <div class="col-sm-5">
-                        <input asp-for="EndDate" min="2020-11-01" class="form-control text-center" style="font-size:15px;">
+                    <div class="col-md-9">
+                        <div class="row">
+                            <label asp-for="PartnerAccount" class="col-sm-2 col-form-label FormLabel">الحساب:
+                                <label id="lblCnt" style="color:red;">(0)</label>
+                            </label>
+                            
+                            <div class="col-sm-10">
+                                <select id="selAccounts" asp-for="PartnerAccount" class="form-control" style="padding:0px;">
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </fieldset>
         </div>
-       
-        <div class="col-md-2 text-center">
-            <fieldset class="box-border" style="padding:8px !important;height:100%;">
-                <button id="btnSave" type="submit" class="btn btn-outline-success mt-3">
-                    <i class="fa fa-search"></i>
-                </button>
-                <a asp-action="CreatePFRReportPDF"
-                   asp-route-account="@Model.PartnerAccount"
-                   asp-route-id="@Model.PartnerId"
-                   asp-route-includeDates="@Model.IncludeDates"
-                   asp-route-startDate="@Model.StartDate"
-                   asp-route-endDate="@Model.EndDate"
-                   target="_blank" class="btn btn-link mt-3"><i class="far fa-file-pdf fa-2x" style="color:red;"></i></a>
-            </fieldset>
+
+    </div>
+    <div class="row  shadow-sm  p-1 bg-white pb-0">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-10">
+                    <fieldset class="box-border">
+                        <legend class="box-border"><input id="chPeriod" type="checkbox" asp-for="IncludeDates" />&nbsp;الفترة</legend>
+                        <div class="row mb-3" id="PeriodDiv">
+                            <label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>
+                            <div class="col-sm-5">
+                                <input id="txtStartDate" asp-for="StartDate" min="2020-11-01" class="form-control text-center" style="font-size:15px;">
+                            </div>
+                            <label asp-for="EndDate" class="col-sm-1 col-form-label FormLabel">الى:</label>
+                            <div class="col-sm-5">
+                                <input id="txtEndDate" asp-for="EndDate" min="2020-11-01" class="form-control text-center" style="font-size:15px;">
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-md-2 text-center">
+                    <button id="btnSave" type="submit" class="btn btn-outline-success mt-3">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <a asp-action="CreatePFRReportPDF"
+                       asp-route-account="@Model.PartnerAccount"
+                       asp-route-id="@Model.PartnerId"
+                       asp-route-includeDates="@Model.IncludeDates"
+                       asp-route-startDate="@Model.StartDate"
+                       asp-route-endDate="@Model.EndDate"
+                       id="btnPDF"
+                       target="_blank" class="btn btn-link mt-3"><i class="far fa-file-pdf fa-2x" style="color:red;"></i></a>
+                </div>
+            </div>
         </div>
-      
     </div>
 </form>
 @if (Model.results != null && Model.results.Count > 0)
@@ -89,21 +105,20 @@
                     string amountColor = "blue";
                     if (@item.Amount < 0) amountColor = "red";
                     accumolator += @item.Amount;
-                <tr style="font-size:12px;">
-                    <td>@accumolator.ToString("N2")</td>
-                    <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
-                    <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
-                    <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
-                    <td>@item.PartnerAccount</td>
-                    <td>@item.PartnerId</td>
-                    <td>@item.CreatedBy.Account</td>
-                    <td>@item.CreatedBy.Id</td>
-                    <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
-                    <td>@item.TransNo</td>
-                    <td>
-                      
-                    </td>
-                </tr>
+                    <tr style="font-size:12px;">
+                        <td>@accumolator.ToString("N2")</td>
+                        <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
+                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
+                        <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
+                        <td>@item.PartnerAccount</td>
+                        <td>@item.PartnerId</td>
+                        <td>@item.CreatedBy.Account</td>
+                        <td>@item.CreatedBy.Id</td>
+                        <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
+                        <td>@item.TransNo</td>
+                        <td>
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
@@ -111,19 +126,24 @@
 }
 
 @section Scripts {
-<script>
-    $('#chPeriod').change(function () {
-        if ($(this).prop("checked")) {
-            $('#PeriodDiv').show();
-        } else {
-            $('#PeriodDiv').hide();
-        }
-    });
+    <script>
+        $('#chPeriod').change(function () {
+            if ($(this).prop("checked")) {
+                $("#txtStartDate").prop('disabled', false);
+                $("#txtEndDate").prop('disabled', false);
+            } else {
+                $("#txtStartDate").prop('disabled', true);
+                $("#txtEndDate").prop('disabled', true);
+            }
+        });
 
-    if ($('#chPeriod').prop("checked")) {
-        $('#PeriodDiv').show();
-    } else {
-        $('#PeriodDiv').hide();
-    }
-</script>
+        if ($(this).prop("checked")) {
+            $("#txtStartDate").prop('disabled', false);
+            $("#txtEndDate").prop('disabled', false);
+        } else {
+            $("#txtStartDate").prop('disabled', true);
+            $("#txtEndDate").prop('disabled', true);
+        }
+    </script>
+    <script src="~/js/prf.js"></script>
 } 

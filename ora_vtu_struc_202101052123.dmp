@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 04/01/2021, 21:41:49 21:41:49  --
+-- Created by mbeshr on 05/01/2021, 21:23:23 21:23:23  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_2021012141.log
+spool ora_vtu_struc_202101052123.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -235,6 +235,34 @@ alter table ADJUSTMENT
 alter table ADJUSTMENT
   add constraint FK4_ADJUSTEMENT foreign key (DEST_ROLE_ID)
   references APPROLE (ROLEID);
+
+prompt
+prompt Creating table BG_SERVICE
+prompt =========================
+prompt
+create table BG_SERVICE
+(
+  bg_id         NUMBER not null,
+  createdon     DATE default sysdate not null,
+  createdby     VARCHAR2(9) not null,
+  createdbyacc  NUMBER not null,
+  bg_source     VARCHAR2(100) not null,
+  partner_id    VARCHAR2(9),
+  partner_acc   NUMBER,
+  start_date    DATE,
+  end_date      DATE,
+  record_count  NUMBER default 0 not null,
+  file_name     VARCHAR2(200),
+  file_location VARCHAR2(200),
+  status        VARCHAR2(100) not null,
+  status_time   DATE default sysdate not null,
+  duration_sec  NUMBER default 0 not null,
+  note          VARCHAR2(300),
+  active_time   DATE default sysdate not null
+)
+;
+alter table BG_SERVICE
+  add constraint PK_BG_SERVICE primary key (BG_ID);
 
 prompt
 prompt Creating table COLLECTION
@@ -762,6 +790,17 @@ increment by 1
 cache 20;
 
 prompt
+prompt Creating sequence SEQ_BDSERVICE_ID
+prompt ==================================
+prompt
+create sequence SEQ_BDSERVICE_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 1
+increment by 1
+cache 20;
+
+prompt
 prompt Creating sequence SEQ_CITY_ID
 prompt =============================
 prompt
@@ -1009,6 +1048,36 @@ and ad.src_acc = src.partner_acc
 and ad.dest_acc = dest.partner_acc
 and ad.src_role_id = srcrole.roleid
 and ad.dest_role_id = destrole.roleid;
+
+prompt
+prompt Creating view V_BG_SERVICE
+prompt ==========================
+prompt
+create or replace force view v_bg_service as
+select
+bg.bg_id,
+bg.createdon,
+bg.createdby,
+bg.createdbyacc,
+creator.partner_name createdby_name,
+bg.bg_source,
+(select c.code_name from common_code c where c.code_type = 'bg_service_source' and c.code_id = bg.bg_source) bg_source_name,
+bg.partner_id,
+bg.partner_acc,
+(select p.partner_name from partner p where p.partner_acc = bg.partner_acc) partner_name,
+bg.start_date,
+bg.end_date,
+bg.record_count,
+bg.file_name,
+bg.file_location,
+bg.status,
+(select c.code_name from common_code c where c.code_type = 'bg_service_status' and c.code_id = bg.status) status_name,
+bg.status_time,
+bg.duration_sec,
+bg.note,
+bg.active_time
+from bg_service bg, partner creator
+where bg.createdbyacc = creator.partner_acc;
 
 prompt
 prompt Creating view V_COLLECTION
@@ -1539,6 +1608,29 @@ function fn_ResetPassword(
       v_act_id      notification.act_id%type     ,
       v_ref_no      notification.ref_no%type   
    ) return number;
+   
+   function fn_Create_bgService(
+     v_createdby     bg_service.createdby%type    ,
+     v_createdbyacc  bg_service.createdbyacc%type ,
+     v_bg_source     bg_service.bg_source%type    ,
+     v_partner_id    bg_service.partner_id%type   ,
+     v_partner_acc   bg_service.partner_acc%type  ,
+     v_start_date    bg_service.start_date%type   ,
+     v_end_date      bg_service.end_date%type  ,
+      v_note      bg_service.note%type ,
+      v_active_time     bg_service.active_time%type 
+     ) return number;
+     
+     function fn_Update_bgService(
+     v_bg_id         bg_service.bg_id%type     ,
+      v_record_count  bg_service.record_count%type ,
+      v_file_name     bg_service.file_name%type    ,
+      v_file_location bg_service.file_location%type,
+      v_status        bg_service.status%type       ,
+      v_status_time   bg_service.status_time%type  ,
+      v_duration_sec  bg_service.duration_sec%type    ,
+       v_active_time     bg_service.active_time%type  
+     ) return number;
 end pk_infra;
 /
 
@@ -2975,6 +3067,68 @@ function fn_ResetPassword(
                  v_exp_object => 'Notification');
          return SQLCODE;    
    end;
+   
+   
+   function fn_Create_bgService(
+     v_createdby     bg_service.createdby%type    ,
+     v_createdbyacc  bg_service.createdbyacc%type ,
+     v_bg_source     bg_service.bg_source%type    ,
+     v_partner_id    bg_service.partner_id%type   ,
+     v_partner_acc   bg_service.partner_acc%type  ,
+     v_start_date    bg_service.start_date%type   ,
+     v_end_date      bg_service.end_date%type  ,
+      v_note      bg_service.note%type   ,
+       v_active_time     bg_service.active_time%type   
+     ) return number is
+     v_bg_id         bg_service.bg_id%type;
+     begin
+       v_bg_id := seq_bdservice_id.nextval();
+     insert into bg_service
+        (bg_id, createdon, createdby, createdbyacc, bg_source, partner_id, partner_acc, 
+        start_date, end_date, record_count, status, status_time, duration_sec, note, active_time)
+      values
+        (v_bg_id, sysdate, v_createdby, v_createdbyacc, v_bg_source, v_partner_id, v_partner_acc, 
+        v_start_date, v_end_date, 0, 'pending', sysdate, 0, v_note, v_active_time);
+       return v_bg_id;
+       
+       EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'bgService');
+         return SQLCODE;    
+     end;
+     
+   function fn_Update_bgService(
+     v_bg_id         bg_service.bg_id%type     ,
+      v_record_count  bg_service.record_count%type ,
+      v_file_name     bg_service.file_name%type    ,
+      v_file_location bg_service.file_location%type,
+      v_status        bg_service.status%type       ,
+      v_status_time   bg_service.status_time%type  ,
+      v_duration_sec  bg_service.duration_sec%type ,
+       v_active_time     bg_service.active_time%type     
+     ) return number is
+     begin
+       update bg_service
+           set  record_count = v_record_count,
+               file_name = v_file_name,
+               file_location = v_file_location,
+               status = v_status,
+               status_time = v_status_time,
+               duration_sec = v_duration_sec,
+               active_time = v_active_time
+         where bg_id = v_bg_id;
+        return 1;
+     EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Update',
+                 v_exp_object => 'bgService');
+         return SQLCODE;   
+     end;
 end pk_infra;
 /
 

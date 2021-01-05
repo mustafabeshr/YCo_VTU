@@ -54,5 +54,6 @@ namespace Yvtu.Infra.Data.Interfaces
         bool ResetPassword(Partner partner);
         Partner GetPartnerById(string id);
         Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner);
+        Task<List<IdName>> GetAccountsAsync(string id);
     }
 }

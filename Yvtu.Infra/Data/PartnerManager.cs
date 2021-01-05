@@ -586,5 +586,29 @@ namespace Yvtu.Infra.Data
             }
         }
 
+        public async Task<List<IdName>> GetAccountsAsync(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = id };
+            WhereClause.Append(" WHERE partner_id=:PartnerId ");
+            parameters.Add(parm);
+            var dataTable = await this.db.GetDataAsync("Select * from partner  " + WhereClause + " order by partner_acc desc", parameters);
+
+            if (dataTable == null) return null;
+            if (dataTable.Rows.Count == 0) return null;
+
+            var partners = new List<IdName>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var account = new IdName();
+                account.Id = row["partner_acc"] == DBNull.Value ? -1 : int.Parse(row["partner_acc"].ToString());
+                var partnerName = row["partner_name"] == DBNull.Value ? string.Empty : row["partner_name"].ToString();
+                account.Name = $"{account.Id} - {partnerName}";
+                partners.Add(account);
+            }
+            return partners;
+        }
     }
 }
