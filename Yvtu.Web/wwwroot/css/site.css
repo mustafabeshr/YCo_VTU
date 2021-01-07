@@ -158,7 +158,9 @@ body {
     padding: 2px 4px 2px 4px;
 }
 .RequiredInput {
-    background-color: #f3edff;
+    border-right-style: solid;
+    border-right-color: red;
+    border-right-width: 3px;
 }
 .icon-stack {
     position: relative;
@@ -232,3 +234,15 @@ legend.box-border {
     font-weight: bold !important;
     text-align: right !important;
 }
+
+.ShadowEffect1 {
+    -webkit-box-shadow: 0 10px 6px -6px #777;
+    -moz-box-shadow: 0 10px 6px -6px #777;
+    box-shadow: 0 10px 6px -6px #777;
+}
+
+/*Check Box Style Start*/
+.cbx {
+
+}
+/*Check Box Style End*/

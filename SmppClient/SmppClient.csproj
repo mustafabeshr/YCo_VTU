@@ -252,6 +252,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
     <None Include="Documentation\SMPP_v3_4_Issue1_2.pdf" />
   </ItemGroup>
   <ItemGroup>

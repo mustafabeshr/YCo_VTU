@@ -205,6 +205,43 @@ namespace Yvtu.Web.Controllers
             model.Results = results;
             return View(model);
         }
+
+        public IActionResult SMSInQuery()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("SMSIn.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var model = new SMSInQueryDto();
+            model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(2));
+            model.EndDate = DateTime.Today.AddDays(1);
+            return View("insms", model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SMSInQuery(SMSInQueryDto model)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("SMSIn.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var results = await new SMSInRepo(db).GetSMSMessagesAsync(model.Sender, model.Message, model.IncludeDates, model.StartDate, model.EndDate);
+            model.Results = results;
+            return View("insms", model);
+        }
     }
 
 }

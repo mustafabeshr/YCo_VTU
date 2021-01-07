@@ -1,1 +1,90 @@
 ﻿@model Yvtu.Web.Dto.CreateBackgroundServiceDto
+
+@{
+    ViewData["Title"] = "Create BG Service";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">انشاء طلب بيانات</p>
+        </div>
+        <form method="post">
+            <div class="form-group col-md-12">
+                <label asp-for="Name" class="FormLabel">وصف الطلب :</label>
+                <input asp-for="Name"  class="form-control RequiredInput"  />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-8">
+                    <label asp-for="Source" class="FormLabel">مصدر البيانات :</label>
+                    <select asp-for="Source" class="form-control RequiredInput" style="padding:0px;"
+                            asp-items="@(new SelectList(Model.Sources,"Id","Name"))">
+                        <option></option>
+                    </select>
+                    <span asp-validation-for="Source" class="text-danger"></span>
+                </div>
+                <div class="form-group col-4">
+                    <label asp-for="Id" class="FormLabel">الرقم :</label>
+                    <input asp-for="Id" readonly class="form-control text-center" style="color:maroon;font-weight:bold;font-size:20px;" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="PartnerId" class="FormLabel">رقم النقطة :</label>
+                    <input id="txtId" asp-for="PartnerId" class="form-control text-center" />
+                    <span asp-validation-for="PartnerId" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="PartnerAccount" class="FormLabel">الحساب :</label>
+                    <label id="lblCnt" style="color:red;">(0)</label>
+                    <select id="selAccounts" asp-for="PartnerAccount" class="form-control" style="padding:0px;">
+                    </select>
+
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-6">
+                    <label asp-for="StartDate" class="FormLabel">من تاريخ :</label>
+                    <input asp-for="StartDate" class="form-control text-center" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="form-group col-6">
+                    <label asp-for="EndDate" class="FormLabel">الى تاريخ :</label>
+                    <input asp-for="EndDate" class="form-control text-center" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label asp-for="ActiveTime" class="FormLabel">وقت التفعيل :</label>
+                    <input asp-for="ActiveTime" class="form-control text-center RequiredInput" />
+                    <span asp-validation-for="ActiveTime" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <label asp-for="Note" class="FormLabel">ملاحظات :</label>
+                    <input asp-for="Note" class="form-control text-center" />
+                    <span asp-validation-for="Note" class="text-danger"></span>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+            @Html.HiddenFor(m => m.Id)
+            @Html.HiddenFor(m => m.PartnerId)
+            @Html.HiddenFor(m => m.ActiveTime)
+            @Html.HiddenFor(m => m.Note)
+            @Html.HiddenFor(m => m.StartDate)
+            @Html.HiddenFor(m => m.EndDate)
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/BgService.js"></script>
+}

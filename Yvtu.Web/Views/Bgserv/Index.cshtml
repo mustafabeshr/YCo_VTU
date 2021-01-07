@@ -1,0 +1,225 @@
+﻿@model Yvtu.Web.Dto.AppBackgroundServiceQueryDto
+
+@{
+    ViewData["Title"] = "Query BG Service";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن طلبات سحب بيانات</p>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <div class="row shadow-lg bg-white pb-3 pt-3">
+        <div class="col-md-2">
+            <input id="txtId" asp-for="Id" class="form-control text-center" placeholder="الرقم">
+        </div>
+        <div class="col-md-5">
+            <input id="txtId" asp-for="Name" class="form-control text-center" placeholder="الوصف">
+        </div>
+        <div class="col-md-5">
+            <div class="row mb-3 text-center" id="PeriodDiv">
+                <div class="col-sm-1 text-center">
+                    <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
+                </div>
+                @*<label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>*@
+                <div class="col-sm-5">
+                    <input id="txtStartDate" asp-for="StartDate" class="form-control text-center" style="font-size:14px;">
+                </div>
+                @*<label asp-for="EndDate" class="col-sm-1 col-form-label FormLabel">الى:</label>*@
+                <div class="col-sm-5">
+                    <input id="txtEndDate" asp-for="EndDate" class="form-control text-center" style="font-size:14px;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row shadow-sm bg-white pb-3">
+        <div class="col-md-3">
+            <div class="row">
+                <label asp-for="Status" class="col-sm-2 col-form-label FormLabel">الحالة:</label>
+                <div class="col-sm-10">
+                    <select asp-for="Status" class="form-control" style="padding:0px;font-size:12px;"
+                            asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
+                        <option value="-1">الكل</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="row">
+                <label asp-for="Source" class="col-sm-2 col-form-label FormLabel">المصدر:</label>
+                <div class="col-sm-10">
+                    <select asp-for="Source" class="form-control" style="padding:0px;font-size:11px;"
+                            asp-items="@(new SelectList(Model.Sources,"Id","Name"))">
+                        <option value="-1">الكل</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="row">
+                <input asp-for="PartnerId" class="form-control text-center" placeholder="رقم النقطة">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <div class="row">
+                <input asp-for="CreatedById" class="form-control text-center" placeholder="المستخدم">
+            </div>
+
+        </div>
+        <div class="col-md-1">
+            <button id="btnSave" type="submit" class="btn btn-outline-success">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+    @Html.HiddenFor(m => m.StartDate)
+    @Html.HiddenFor(m => m.EndDate)
+    @Html.HiddenFor(m => m.PartnerId)
+    @Html.HiddenFor(m => m.CreatedById)
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.Source)
+    @Html.HiddenFor(m => m.Status)
+</form>
+
+@if (Model != null && Model.Results != null)
+{
+    @foreach (var item in Model.Results)
+    {
+        <div class="row shadow-lg bg-white p-2" style="font-size:12px;margin-top:1px;">
+            <div class="row container-fluid">
+                <div class="col-md-1 text-center">
+                    <div style="font-size:18px;font-weight:bold;background-color:lightgreen;color:purple;border-radius:8px;">
+                        @item.Id
+                    </div>
+                </div>
+                <div class="col-md-6 text-right">
+                    @item.Name
+                </div>
+                <div class="col-md-1 text-center">
+                    @{ 
+                        var bgColor = string.Empty;
+                        var fgColor = string.Empty;
+                        if (@item.Status.Id == "pending")
+                        {
+                            bgColor = "purple";
+                            fgColor = "white";
+                        } else if (@item.Status.Id == "processing")
+                        {
+                            bgColor = "yellow";
+                            fgColor = "black";
+                        }
+                        else if (@item.Status.Id == "closed")
+                        {
+                            bgColor = "#07b76b";
+                            fgColor = "white";
+                        }
+                        else if (@item.Status.Id == "cancelled")
+                        {
+                            bgColor = "#ed045d";
+                            fgColor = "white";
+                        }
+                        else 
+                        {
+                            bgColor = "purple";
+                            fgColor = "white";
+                        }
+                    }
+                    <div class="ShadowEffect1" style="font-size:13px;background-color:@bgColor;color:@fgColor;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        @item.Status.Name
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div style="font-size:13px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;border:1px solid gray;">
+                        @item.ActiveTime.ToShortDateString() &emsp; @item.ActiveTime.ToString("H:mm:ss")
+                    </div>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div style="font-size:13px;background-color:#92fbb4;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        @item.Source.Name
+                    </div>
+                </div>
+            </div>
+            <div class="row container-fluid">
+                <div class="col-md-4 text-center" style="color:green;">
+                    @if (!string.IsNullOrEmpty(item.Partner.Id))
+                    {
+                        <span style="padding:4px;">@item.Partner.Id</span>
+                        <span style="padding: 4px; border-right: 1px solid #dfcffc;">@item.Partner.Account</span>
+                        <span style="padding: 4px; border-right: 1px solid #ECE2FF;">@item.Partner.Name</span>
+                    }
+                    else
+                    {
+                        <span></span>
+                    }
+                </div>
+                <div class="col-md-4 text-center text-muted">
+                    <span style="padding:4px;">@item.CreatedBy.Id</span>
+                    <span style="padding: 4px; border-right: 1px solid #dfcffc;">@item.CreatedBy.Account</span>
+                    <span style="padding: 4px; border-right: 1px solid #ECE2FF;">@item.CreatedBy.Name</span>
+                </div>
+                <div class="col-md-4 text-right">
+                    <span style="padding:4px;">@item.StartDate.ToString("yyyy/MM/dd")</span>  &hArr;<span style="padding:4px;">@item.EndDate.ToString("yyyy/MM/dd")</span>
+                </div>
+            </div>
+            <div class="row container-fluid">
+                <div class="col-md-3 text-right">
+                    <div style="font-size:13px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        <span style="font-size:11px;color:blue;">عدد السجلات :</span> @item.RecordCount.ToString("N0")
+                    </div>
+                </div>
+                <div class="col-md-5 text-right">
+                    <div style="font-size:13px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        <span style="font-size:11px;color:blue;">اسم الملف :</span>
+                        @if (!string.IsNullOrEmpty(item.FileName))
+                        {
+                            <a asp-action="download" asp-route-id="@item.Id" style="font-size:15px">
+                            <i class="fas fa-file-excel" style="color:green;"></i>&nbsp;@item.FileName</a>
+                        }
+                    </div>
+                </div>
+                <div class="col-md-2 text-right">
+                    <div style="font-size:15px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        <span style="font-size:11px;color:blue;">الحجم :</span>
+                        @if (!string.IsNullOrEmpty(item.FileName))
+                        {
+                          @item.FileSizeFormat
+                        }
+                    </div>
+                </div>
+                <div class="col-md-2 text-right">
+                    <div style="font-size:15px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        <span style="font-size:11px;color:blue;">مدة المعالجة :</span> @item.DurationTime
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts{
+    <script>
+        $('#chPeriod').change(function () {
+            if ($(this).prop("checked")) {
+                $("#txtStartDate").prop('disabled', false);
+                $("#txtEndDate").prop('disabled', false);
+            } else {
+                $("#txtStartDate").prop('disabled', true);
+                $("#txtEndDate").prop('disabled', true);
+            }
+        });
+
+        if ($(this).prop("checked")) {
+            $("#txtStartDate").prop('disabled', false);
+            $("#txtEndDate").prop('disabled', false);
+        } else {
+            $("#txtStartDate").prop('disabled', true);
+            $("#txtEndDate").prop('disabled', true);
+        }
+    </script>
+}

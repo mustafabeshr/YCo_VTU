@@ -1,0 +1,144 @@
+﻿@model Yvtu.Web.Dto.SMSInQueryDto
+
+@{
+    ViewData["Title"] = "Query Incoming SMS";
+}
+@await Component.InvokeAsync("NToastNotify")
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الرسائل القصيرة الواردة للخدمة</p>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <div class="row shadow-lg bg-white pb-3 pt-3">
+        <div class="col-md-2">
+            <input asp-for="Sender" class="form-control text-center" placeholder="المرسل">
+        </div>
+        <div class="col-md-5">
+            <input asp-for="Receiver" class="form-control text-center" placeholder="رقم الخدمة">
+        </div>
+        <div class="col-md-5">
+            <div class="row mb-3 text-center" id="PeriodDiv">
+                <div class="col-sm-1 text-center">
+                    <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
+                </div>
+                @*<label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>*@
+                <div class="col-sm-5">
+                    <input id="txtStartDate" asp-for="StartDate" class="form-control text-center" style="font-size:14px;">
+                </div>
+                @*<label asp-for="EndDate" class="col-sm-1 col-form-label FormLabel">الى:</label>*@
+                <div class="col-sm-5">
+                    <input id="txtEndDate" asp-for="EndDate" class="form-control text-center" style="font-size:14px;">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row shadow-sm bg-white pb-3">
+        <div class="col-md-9">
+            <div class="row">
+                <input asp-for="Message" class="form-control text-center" placeholder="نص الرسالة">
+            </div>
+
+        </div>
+        <div class="col-md-1">
+            <button id="btnSave" type="submit" class="btn btn-outline-success">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
+    </div>
+</form>
+
+@if (Model != null && Model.Results != null)
+{
+<div class="row shadow-lg p-2" style="font-size:12px;margin-top:1px;background-color:#663399;color:white;">
+    <div class="row container-fluid">
+        <div class="col-md-1 text-center">
+            <div style="font-size:11px;border-radius:8px;">
+                #
+            </div>
+        </div>
+        <div class="col-md-1 text-center">
+            المرسل
+        </div>
+        <div class="col-md-6 text-right">
+            نص الرسالة
+        </div>
+        <div class="col-md-2 text-center">
+            <div style="font-size:13px;border-radius:8px;padding-top:8px;padding-bottom:8px;border:1px solid white;">
+                وقت الوصول
+            </div>
+        </div>
+        <div class="col-md-1 text-center">
+            <div style="font-size:13px;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                اللغة
+            </div>
+        </div>
+        <div class="col-md-1 text-center">
+            <div style="font-size:11px;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                # المرجع
+            </div>
+        </div>
+    </div>
+    </div>
+    @foreach (var item in Model.Results)
+    {
+        <div class="row shadow-lg bg-white p-2" style="font-size:12px;margin-top:1px;">
+            <div class="row container-fluid">
+                <div class="col-md-1 text-center">
+                    <div style="font-size:11px;color:purple;border-radius:8px;">
+                        @item.Id
+                    </div>
+                </div>
+                <div class="col-md-1 text-center">
+                    @item.Sender
+                </div>
+                <div class="col-md-6 text-right">
+                    @item.Message
+                </div>
+                <div class="col-md-2 text-center">
+                    <div style="font-size:13px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;border:1px solid gray;">
+                        @item.CreatedOn.ToShortDateString() &emsp; @item.CreatedOn.ToString("H:mm:ss")
+                    </div>
+                </div>
+                <div class="col-md-1 text-center">
+                    <div style="font-size:13px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        @item.Lang
+                    </div>
+                </div>
+                <div class="col-md-1 text-center">
+                    <div style="font-size:11px;color:black;border-radius:8px;padding-top:8px;padding-bottom:8px;">
+                        @item.RefNo
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    }
+
+
+
+
+    @section Scripts{
+        <script>
+            $('#chPeriod').change(function () {
+                if ($(this).prop("checked")) {
+                    $("#txtStartDate").prop('disabled', false);
+                    $("#txtEndDate").prop('disabled', false);
+                } else {
+                    $("#txtStartDate").prop('disabled', true);
+                    $("#txtEndDate").prop('disabled', true);
+                }
+            });
+
+            if ($(this).prop("checked")) {
+                $("#txtStartDate").prop('disabled', false);
+                $("#txtEndDate").prop('disabled', false);
+            } else {
+                $("#txtStartDate").prop('disabled', true);
+                $("#txtEndDate").prop('disabled', true);
+            }
+        </script>
+    }
