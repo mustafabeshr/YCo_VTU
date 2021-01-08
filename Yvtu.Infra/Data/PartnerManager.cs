@@ -25,6 +25,17 @@ namespace Yvtu.Infra.Data
             this.partnerActivity = partnerActivity;
         }
 
+        public bool CheckPass(Partner partner, string pwd)
+        {
+            //var pass = Utility.GenerateNewCode(4);
+            byte[] salt = Convert.FromBase64String(partner.Extra);
+            string hash = Pbkdf2Hasher.ComputeHash(pwd, salt);
+            if (hash == partner.Pwd)
+            {
+                return true;
+            }
+            return false;
+        }
         public bool ChangePwd(int PartnerAcc, string PartnerId,string newPwd)
         {
             //var pass = Utility.GenerateNewCode(4);

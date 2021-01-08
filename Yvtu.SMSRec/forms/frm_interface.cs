@@ -3,12 +3,10 @@ using System.Windows.Forms;
 using SMPPSocket;
 using System.Drawing;
 using System.ComponentModel;
-using System.Threading;
-using System.Text;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Yvtu.Core.Entities;
-using Yvtu.SMSRec.Repo;
+using Yvtu.Infra.Data.Interfaces;
+using Yvtu.Infra.Data;
 
 namespace Yvtu.SMSRec
 {
@@ -103,7 +101,9 @@ namespace Yvtu.SMSRec
         Interface CurrentInterface;
         bool StopLog = false;
         int _bindtype;
-        private readonly IRecDbContext db;
+        private readonly IAppDbContext db;
+        private readonly IPartnerManager partnerManager;
+        private readonly IPartnerActivityRepo partnerActivityRepo;
 
         //-----------------------------------------------------------
 
@@ -121,10 +121,12 @@ namespace Yvtu.SMSRec
                 return 1;
             }
         }
-        public frm_interface(IRecDbContext db)
+        public frm_interface(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             InitializeComponent();
             this.db = db;
+            this.partnerManager = partnerManager;
+            this.partnerActivityRepo = partnerActivityRepo;
             //bw_Delivery.WorkerReportsProgress = true;
             //bw_Delivery.WorkerSupportsCancellation = true;
             //bw_Delivery.DoWork += new DoWorkEventHandler(bw_Delivery_DoWork);
@@ -132,7 +134,7 @@ namespace Yvtu.SMSRec
             //bw_Delivery.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_Delivery_RunWorkerCompleted);
 
         }
-        public frm_interface(byte Interface_No, IRecDbContext db)
+        public frm_interface(byte Interface_No, IAppDbContext db)
         {
             _interface_no = Interface_No;
             this.db = db;
@@ -145,7 +147,7 @@ namespace Yvtu.SMSRec
 
            
         }
-        public frm_interface(byte Interface_No,frm_Parent ParentForm, IRecDbContext db)
+        public frm_interface(byte Interface_No,frm_Parent ParentForm, IAppDbContext db)
         {
             _interface_no = Interface_No;
             _parentForm = ParentForm;
@@ -185,7 +187,7 @@ namespace Yvtu.SMSRec
                 DeliverMessage.Delivered_Message delmsg = (DeliverMessage.Delivered_Message)e.Argument;
                 if (delmsg.Short_code == SharedParams.Short_Code.ToString())
                 {
-                DeliverMessage DeliverMsg = new DeliverMessage(db);
+                DeliverMessage DeliverMsg = new DeliverMessage(db, partnerManager, partnerActivityRepo);
                 DeliverMessage.RequestReturnValue RQretuenvalue = new DeliverMessage.RequestReturnValue();
                     var RQpack = new PartnerRequest();
                     var queueNo = getCurrentChannelNo();
@@ -197,7 +199,7 @@ namespace Yvtu.SMSRec
                         bw_Delivery.ReportProgress(0, c2);
                         if (RQpack.RequestId == 3)
                         {
-                            var result = new Repo.PartnerRequestRepo(db).Create(RQpack);
+                            var result = new PartnerRequestRepo(db).Create(RQpack);
                         }
                     }
                     else

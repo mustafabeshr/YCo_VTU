@@ -31,6 +31,7 @@ namespace Yvtu.Infra.Data.Interfaces
     }
     public interface IPartnerManager
     {
+        bool CheckPass(Partner partner, string pwd);
         ValidatePartnerResult Validate(string partnerId);
         Task<ValidatePartnerResult> ValidateAsync(string partnerId);
         PartBasicInfo GetPartnerBasicInfo(string partnerId);

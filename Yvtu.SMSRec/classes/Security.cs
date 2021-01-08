@@ -2,14 +2,15 @@
 using System.Data;
 using System.Text;
 using Yvtu.Core.Entities;
+using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.SMSRec
 {
     class Security
     {
-        private readonly IRecDbContext db;
+        private readonly IAppDbContext db;
 
-        public Security(IRecDbContext db)
+        public Security(IAppDbContext db)
         {
             this.db = db;
         }

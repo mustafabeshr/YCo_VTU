@@ -2,16 +2,22 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using Yvtu.Core.Entities;
+using Yvtu.Infra.Data;
+using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.SMSRec
 {
     partial class DeliverMessage
     {
-        private readonly IRecDbContext db;
+        private readonly IAppDbContext db;
+        private readonly IPartnerManager partnerManager;
+        private readonly IPartnerActivityRepo partnerActivityRepo;
 
-        public DeliverMessage(IRecDbContext db)
+        public DeliverMessage(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             this.db = db;
+            this.partnerManager = partnerManager;
+            this.partnerActivityRepo = partnerActivityRepo;
         }
         // Write your code in this class to process the request ...
         public RequestReturnValue Parse_Request(Delivered_Message ClientMessage, byte queueNo, out PartnerRequest parsedRequest)
@@ -105,8 +111,9 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 2;
                             return ret;
                         }
-                        var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
-                        if (partner == null)
+                        var partnerResult = partnerManager.Validate(ClientMessage.Mobile_No);
+                        
+                        if (!partnerResult.Success)
                         {
                             ret.Ret_ID = -1;
                             ret.Ret_Message = "Not_Found";
@@ -115,6 +122,7 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 2;
                             return ret;
                         }
+                        var partner = partnerResult.Partner;
                         if (partner.Balance < double.Parse(Tokens[1]))
                         {
                             ret.Ret_ID = -1;
@@ -124,8 +132,8 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 2;
                             return ret;
                         }
-                        var targetPartner = new Repo.PartnerManager(db).GetActivePartner(Tokens[2]);
-                        if (targetPartner == null)
+                        var targetPartnerResult = partnerManager.Validate(Tokens[2]);
+                        if (!targetPartnerResult.Success)
                         {
                             ret.Ret_ID = -1;
                             ret.Ret_Message = "Another_Partner_Not_Found";
@@ -134,7 +142,8 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 2;
                             return ret;
                         }
-                        var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Money.Transfer", partner.Role.Id, targetPartner.Role.Id);
+                        var targetPartner = targetPartnerResult.Partner;
+                        var permission = partnerActivityRepo.GetPartAct("Money.Transfer", partner.Role.Id, targetPartner.Role.Id);
                         if (permission == null)
                         {
                             ret.Ret_ID = -1;
@@ -174,7 +183,7 @@ namespace Yvtu.SMSRec
                         #region Client weather authonticated or not  
                         if (partner.Status.Id == 1)
                         {
-                            var isCorrectPass = new Repo.PartnerManager(db).CheckPass(partner, Tokens[3]);
+                            var isCorrectPass = partnerManager.CheckPass(partner, Tokens[3]);
                             if (isCorrectPass)
                             {
                                 #region Do Money Transfer
@@ -191,7 +200,7 @@ namespace Yvtu.SMSRec
                                 //moneyTransfer.RequestNo = "0";
                                 moneyTransfer.RequestAmount = double.Parse(Tokens[1]);
                                 //moneyTransfer.Note = "";
-                                var result = new Repo.MoneyTransferRepo(db).Create(moneyTransfer);
+                                var result = new MoneyTransferRepo(db, partnerManager, partnerActivityRepo).Create(moneyTransfer);
                                 if (result.Success)
                                 {
                                     ret.Ret_ID = result.AffectedCount;
@@ -296,8 +305,9 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 3;
                             return ret;
                         }
-                        var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
-                        if (partner == null)
+                        var partnerResult = partnerManager.Validate(ClientMessage.Mobile_No);
+                        
+                        if (!partnerResult.Success)
                         {
                             ret.Ret_ID = -1;
                             ret.Ret_Message = "Not_Found";
@@ -306,7 +316,8 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 3;
                             return ret;
                         }
-                        var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Balance.Query", partner.Role.Id);
+                        var partner = partnerResult.Partner;
+                        var permission = partnerActivityRepo.GetPartAct("Balance.Query", partner.Role.Id);
                         if (permission == null)
                         {
                             ret.Ret_ID = -1;
@@ -316,7 +327,7 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 3;
                             return ret;
                         }
-                        var isCorrectPass = new Repo.PartnerManager(db).CheckPass(partner, Tokens[1]);
+                        var isCorrectPass = partnerManager.CheckPass(partner, Tokens[1]);
                         if (isCorrectPass)
                         {
                             var balance = partner.Balance - (partner.Reserved < 0 ? 0 : partner.Reserved);
@@ -330,7 +341,7 @@ namespace Yvtu.SMSRec
                             parsedRequest.ReplayDesc = "رصيد الشاحن الفوري هو " + balance.ToString("N0");
 
 
-                            var result = new Repo.OutSMSRepo(db).Create(new SMSOut
+                            var result = new OutSMSRepo(db).Create(new SMSOut
                             {
                                 Receiver = parsedRequest.MobileNo,
                                 Message = "رصيد الشاحن الفوري الخاص بك هو " + balance.ToString("N0")
@@ -389,8 +400,9 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 1;
                             return ret;
                         }
-                        var partner = new Repo.PartnerManager(db).GetActivePartner(ClientMessage.Mobile_No);
-                        if (partner == null)
+                        var partnerResult = partnerManager.Validate(ClientMessage.Mobile_No);
+                        
+                        if (!partnerResult.Success)
                         {
                             ret.Ret_ID = -1;
                             ret.Ret_Message = "Not_Found";
@@ -399,6 +411,7 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 1;
                             return ret;
                         }
+                        var partner = partnerResult.Partner;
                         if (partner.Balance < double.Parse(Tokens[0]))
                         {
                             ret.Ret_ID = -1;
@@ -408,7 +421,7 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 1;
                             return ret;
                         }
-                        var permission = new Repo.PartnerActivityRepo(db).GetPartAct("Recharge.Create", partner.Role.Id, 9);
+                        var permission = partnerActivityRepo.GetPartAct("Recharge.Create", partner.Role.Id, 9);
                         if (permission == null)
                         {
                             ret.Ret_ID = -1;
@@ -448,7 +461,7 @@ namespace Yvtu.SMSRec
                         #region Client weather authonticated or not  
                         if (partner.Status.Id == 1)
                         {
-                            var isCorrectPass = new Repo.PartnerManager(db).CheckPass(partner, Tokens[2]);
+                            var isCorrectPass = partnerManager.CheckPass(partner, Tokens[2]);
                             if (isCorrectPass)
                             {
                                 #region Do Queue Recharge Request
@@ -458,7 +471,7 @@ namespace Yvtu.SMSRec
                                 recharge.PointOfSale = partner;
                                 recharge.QueueNo = queueNo > 0 ? queueNo : 1;
                                 recharge.AccessChannel.Id = "sms";
-                                var result = new Repo.RechargeCollectionRepo(db).Create(recharge);
+                                var result = new RechargeRepo(db, partnerManager).Create(recharge);
                                 if (result.Success)
                                 {
                                     ret.Ret_ID = result.AffectedCount;

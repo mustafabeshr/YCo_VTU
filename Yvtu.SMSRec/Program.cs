@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Yvtu.Infra.Data;
+using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.SMSRec
 {
@@ -45,7 +47,9 @@ namespace Yvtu.SMSRec
         private static void ConfigureServices(IConfiguration configuration,
             IServiceCollection services)
         {
-            services.AddSingleton<IRecDbContext, RecDbContext>();
+            services.AddSingleton<IAppDbContext, AppDbContext>();
+            services.AddScoped<IPartnerManager, PartnerManager>();
+            services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
             services.AddSingleton<frm_Parent>();
         }
         

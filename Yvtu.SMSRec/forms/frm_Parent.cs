@@ -10,9 +10,9 @@ namespace Yvtu.SMSRec
         private byte childFormNumber = 0;
         private bool collapseSharedParamPanel = false;
 
-        public IRecDbContext Db { get; }
+        public IAppDbContext Db { get; }
 
-        public frm_Parent(IRecDbContext db)
+        public frm_Parent(IAppDbContext db)
         {
             InitializeComponent();
             Db = db;
