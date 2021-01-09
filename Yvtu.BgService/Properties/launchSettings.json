@@ -1,0 +1,10 @@
+﻿{
+  "profiles": {
+    "Yvtu.BgService": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

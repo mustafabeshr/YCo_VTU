@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 07/01/2021, 21:47:45 21:47:45  --
+-- Created by mbeshr on 09/01/2021, 21:50:16 21:50:16  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202101072147.log
+spool ora_vtu_struc_202101092149.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -1636,7 +1636,6 @@ function fn_ResetPassword(
       v_status        bg_service.status%type       ,
       v_status_time   bg_service.status_time%type  ,
       v_duration_sec  bg_service.duration_sec%type    ,
-       v_active_time     bg_service.active_time%type  ,
        v_file_size    bg_service.file_size%type
      ) return number;
      
@@ -1644,6 +1643,11 @@ function fn_ResetPassword(
    v_bg_id         bg_service.bg_id%type,
    v_actual_start_time         bg_service.actual_start_time%type
    ) return number;
+   
+   function fn_bgService_processing_start (
+     v_bg_id         bg_service.bg_id%type,
+     v_setActualTime  number
+ ) return number;
 end pk_infra;
 /
 
@@ -2378,7 +2382,22 @@ begin
       if (v_pos_bal < v_CollectionRow.Amount) then
     begin
         -- balance not enough
-        return -501;
+        if (v_status = 1) then
+          begin
+             update collection
+              set 
+               pos_bal = v_pos_bal,
+               status = 3,
+               status_time = sysdate,
+               ref_no = v_ref_no,
+               ref_message = v_ref_message,
+               ref_time = v_ref_time,
+               ref_trans_no = v_ref_trans_no,
+               debug_info = '-501-balance not enough'
+                where cl_id = v_cl_id; 
+                 return -501;
+          end;    
+          end if;       
     end;
   end if;
   
@@ -3123,7 +3142,6 @@ function fn_ResetPassword(
       v_status        bg_service.status%type       ,
       v_status_time   bg_service.status_time%type  ,
       v_duration_sec  bg_service.duration_sec%type ,
-       v_active_time     bg_service.active_time%type  ,
        v_file_size    bg_service.file_size%type   
      ) return number is
      begin
@@ -3134,7 +3152,6 @@ function fn_ResetPassword(
                status = v_status,
                status_time = v_status_time,
                duration_sec = v_duration_sec,
-               active_time = v_active_time,
                file_size = v_file_size
          where bg_id = v_bg_id;
         return 1;
@@ -3146,6 +3163,38 @@ function fn_ResetPassword(
                  v_exp_object => 'bgService');
          return SQLCODE;   
      end;
+     
+  function fn_bgService_processing_start (
+     v_bg_id         bg_service.bg_id%type,
+     v_setActualTime  number
+ ) return number is
+ begin
+   if (v_setActualTime = 1) then
+     begin
+       update bg_service
+       set status = 'processing',
+       status_time = sysdate,
+       actual_start_time = sysdate
+        where bg_id = v_bg_id;
+     end;
+  else 
+    begin
+      update bg_service
+       set status = 'processing',
+       status_time = sysdate
+        where bg_id = v_bg_id;
+    end;
+  end if;
+    return v_setActualTime;
+   EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Update',
+                 v_exp_object => 'bgService_processing_start');
+         return SQLCODE;         
+ end;
+    
  function fn_UpdateBgServActualStartTime (
    v_bg_id         bg_service.bg_id%type,
    v_actual_start_time         bg_service.actual_start_time%type

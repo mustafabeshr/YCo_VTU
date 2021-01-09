@@ -69,6 +69,42 @@ namespace Yvtu.Infra.Data
             }
         }
 
+        public OpertionResult Update(AppBackgroundService obj)
+        {
+
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_bg_id",OracleDbType = OracleDbType.Int32,  Value = obj.Id },
+                 new OracleParameter{ ParameterName = "v_record_count",OracleDbType = OracleDbType.Int32,  Value = obj.RecordCount},
+                 new OracleParameter{ ParameterName = "v_file_name",OracleDbType = OracleDbType.Varchar2,  Value = obj.FileName },
+                 new OracleParameter{ ParameterName = "v_file_location",OracleDbType = OracleDbType.Varchar2,  Value = obj.FileLocation },
+                 new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Varchar2,  Value = obj.Status.Id },
+                 new OracleParameter{ ParameterName = "v_status_time",OracleDbType = OracleDbType.Date,  Value = obj.StatusTime },
+                 new OracleParameter{ ParameterName = "v_duration_sec",OracleDbType = OracleDbType.Int32,  Value = obj.DurationInSec },
+                 new OracleParameter{ ParameterName = "v_file_size",OracleDbType = OracleDbType.Int64,  Value = obj.FileSize }
+                };
+                #endregion
+                db.ExecuteStoredProc("pk_infra.fn_Update_bgService", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                if (result > 0)
+                {
+                    return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
+                }
+                else
+                {
+                    return new OpertionResult { AffectedCount = result, Success = false, Error = string.Empty };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OpertionResult { AffectedCount = -1, Success = false, Error = ex.Message };
+            }
+        }
+
         public async Task<List<AppBackgroundService>> GetBackgroundServicesAsync(BackgroundServiceListParam param)
         {
             #region Parameters
@@ -151,6 +187,24 @@ namespace Yvtu.Infra.Data
             }
             return results;
         }
+
+        public async Task<Queue<AppBackgroundService>> GetBackgroundServicesAsync(string whereClause, List<OracleParameter> parameters)
+        {
+            string strSql = $"select * from v_bg_service {whereClause} order by bg_id";
+            DataTable masterDataTable;
+            masterDataTable = await db.GetDataAsync(strSql, parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new Queue<AppBackgroundService>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToAppBackgroundService(row);
+                results.Enqueue(obj);
+            }
+            return results;
+        }
         public async Task<AppBackgroundService> GetBackgroundServiceAsync(int id)
         {
             #region Parameters
@@ -205,6 +259,27 @@ namespace Yvtu.Infra.Data
             obj.FileSize = row["file_size"] == DBNull.Value ? 0 : Int64.Parse(row["file_size"].ToString());
             obj.ActualStartTime = row["actual_start_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["actual_start_time"].ToString());
             return obj;
+        }
+
+        public async Task<bool> StartProcessingAsync(int id, bool setActualTime)
+        {
+            try
+            {
+                #region Parameters
+                    var parameters = new List<OracleParameter> {
+                     new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                     new OracleParameter{ ParameterName = "v_bg_id",OracleDbType = OracleDbType.Int32,  Value = id },
+                     new OracleParameter{ ParameterName = "v_setActualTime",OracleDbType = OracleDbType.Int32,  Value = setActualTime ? 1 : 0 }
+                    };
+                #endregion
+                await db.ExecuteStoredProcAsync("pk_infra.fn_bgService_processing_start", parameters);
+                var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+                return result > 0;
+            }
+            catch (Exception exp)
+            {
+                throw;
+            }
         }
     }
 }

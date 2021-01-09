@@ -21,7 +21,7 @@ namespace Yvtu.Infra.Data
             var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "SettCode", OracleDbType = OracleDbType.Varchar2,  Value = code },
             };
-            var globalDataTable = this.db.GetData("Select * from GLOGALSETTINGS where act_id = :SettCode", parameters);
+            var globalDataTable = this.db.GetData("Select * from GLOGALSETTINGS where sett_code = :SettCode", parameters);
             var globalSetting = new AppGlobalSettings();
             if (globalDataTable != null)
             {

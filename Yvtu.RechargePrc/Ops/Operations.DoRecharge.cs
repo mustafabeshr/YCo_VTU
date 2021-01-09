@@ -31,6 +31,48 @@ namespace Yvtu.RechargePrc.Ops
                 ResultDesc = "Exception has been occured"
             };
             var watch = System.Diagnostics.Stopwatch.StartNew();
+            // Start Send Request -------------------------------
+            //using (var bankClient = new HWSer.BankMgrService())
+            //{
+            //    var payRequest = new HWSer.PaymentRequest();
+            //    var payRequestResultMessage = new HWSer.PaymentRequestMessage();
+            //    var session = new HWSer.SessionEntityType();
+            //    var requestHeader = new HWSer.RequestHeader();
+
+            //    bankClient.Timeout = 180000;
+            //    session.AgentCode = "OmanEchs";
+            //    session.Password = "OA@e95";
+
+            //    //requestHeader.CommandId = "123456";
+            //    requestHeader.Version = "1";
+            //    requestHeader.TransactionId = recharge.Id;
+            //    requestHeader.SessionEntity = session;
+
+            //    payRequest.SubscriberNo = mobile;
+            //    payRequest.PaymentAmt = amount * 100;
+            //    payRequestResultMessage.PaymentRequest = payRequest;
+            //    payRequestResultMessage.RequestHeader = requestHeader;
+
+            //    bankClient.Url = "http://10.76.34.50:7080/BANK/BankInterface";
+            try
+            {
+                //    var requestResult = await Task.Run(() => bankClient.Payment(payRequestResultMessage));
+                //    if (requestResult != null)
+                //    {
+
+                //    }
+                //    else
+                //    {
+
+                //    }
+            }
+            catch (Exception ex)
+            {
+                result.ResultCode = -1000;
+                result.ResultDesc = ex.GetType().Name + "-" +ex.Message;
+            }
+            //}
+            // End Send Request -------------------------------
             //await HTTPClientWrapper<RechargeResponseDto>.Get("");
             watch.Stop();
             double elapsedMs = watch.ElapsedMilliseconds;

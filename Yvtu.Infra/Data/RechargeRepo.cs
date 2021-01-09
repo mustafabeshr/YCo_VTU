@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data.Interfaces;
@@ -222,6 +223,44 @@ namespace Yvtu.Infra.Data
                 obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["ref_time"].ToString());
                 obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
                 results.Enqueue(obj);
+            }
+            return results;
+        }
+        public async Task<List<RechargeCollection>> GetCollectionsAsync(string whereClause, List<OracleParameter> parameters)
+        {
+            string strSql = $"select * from V_COLLECTION {whereClause} order by cl_id";
+            DataTable masterDataTable;
+            masterDataTable = await db.GetDataAsync(strSql, parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new List<RechargeCollection>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = new RechargeCollection();
+                obj.Id = row["cl_id"] == DBNull.Value ? 0 : int.Parse(row["cl_id"].ToString());
+                obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                obj.SubscriberNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
+                obj.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+                obj.PointOfSale.Id = row["pos_id"] == DBNull.Value ? string.Empty : row["pos_id"].ToString();
+                obj.PointOfSale.Account = row["pos_acc"] == DBNull.Value ? 0 :int.Parse(row["pos_acc"].ToString());
+                obj.PointOfSale.Balance = row["pos_bal"] == DBNull.Value ? 0 : double.Parse(row["pos_bal"].ToString());
+                obj.PointOfSale.Name = row["pos_name"] == DBNull.Value ? string.Empty : row["pos_name"].ToString();
+                obj.PointOfSale.Role.Id = row["pos_role_id"] == DBNull.Value ? 0 : int.Parse(row["pos_role_id"].ToString());
+                obj.PointOfSale.Role.Name = row["pos_role_name"] == DBNull.Value ? string.Empty : row["pos_role_name"].ToString();
+                obj.AccessChannel.Id = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
+                obj.AccessChannel.Name = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
+                obj.Status.Id = row["status"] == DBNull.Value ? 0 : int.Parse(row["status"].ToString());
+                obj.Status.Name = row["status_name"] == DBNull.Value ? string.Empty : row["status_name"].ToString();
+                obj.StatusTime = row["status_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["status_time"].ToString());
+                obj.QueueNo = row["queue_no"] == DBNull.Value ? 0 : int.Parse(row["queue_no"].ToString());
+                obj.RefNo = row["ref_no"] == DBNull.Value ? string.Empty : row["ref_no"].ToString();
+                obj.RefMessage = row["ref_message"] == DBNull.Value ? string.Empty : row["ref_message"].ToString();
+                obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
+                obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
+                obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+                results.Add(obj);
             }
             return results;
         }
