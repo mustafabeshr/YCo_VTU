@@ -360,5 +360,54 @@ namespace Yvtu.Infra.Data
             }
             return results;
         }
+
+        public async Task<List<ToExcelSchema.MoneyTransfer>> GetMoneyTransferForExcelAsync(string whereClause, List<OracleParameter> parameters)
+        {
+            string strSql = $"select * from V_MONEY_TRANSFER {whereClause} order by trans_id";
+            DataTable masterDataTable;
+            masterDataTable = await db.GetDataAsync(strSql, parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new List<ToExcelSchema.MoneyTransfer>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = new ToExcelSchema.MoneyTransfer();
+                obj.Id = row["trans_id"] == DBNull.Value ? -1 : int.Parse(row["trans_id"].ToString());
+                obj.PartnerId = row["part_id"] == DBNull.Value ? string.Empty : row["part_id"].ToString();
+                obj.PartnerName = row["part_name"] == DBNull.Value ? string.Empty : row["part_name"].ToString();
+                obj.RoleName = row["part_role_name"] == DBNull.Value ? string.Empty : row["part_role_name"].ToString();
+                obj.PartnerAccount = row["part_acc"] == DBNull.Value ? -1 : int.Parse(row["part_acc"].ToString());
+                obj.PartnerBalance = row["part_bal"] == DBNull.Value ? 0 : double.Parse(row["part_bal"].ToString());
+                obj.PayType = row["pay_type_name"] == DBNull.Value ? string.Empty : row["pay_type_name"].ToString();
+                obj.PayNo = row["pay_no"] == DBNull.Value ? string.Empty : row["pay_no"].ToString();
+                obj.PayDate = row["pay_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["pay_date"].ToString());
+                obj.PayBank = row["bank_name"] == DBNull.Value ? string.Empty : row["bank_name"].ToString();
+                obj.CreatedBy = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+                obj.CreatedByName = row["creator_name"] == DBNull.Value ? string.Empty : row["creator_name"].ToString();
+                obj.CreatedByRoleName = row["creator_role_name"] == DBNull.Value ? string.Empty : row["creator_role_name"].ToString();
+                obj.CreatedByBalance = row["creator_bal"] == DBNull.Value ? 0 : double.Parse(row["creator_bal"].ToString());
+                obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+                obj.AccessChannel = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
+                obj.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+                obj.TaxPercent = row["tax_per"] == DBNull.Value ? 0 : double.Parse(row["tax_per"].ToString());
+                obj.TaxAmount = row["tax_amt"] == DBNull.Value ? 0 : double.Parse(row["tax_amt"].ToString());
+                obj.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+                obj.BounsAmount = row["bonus_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_amt"].ToString());
+                obj.BounsTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+                obj.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
+                obj.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
+                obj.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
+                obj.RequestAmount = row["request_amt"] == DBNull.Value ? 0 : double.Parse(row["request_amt"].ToString());
+                obj.BillNo = row["bill_no"] == DBNull.Value ? string.Empty : row["bill_no"].ToString();
+                obj.RequestNo = row["request_no"] == DBNull.Value ? string.Empty : row["request_no"].ToString();
+                obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
+                obj.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
+                obj.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+                results.Add(obj);
+            }
+            return results;
+        }
     }
 }

@@ -16,6 +16,7 @@
 
 <form method="post">
     <div class="row shadow-lg bg-white pb-3 pt-3">
+
         <div class="col-md-2">
             <input id="txtId" asp-for="Id" class="form-control text-center" placeholder="الرقم">
         </div>
@@ -102,14 +103,15 @@
                     @item.Name
                 </div>
                 <div class="col-md-1 text-center">
-                    @{ 
+                    @{
                         var bgColor = string.Empty;
                         var fgColor = string.Empty;
                         if (@item.Status.Id == "pending")
                         {
                             bgColor = "purple";
                             fgColor = "white";
-                        } else if (@item.Status.Id == "processing")
+                        }
+                        else if (@item.Status.Id == "processing")
                         {
                             bgColor = "yellow";
                             fgColor = "black";
@@ -124,7 +126,7 @@
                             bgColor = "#ed045d";
                             fgColor = "white";
                         }
-                        else 
+                        else
                         {
                             bgColor = "purple";
                             fgColor = "white";
@@ -165,6 +167,18 @@
                 </div>
                 <div class="col-md-4 text-right">
                     <span style="padding:4px;">@item.StartDate.ToString("yyyy/MM/dd")</span>  &hArr;<span style="padding:4px;">@item.EndDate.ToString("yyyy/MM/dd")</span>
+                    <span id="deleteConfirmSpan_@item.Id" style="display:none;">
+                        <br />
+                        <span style="color:red;">هل انت متاكد من الحذف؟</span>
+                        <a asp-action="Delete" asp-controller="Bgserv" asp-route-id="@Model.Id" class="btn btn_link" style="font-size:12px;color:red; width:10px;">نعم</a>
+                        <a href="#" class="btn btn_link" onclick="confirmDelete(@item.Id, false)" style="font-size:12px;color:black; width:10px;">لا</a>
+                    </span>
+                    @if(item.Status.Id != "processing" && item.Status.Id != "closed")
+                    {
+                        <span id="deleteSpan_@item.Id" class="float-left">
+                            <a href="#" onclick="confirmDelete(@item.Id,true)" data-toggle="tooltip" data-placement="top" title="حذف"><i class="far fa-trash-alt  text-danger"></i></a>
+                        </span>
+                    }
                 </div>
             </div>
             <div class="row container-fluid">
@@ -179,7 +193,8 @@
                         @if (!string.IsNullOrEmpty(item.FileName))
                         {
                             <a asp-action="download" asp-route-id="@item.Id" style="font-size:15px">
-                            <i class="fas fa-file-excel" style="color:green;"></i>&nbsp;@item.FileName</a>
+                                <i class="fas fa-file-excel" style="color:green;"></i>&nbsp;@item.FileName
+                            </a>
                         }
                     </div>
                 </div>
@@ -188,7 +203,7 @@
                         <span style="font-size:11px;color:blue;">الحجم :</span>
                         @if (!string.IsNullOrEmpty(item.FileName))
                         {
-                          @item.FileSizeFormat
+                            @item.FileSizeFormat
                         }
                     </div>
                 </div>
@@ -221,5 +236,18 @@
             $("#txtStartDate").prop('disabled', true);
             $("#txtEndDate").prop('disabled', true);
         }
+        function confirmDelete(id,isDeleteClicked) {
+            var deleteSpan = 'deleteSpan_'+id;
+            var confirmDeleteSpan = 'deleteConfirmSpan_'+ id;
+
+            if (isDeleteClicked) {
+                $('#' + deleteSpan).hide();
+                $('#' + confirmDeleteSpan).show();
+            } else {
+                $('#' + deleteSpan).show();
+                $('#' + confirmDeleteSpan).hide();
+            }
+        }
+
     </script>
 }

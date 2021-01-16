@@ -92,20 +92,24 @@ button.accept-policy {
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
+   
 }
 
 body {
     /* Margin bottom by footer height */
+    background-image:url("/images/bg1.webp");
+    
     margin-bottom: 60px;
     direction: rtl;
     text-align: right;
     font-family: 'DroidKufi-Normal';
-    background: #ece2ff; /* #dcdcdc fallback for old browsers */
+    /*background: White;*/ /*#ece2ff;*/ /* #dcdcdc fallback for old browsers */
     /*background: -webkit-linear-gradient(to top, #c31432, #240b36);*/ /* Chrome 10-25, Safari 5.1-6 */
     /*background: linear-gradient(to top, #c31432, #240b36);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 }
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -129,10 +133,10 @@ body {
 }
 
 .LoginBox {
-    border: solid 1px #e8e1e1;
+    border: solid 1px #474747;
     padding: 30px 30px 70px 30px;
     height: 100%;
-    /*border-radius: 15px;*/
+    border-radius: 15px;
     background-color: white;
 }
 .MainLink {

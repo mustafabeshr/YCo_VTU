@@ -149,7 +149,7 @@ namespace Yvtu.Infra.Data
 
                 if (!string.IsNullOrEmpty(param.Name))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " AND name LIKE '%' || :Name || '%' " : " WHERE name LIKE '%' || :Name || '%' ");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND service_name LIKE '%' || :Name || '%' " : " WHERE service_name LIKE '%' || :Name || '%' ");
                     var p = new OracleParameter { ParameterName = "Name", OracleDbType = OracleDbType.Varchar2, Value = param.Name };
                     parameters.Add(p);
                 }

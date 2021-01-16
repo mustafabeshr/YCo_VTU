@@ -17,4 +17,8 @@
     <ProjectReference Include="..\Yvtu.SMSRec\Yvtu.SMSRec.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\bgServiceFiles\" />
+  </ItemGroup>
+
 </Project>

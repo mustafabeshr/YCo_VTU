@@ -6,7 +6,7 @@ namespace Yvtu.Core.Utility
 {
     public static class ServicesLib
     {
-        public static string ConvertToTimeFormatter(int value)
+        public static string ConvertToTimeFormatter(double value)
         {
             TimeSpan time = TimeSpan.FromSeconds(value);
             return time.ToString(@"hh\:mm\:ss");

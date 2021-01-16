@@ -32,19 +32,20 @@ namespace Yvtu.BgService
                     if (appBuffer != null && appBuffer.Count > 0)
                     {
                         var obj = appBuffer.Dequeue();
-                        if (obj.Source.Id == "collection")
-                        {
-                            _logger.LogInformation("before Recharge Collection Called", appBuffer.Count);
+                         _logger.LogInformation("before Recharge Collection Called", appBuffer.Count);
                             await new ExportRechargeCollections(db, obj, fileLocation).ExportAsync();
                             _logger.LogInformation("after Recharge Collection Called", appBuffer.Count);
-                        }
+                        
                     }
                     else
                     {
-                        appBuffer = await new AppBackgroundServiceRepo(db).GetBackgroundServicesAsync(" WHERE status = 'pending' ", null);
+                        appBuffer = await new AppBackgroundServiceRepo(db).GetBackgroundServicesAsync(" WHERE status = 'pending' and sysdate > active_time ", null);
+                        if (appBuffer == null)
+                        {
+                            Thread.Sleep(TimeSpan.FromSeconds(5));
+                        }
                         _logger.LogInformation("Fill Buffer {0}", appBuffer?.Count);
                     }
-                    var t = await db.GetDataAsync("select * from IDTYPES", null);
                     _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
                     await Task.Delay(1000, stoppingToken);
                 }

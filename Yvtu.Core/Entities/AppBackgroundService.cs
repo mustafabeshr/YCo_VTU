@@ -29,9 +29,9 @@ namespace Yvtu.Core.Entities
         public DateTime StatusTime { get; set; }
         public DateTime ActiveTime { get; set; }
         public DateTime ActualStartTime { get; set; }
-        public int DurationInSec { get; set; }
+        public double DurationInSec { get; set; }
         public string DurationTime { get {
-                if (this.DurationInSec == 0 && (this.ActualStartTime != null && this.ActualStartTime > DateTime.MinValue))
+                if (this.Status.Id == "processing" && this.DurationInSec == 0 && (this.ActualStartTime != null && this.ActualStartTime > DateTime.MinValue))
                 {
                     var duration = Convert.ToInt32(DateTime.Now.Subtract(this.ActualStartTime).TotalSeconds);
                     return ServicesLib.ConvertToTimeFormatter(duration);

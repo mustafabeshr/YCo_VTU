@@ -21,7 +21,7 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow" style="min-height:100px;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark  border-bottom box-shadow" style="min-height:100px;background-color:#f3f1f1">
             <div class="container">
                 <a asp-action="Index" asp-controller="Home" class="brand-link" style="text-decoration: none;font-size:18px;">
                     <img src="~/images/Y-Logo2.png" alt="YCo Logo" class="brand-image" width="70" height="70" style="opacity: .8">
@@ -38,7 +38,7 @@
 
                     </div>*@
 
-                <div class="float-left" style="font-size:12px; border-right:solid 1px #a7a7a7;">
+                <div class="float-left" style="font-size:12px; border-right:solid 1px #e9e5e5;">
                     <div style="display:block;font-size:20px;font-weight:bold;text-align:center;padding-right:40px;color:gray;">
                         @if (this.User.Identity.IsAuthenticated)
                         {
@@ -59,8 +59,8 @@
                             <div style="display:inline-flex">
                                 <ul class="navbar-nav flex-grow-1">
                                     <li class="nav-item dropdown">
-                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#"
-                                           role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i>&nbsp;&nbsp;@User.Identity.Name</a>
+                                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" style="color:gray;"
+                                           role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" style="color:gray;"></i>&nbsp;&nbsp;@User.Identity.Name</a>
 
                                         <div class="dropdown-menu text-right" style="font-size:12px;">
 
@@ -88,7 +88,7 @@
                         }
                         else
                         {
-                            <a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>
+                            @*<a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>*@
                         }
                     </div>
                 </div>
