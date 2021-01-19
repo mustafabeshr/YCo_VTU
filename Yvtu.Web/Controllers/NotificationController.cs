@@ -9,6 +9,7 @@ using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
+using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
@@ -31,13 +32,15 @@ namespace Yvtu.Web.Controllers
 
         public IActionResult Index()
         {
-            var model = new NotificationQuery();
+            var model = new SMSOutBackDto();
+            model.StartDate = DateTime.Today.AddMonths(-1);
+            model.EndDate = DateTime.Today;
             return View(model);
         }
         [HttpPost]
-        public IActionResult Index(NotificationQuery model)
+        public IActionResult Index(SMSOutBackDto model)
         {
-            var partner = partnerManager.GetPartnerBasicInfo(model.QPartnerId);
+            var partner = partnerManager.GetPartnerBasicInfo(model.Receiver);
             var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = partnerActivity.GetPartAct("Notification.Query", currentRole);
             if (permission == null)
@@ -58,10 +61,15 @@ namespace Yvtu.Web.Controllers
             }
             else
             { 
-                if (!string.IsNullOrEmpty(model.QPartnerId))
-                {
-                    model.Results = new NotificationRepo(db, partnerManager).GetList(model.QPartnerId);
-                }
+                
+                    model.Results = new SMSOutBackRepo(db, partnerManager).GetList(new SMSOutBackRepo.GetListParam
+                    {
+                        Message = model.Message,
+                        Receiver = model.Receiver,
+                        IncludeDates = model.IncludeDates,
+                        StartDate = model.StartDate,
+                        EndDate = model.EndDate
+                    });
             }
 
             return View(model);

@@ -99,8 +99,8 @@ html {
 
 body {
     /* Margin bottom by footer height */
-    background-image:url("/images/bg1.webp");
-    
+    /*background-image:url("/images/bg1.webp");*/
+    background-color: #b793db;
     margin-bottom: 60px;
     direction: rtl;
     text-align: right;

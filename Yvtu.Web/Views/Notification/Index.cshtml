@@ -1,4 +1,4 @@
-﻿@model Yvtu.Core.Queries.NotificationQuery
+﻿@model Yvtu.Web.Dto.SMSOutBackDto
 
 
 @{
@@ -16,56 +16,98 @@
 </div>
 
 <form method="post" asp-action="Index" asp-controller="Notification">
-    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
-            <div class="col-sm-1">
-                <label class="col-sm-2 col-form-label FormLabel">الرقم:</label>
-            </div>
-            <div class="col-sm-9">
-                <input asp-for="QPartnerId" class="form-control text-center">
-            </div>
+    <div class="row  shadow-lg  p-3 bg-white">
         <div class="col-sm-2">
-            
-                <button id="btnSave" type="submit" class="btn btn-outline-success">
-                    <i class="fa fa-search"></i>
-                </button>
+            <input asp-for="Receiver" class="form-control text-center" placeholder="رقم النقطة">
         </div>
-
+        <div class="col-sm-4">
+            <input asp-for="Message" class="form-control text-center"  placeholder="نص الرسالة">
+        </div>
+        <div class="col-sm-5">
+            <div class="row mb-3 text-center" id="PeriodDiv">
+                <div class="col-sm-1 text-center">
+                    <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
+                </div>
+                <div class="col-sm-5">
+                    <input id="txtStartDate" asp-for="StartDate"  min="2020-11-01"  class="form-control text-center" style="font-size:14px;">
+                </div>
+                <div class="col-sm-5">
+                    <input id="txtEndDate" asp-for="EndDate"  min="2020-11-01"  class="form-control text-center" style="font-size:14px;">
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-1">
+            <button id="btnSave" type="submit" class="btn btn-outline-success">
+                <i class="fa fa-search"></i>
+            </button>
+        </div>
     </div>
 </form>
 
 @if (Model != null && Model.Results != null && Model.Results.Count > 0)
 {
-    <div class="row shadow-sm p-1 bg-white">
+<div class="row shadow-sm p-1 bg-white">
+    <span class="float-right p-2" 
+          style="font-size:15px;border:1px solid none;position:absolute;right:200px;top:266px;background-color:#F3F1F1;width:60px;text-align:center;"
+          >@Model.Results.Count.ToString("N0")</span>
+    <table class="table table-hover text-center">
+        <thead>
+            <tr style="font-size:11px;">
+                <th style="vertical-align: middle;">الرسالة</th>
+                <th style="vertical-align: middle;">الرقم</th>
+                <th style="vertical-align: middle;">انشاء في</th>
+                <th style="vertical-align: middle;">المرسل</th>
+                <th style="vertical-align: middle;">تم الارسال في</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Results)
+            {
+                <tr style="font-size:13px;">
+                    <td style="text-align:right;">@item.Message</td>
+                    <td>@item.Receiver</td>
+                    <td>
+                        @item.CreatedOn.ToString("yyyy/MM/dd")<br />
+                        @item.CreatedOn.ToString("ss:mm:H")
+                    </td>
+                    <td>@item.Sender</td>
+                    @if (!item.BackedOn.Equals(DateTime.MinValue))
+                    {
+                        <td>
+                            @item.BackedOn.ToString("yyyy/MM/dd") <br />
+                            @item.BackedOn.ToString("ss:mm:H")
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="text-muted">انتظار</td>
+                    }
 
-        <table class="table table-hover text-center">
-            <thead>
-                <tr style="font-size:11px;">
-                    <th>الرسالة</th>
-                    <th>الرقم</th>
-                    <th>التاريخ</th>
-                    <th>م</th>
-                    <th>المرجع</th>
-                    <th>الاجراء</th>
-                    <th>اسم النقطة</th>
-                    <th>رقم الحساب</th>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Results)
-                {
-                    <tr style="font-size:12px;">
-                        <td>@item.Message</td>
-                        <td>@item.Partner.Id</td>
-                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
-                        <td>@item.Id</td>
-                        <td>@item.RefNo</td>
-                        <td>@item.Activity.Name</td>
-                        <td>@item.Partner.Name</td>
-                        <td>@item.Partner.Account</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+        </tbody>
+    </table>
+</div>
 }
 
+@section Scripts{
+    <script>
+            $('#chPeriod').change(function () {
+                if ($(this).prop("checked")) {
+                    $("#txtStartDate").prop('disabled', false);
+                    $("#txtEndDate").prop('disabled', false);
+                } else {
+                    $("#txtStartDate").prop('disabled', true);
+                    $("#txtEndDate").prop('disabled', true);
+                }
+            });
+
+        if ($('#chPeriod').prop("checked")) {
+                $("#txtStartDate").prop('disabled', false);
+                $("#txtEndDate").prop('disabled', false);
+            } else {
+                $("#txtStartDate").prop('disabled', true);
+                $("#txtEndDate").prop('disabled', true);
+            }
+    </script>
+}

@@ -18,20 +18,18 @@ namespace Yvtu.Infra.Data
             this.db = db;
             this.partnerManager = partnerManager;
         }
-        public OpertionResult Create(Notification Notify)
+        public OpertionResult Create(SMSOut sms)
         {
             try
             {
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_partner_id",OracleDbType = OracleDbType.Varchar2,  Value = Notify.Partner.Id },
-                 new OracleParameter{ ParameterName = "v_notify_msg",OracleDbType = OracleDbType.Varchar2,  Value = Notify.Message },
-                 new OracleParameter{ ParameterName = "v_act_id",OracleDbType = OracleDbType.Varchar2,  Value = Notify.Activity.Id },
-                 new OracleParameter{ ParameterName = "v_ref_no",OracleDbType = OracleDbType.Int32,  Value = Notify.RefNo }
+                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.Varchar2,  Value = sms.Message },
+                 new OracleParameter{ ParameterName = "v_receiver",OracleDbType = OracleDbType.Varchar2,  Value = sms.Receiver },
                 };
                 #endregion
-                db.ExecuteStoredProc("pk_infra.fn_create_notification", parameters);
+                db.ExecuteStoredProc("pk_infra.fn_createOutSMS", parameters);
                 var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
 
                 if (result > 0)
@@ -97,10 +95,8 @@ namespace Yvtu.Infra.Data
         }
         public void SendNotification<T>(string activityId, int refNo, T data)
         {
-            var notify = new Notification();
             var activity = new ActivityRepo(db, partnerManager).GetActivity(activityId);
-            notify.Activity = activity;
-            var messages = new ActivityMessageRepo(db, partnerManager).GetList(notify.Activity.Id, -1);
+            var messages = new ActivityMessageRepo(db, partnerManager).GetList(activity.Id, -1);
             var toNumber = string.Empty;
             foreach (var m in messages)
             {
@@ -114,10 +110,10 @@ namespace Yvtu.Infra.Data
 
                 if (!string.IsNullOrEmpty(toNumber) && !string.IsNullOrEmpty(readyMsg))
                 {
-                    notify.Partner.Id = toNumber;
-                    notify.Message = readyMsg;
-                    notify.RefNo = refNo;
-                    var result = Create(notify);
+                    var sms = new SMSOut();
+                    sms.Receiver = toNumber;
+                    sms.Message = readyMsg;
+                    var result = Create(sms);
                 }
             }
         }
