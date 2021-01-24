@@ -423,7 +423,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "MasetrRowId", OracleDbType = OracleDbType.Int32,  Value = id },
                  new OracleParameter{ ParameterName = "ToRoleId", OracleDbType = OracleDbType.Int32,  Value = toRoleId }
             };
-            var masterDataTable = this.db.GetData("Select * from v_partner_activity_detail  where master_row=:MasetrRowId and dest_role_id=:ToRoleId order by row_id", parameters);
+            var masterDataTable = this.db.GetData("Select * from v_partner_activity_detail  where master_row=:MasetrRowId and toroleid=:ToRoleId order by row_id", parameters);
 
             var actDetails = new List<PartnerActivityDetail>();
             if (masterDataTable != null)

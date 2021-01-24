@@ -86,52 +86,65 @@ namespace Yvtu.Infra.Data
             return cmd;
         }
 
-        public DataTable GetData(string sql, IEnumerable<OracleParameter> parameters)
+    public DataTable GetData(string sql, IEnumerable<OracleParameter> parameters)
+    {
+        using (var conn = GetConnection("DbConn"))
         {
-            using (var conn = GetConnection("DbConn"))
-            {
-                var cmd = GetCommand(sql, parameters);
-                cmd.Connection = conn;
-                if (conn.State != ConnectionState.Open) conn.Open();
-                var da = new OracleDataAdapter(cmd);
-                var ds = new DataSet();
-                da.Fill(ds);
-                return ds.Tables[0];
-            }
-        }
-
-        private OracleConnection GetConnection(string connectionStringName)
-        {
-            var connString = Configuration.GetConnectionString(connectionStringName);
-            return new OracleConnection(connString);
-        }
-
-        public async Task<int> ExecuteSqlCommandAsync(string sql, IEnumerable<OracleParameter> parameters)
-        {
-            using (var conn = GetConnection("DbConn"))
-            {
-                var cmd = GetCommand(sql, parameters);
-                cmd.Connection = conn;
-                if (conn.State != ConnectionState.Open) conn.Open();
-                return await cmd.ExecuteNonQueryAsync();
-            }
-        }
-
-        public async Task<DataTable> GetDataAsync(string sql, IEnumerable<OracleParameter> parameters)
-        {
-            using (var conn = GetConnection("DbConn"))
-            {
-                var ds = new DataSet();
-                await Task.Run(() =>
-               {
-                   var cmd = GetCommand(sql, parameters);
-                   cmd.Connection = conn;
-                   if (conn.State != ConnectionState.Open) conn.Open();
-                   var da = new OracleDataAdapter(cmd);
-                   da.Fill(ds);
-               });
-              return ds.Tables[0];
-            }
+            var cmd = GetCommand(sql, parameters);
+            cmd.Connection = conn;
+            if (conn.State != ConnectionState.Open) conn.Open();
+            var da = new OracleDataAdapter(cmd);
+            var ds = new DataSet();
+            da.Fill(ds);
+            return ds.Tables[0];
         }
     }
+    public int GetIntScalarValue(string sql, IEnumerable<OracleParameter> parameters)
+    {
+        using (var conn = GetConnection("DbConn"))
+        {
+            var cmd = GetCommand(sql, parameters);
+            cmd.Connection = conn;
+            if (conn.State != ConnectionState.Open) conn.Open();
+            var da = new OracleDataAdapter(cmd);
+            var ds = new DataSet();
+            da.Fill(ds);
+            return ds.Tables[0] == null ? 0 : int.Parse(ds.Tables[0].Rows[0]["val"].ToString());
+        }
+    }
+
+    private OracleConnection GetConnection(string connectionStringName)
+    {
+        var connString = Configuration.GetConnectionString(connectionStringName);
+        return new OracleConnection(connString);
+    }
+
+    public async Task<int> ExecuteSqlCommandAsync(string sql, IEnumerable<OracleParameter> parameters)
+    {
+        using (var conn = GetConnection("DbConn"))
+        {
+            var cmd = GetCommand(sql, parameters);
+            cmd.Connection = conn;
+            if (conn.State != ConnectionState.Open) conn.Open();
+            return await cmd.ExecuteNonQueryAsync();
+        }
+    }
+
+    public async Task<DataTable> GetDataAsync(string sql, IEnumerable<OracleParameter> parameters)
+    {
+        using (var conn = GetConnection("DbConn"))
+        {
+            var ds = new DataSet();
+            await Task.Run(() =>
+           {
+               var cmd = GetCommand(sql, parameters);
+               cmd.Connection = conn;
+               if (conn.State != ConnectionState.Open) conn.Open();
+               var da = new OracleDataAdapter(cmd);
+               da.Fill(ds);
+           });
+            return ds.Tables[0];
+        }
+    }
+}
 }

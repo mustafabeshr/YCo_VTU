@@ -94,35 +94,52 @@ namespace Yvtu.Infra.Data
             var results = new List<RechargeQueryResult>();
             foreach (DataRow row in masterDataTable.Rows)
             {
-                var obj = new RechargeQueryResult();
-                obj.Id = row["cl_id"] == DBNull.Value ? -1 : int.Parse(row["cl_id"].ToString());
-                obj.SubsNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
-                obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
-                obj.SubsNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
-                obj.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
-                obj.POSId = row["pos_id"] == DBNull.Value ? string.Empty : row["pos_id"].ToString();
-                obj.POSAccount = row["pos_acc"] == DBNull.Value ? 0 :int.Parse(row["pos_acc"].ToString());
-                obj.POSBalance = row["pos_bal"] == DBNull.Value ? 0 :double.Parse(row["pos_bal"].ToString());
-                obj.POSName = row["pos_name"] == DBNull.Value ? string.Empty : row["pos_name"].ToString();
-                obj.POSRoleId = row["pos_role_id"] == DBNull.Value ? 0 :int.Parse(row["pos_role_id"].ToString());
-                obj.POSRoleName = row["pos_role_name"] == DBNull.Value ? string.Empty : row["pos_role_name"].ToString();
-                obj.AccessChannelId = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
-                obj.AccessChannelName = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
-                obj.Status = row["status"] == DBNull.Value ? 0 :int.Parse(row["status"].ToString());
-                obj.StatusName = row["status_name"] == DBNull.Value ? string.Empty : row["status_name"].ToString();
-                obj.StatusOn = row["status_time"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["status_time"].ToString());
-                obj.QueueNo = row["queue_no"] == DBNull.Value ? 0 :int.Parse(row["queue_no"].ToString());
-                obj.RefNo = row["ref_no"] == DBNull.Value ? string.Empty : row["ref_no"].ToString();
-                obj.RefMessage = row["ref_message"] == DBNull.Value ? string.Empty : row["ref_message"].ToString();
-                obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["ref_time"].ToString());
-                obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
-                obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+                var obj = ConvertDataRowToRechargeQueryResult(row);
                 results.Add(obj);
             }
             param.Results = results;
             return param;
         }
+        public RechargeQueryResult GetRecharge(int id)
+        {
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "RechargeId", OracleDbType = OracleDbType.Int32, Value = id };
+            parameters.Add(parm);
+            var masterDataTable = this.db.GetData("Select * from v_collection t WHERE cl_id=:RechargeId", parameters);
 
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            return ConvertDataRowToRechargeQueryResult(masterDataTable.Rows[0]);
+
+        }
+        private RechargeQueryResult ConvertDataRowToRechargeQueryResult(DataRow row)
+        {
+            var obj = new RechargeQueryResult();
+            obj.Id = row["cl_id"] == DBNull.Value ? -1 : int.Parse(row["cl_id"].ToString());
+            obj.SubsNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
+            obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+            obj.SubsNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
+            obj.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+            obj.POSId = row["pos_id"] == DBNull.Value ? string.Empty : row["pos_id"].ToString();
+            obj.POSAccount = row["pos_acc"] == DBNull.Value ? 0 : int.Parse(row["pos_acc"].ToString());
+            obj.POSBalance = row["pos_bal"] == DBNull.Value ? 0 : double.Parse(row["pos_bal"].ToString());
+            obj.POSName = row["pos_name"] == DBNull.Value ? string.Empty : row["pos_name"].ToString();
+            obj.POSRoleId = row["pos_role_id"] == DBNull.Value ? 0 : int.Parse(row["pos_role_id"].ToString());
+            obj.POSRoleName = row["pos_role_name"] == DBNull.Value ? string.Empty : row["pos_role_name"].ToString();
+            obj.AccessChannelId = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
+            obj.AccessChannelName = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
+            obj.Status = row["status"] == DBNull.Value ? 0 : int.Parse(row["status"].ToString());
+            obj.StatusName = row["status_name"] == DBNull.Value ? string.Empty : row["status_name"].ToString();
+            obj.StatusOn = row["status_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["status_time"].ToString());
+            obj.QueueNo = row["queue_no"] == DBNull.Value ? 0 : int.Parse(row["queue_no"].ToString());
+            obj.RefNo = row["ref_no"] == DBNull.Value ? string.Empty : row["ref_no"].ToString();
+            obj.RefMessage = row["ref_message"] == DBNull.Value ? string.Empty : row["ref_message"].ToString();
+            obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
+            obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
+            obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+            return obj;
+        }
         public OpertionResult Create(RechargeCollection rechargeCollection)
         {
 

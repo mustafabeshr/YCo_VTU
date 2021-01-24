@@ -166,6 +166,8 @@ namespace Yvtu.Infra.Data
             string NewValue = Regex.Replace(value, @"/[|!#$%&()=?»«@£§€{};<'>_""]", "");
             return NewValue;
         }
+
+        
     }
 
    public class MonyToString
@@ -369,6 +371,6 @@ namespace Yvtu.Infra.Data
         }
 
     }
-
+    
     
 }

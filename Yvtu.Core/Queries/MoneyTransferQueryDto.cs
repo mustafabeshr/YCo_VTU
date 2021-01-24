@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Yvtu.Core.Entities;
 
 namespace Yvtu.Core.Queries
 {
     public class MoneyTransferQueryDto
     {
+        public MoneyTransferQueryDto()
+        {
+            Paging = new Paging();
+        }
         public int QId { get; set; }
         [StringLength(9)]
         public string QPartnerId { get; set; }
@@ -15,9 +20,7 @@ namespace Yvtu.Core.Queries
         public DateTime QToDate { get; set; }
         public string QListTypeId { get; set; }
         public int QShortItems { get; set; }
-        public int PageNo { get; set; }
-        public int NoPerPage { get; set; }
-        public int TotalPages { get; set; }
+        public Paging  Paging { get; set; }
         public string Error { get; set; }
         public string QScope { get; set; }
         public string QueryUser { get; set; }

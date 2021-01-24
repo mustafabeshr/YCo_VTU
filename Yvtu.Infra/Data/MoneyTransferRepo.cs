@@ -126,7 +126,6 @@ namespace Yvtu.Infra.Data
 
         public MoneyTransferQueryDto MTQuery(MoneyTransferQueryDto param, int count = 200)
         {
-
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
             if (param.QId > 0)
@@ -234,51 +233,197 @@ namespace Yvtu.Infra.Data
             var moneyTransfer = new List<MoneyTransferDetailQueryDto>();
             foreach (DataRow row in masterDataTable.Rows)
             {
-                var obj = new MoneyTransferDetailQueryDto();
-                obj.Seq = row["seq"] == DBNull.Value ? -1 : int.Parse(row["seq"].ToString());
-                obj.Id = row["trans_id"] == DBNull.Value ? -1 : int.Parse(row["trans_id"].ToString());
-                obj.PartnerId = row["part_id"] == DBNull.Value ? string.Empty : row["part_id"].ToString();
-                obj.PartnerName = row["part_name"] == DBNull.Value ? string.Empty : row["part_name"].ToString();
-                obj.PartnerRoleId = row["part_role_id"] == DBNull.Value ? -1 : int.Parse(row["part_role_id"].ToString());
-                obj.PartnerRoleName = row["part_role_name"] == DBNull.Value ? string.Empty : row["part_role_name"].ToString();
-                obj.PartnerAccount = row["part_acc"] == DBNull.Value ? -1 : int.Parse(row["part_acc"].ToString());
-                obj.PartnerBalance = row["part_bal"] == DBNull.Value ? 0 : double.Parse(row["part_bal"].ToString());
-                obj.PayTypeId = row["pay_type"] == DBNull.Value ? string.Empty : row["pay_type"].ToString();
-                obj.PayTypeName = row["pay_type_name"] == DBNull.Value ? string.Empty : row["pay_type_name"].ToString();
-                obj.PayNo = row["pay_no"] == DBNull.Value ? string.Empty : row["pay_no"].ToString();
-                obj.PayDate = row["pay_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["pay_date"].ToString());
-                obj.PayBank = row["bank_name"] == DBNull.Value ? string.Empty : row["bank_name"].ToString();
-                obj.CreatorBy = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
-                obj.CreatorByName = row["creator_name"] == DBNull.Value ? string.Empty : row["creator_name"].ToString();
-                obj.CreatorByRoleId = row["creator_role_id"] == DBNull.Value ? 0 :int.Parse(row["creator_role_id"].ToString());
-                obj.CreatorByRoleName = row["creator_role_name"] == DBNull.Value ? string.Empty : row["creator_role_name"].ToString();
-                obj.CreatorAccount = row["creator_acc"] == DBNull.Value ? -1 : int.Parse(row["creator_acc"].ToString());
-                obj.CreatorBalance = row["creator_bal"] == DBNull.Value ? 0 :double.Parse(row["creator_bal"].ToString());
-                obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["createdon"].ToString());
-                obj.AccessChannelId = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
-                obj.AccessChannelName = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
-                obj.Amount = row["amount"] == DBNull.Value ? 0 :double.Parse(row["amount"].ToString());
-                obj.TaxPercent = row["tax_per"] == DBNull.Value ? 0 : double.Parse(row["tax_per"].ToString());
-                obj.TaxAmount = row["tax_amt"] == DBNull.Value ? 0 : double.Parse(row["tax_amt"].ToString());
-                obj.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-                obj.BounsAmount = row["bonus_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_amt"].ToString());
-                obj.BounsTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
-                obj.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
-                obj.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
-                obj.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
-                obj.RequestAmount = row["request_amt"] == DBNull.Value ? 0 : double.Parse(row["request_amt"].ToString());
-                obj.BillNo = row["bill_no"] == DBNull.Value ? string.Empty : row["bill_no"].ToString();
-                obj.RequestNo = row["request_no"] == DBNull.Value ? string.Empty : row["request_no"].ToString();
-                obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
-                obj.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
-                obj.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+                var obj = ConvertDataRowToDataModel(row);
                 moneyTransfer.Add(obj);
             }
             param.Results = moneyTransfer;
             return param;
         }
 
+        public MoneyTransferQueryDto MTQueryWithPaging(MoneyTransferQueryDto param)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildCriteria(param, ref WhereClause);
 
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from ( ");
+            strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
+            strSqlStatment.Append("Select * from v_money_transfer  " + WhereClause + " order by createdon desc ");
+            strSqlStatment.Append(") main_data ) ");
+            strSqlStatment.Append($"WHERE seq >= ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
+            var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+
+            var moneyTransfer = new List<MoneyTransferDetailQueryDto>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToDataModel(row, true);
+                moneyTransfer.Add(obj);
+            }
+            param.Results = moneyTransfer;
+            
+            return param;
+        }
+
+        private List<OracleParameter> BuildCriteria(MoneyTransferQueryDto param, ref string criteria)
+        {
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            if (param.QId > 0)
+            {
+                var parm = new OracleParameter { ParameterName = "TransId", OracleDbType = OracleDbType.Int32, Value = param.QId };
+                WhereClause.Append(" WHERE trans_id=:TransId ");
+                parameters.Add(parm);
+            }
+            if (!string.IsNullOrEmpty(param.QPartnerId))
+            {
+                if (param.QListTypeId == "all")
+                {
+                    if (param.QScope == "CurOpOnly")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId OR createdby=:PartId "
+                        : " AND part_id=:PartId OR createdby=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else if (param.QScope == "Exclusive")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString())
+                        ? " WHERE (part_id=:PartId OR createdby=:PartId) AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))"
+                        : " AND (part_id=:PartId OR createdby=:PartId)  AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId OR createdby=:PartId "
+                          : " AND part_id=:PartId OR createdby=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
+                        parameters.Add(parm);
+                    }
+                }
+                else if (param.QListTypeId == "debit")
+                {
+                    if (param.QScope == "CurOpOnly")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId "
+                        : " AND part_id=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else if (param.QScope == "Exclusive")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString())
+                        ? " WHERE (part_id=:PartId) AND (exists (select 1 from partner where (partner.partner_id = t.part_id) and partner.ref_partner = '" + param.QueryUser + "'))"
+                        : " AND (part_id=:PartId)  AND (exists (select 1 from partner where (partner.partner_id = t.part_id) and partner.ref_partner = '" + param.QueryUser + "'))");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId " : " AND part_id=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
+                        parameters.Add(parm);
+
+                    }
+                }
+                else if (param.QListTypeId == "credit")
+                {
+                    if (param.QScope == "CurOpOnly")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdby=:PartId "
+                        : " AND createdby=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else if (param.QScope == "Exclusive")
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString())
+                        ? " WHERE (part_id=:PartId) AND (exists (select 1 from partner where (partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))"
+                        : " AND (part_id=:PartId)  AND (exists (select 1 from partner where (partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        parameters.Add(parm);
+                    }
+                    else
+                    {
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdby=:PartId " : " AND createdby=:PartId  ");
+                        var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
+                        parameters.Add(parm);
+                    }
+                }
+               
+            }
+            if (param.QFromDate > DateTime.MinValue && param.QFromDate != null)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate   ");
+                var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.QFromDate };
+                parameters.Add(parm);
+            }
+            if (param.QToDate > DateTime.MinValue && param.QToDate != null)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate   ");
+                var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.QToDate };
+                parameters.Add(parm);
+            }
+            criteria = WhereClause.ToString();
+            return parameters;
+        }
+
+        public int GetCount(MoneyTransferQueryDto param)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildCriteria(param, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from v_money_transfer  { WhereClause }" );
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+
+        private MoneyTransferDetailQueryDto ConvertDataRowToDataModel(DataRow row , bool includeSeq = false)
+        {
+            var dataModel = new MoneyTransferDetailQueryDto();
+            if (includeSeq) dataModel.Seq = row["seq"] == DBNull.Value ? -1 : int.Parse(row["seq"].ToString());
+            dataModel.Id = row["trans_id"] == DBNull.Value ? -1 : int.Parse(row["trans_id"].ToString());
+            dataModel.PartnerId = row["part_id"] == DBNull.Value ? string.Empty : row["part_id"].ToString();
+            dataModel.PartnerName = row["part_name"] == DBNull.Value ? string.Empty : row["part_name"].ToString();
+            dataModel.PartnerRoleId = row["part_role_id"] == DBNull.Value ? -1 : int.Parse(row["part_role_id"].ToString());
+            dataModel.PartnerRoleName = row["part_role_name"] == DBNull.Value ? string.Empty : row["part_role_name"].ToString();
+            dataModel.PartnerAccount = row["part_acc"] == DBNull.Value ? -1 : int.Parse(row["part_acc"].ToString());
+            dataModel.PartnerBalance = row["part_bal"] == DBNull.Value ? 0 : double.Parse(row["part_bal"].ToString());
+            dataModel.PayTypeId = row["pay_type"] == DBNull.Value ? string.Empty : row["pay_type"].ToString();
+            dataModel.PayTypeName = row["pay_type_name"] == DBNull.Value ? string.Empty : row["pay_type_name"].ToString();
+            dataModel.PayNo = row["pay_no"] == DBNull.Value ? string.Empty : row["pay_no"].ToString();
+            dataModel.PayDate = row["pay_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["pay_date"].ToString());
+            dataModel.PayBank = row["bank_name"] == DBNull.Value ? string.Empty : row["bank_name"].ToString();
+            dataModel.CreatorBy = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+            dataModel.CreatorByName = row["creator_name"] == DBNull.Value ? string.Empty : row["creator_name"].ToString();
+            dataModel.CreatorByRoleId = row["creator_role_id"] == DBNull.Value ? 0 : int.Parse(row["creator_role_id"].ToString());
+            dataModel.CreatorByRoleName = row["creator_role_name"] == DBNull.Value ? string.Empty : row["creator_role_name"].ToString();
+            dataModel.CreatorAccount = row["creator_acc"] == DBNull.Value ? -1 : int.Parse(row["creator_acc"].ToString());
+            dataModel.CreatorBalance = row["creator_bal"] == DBNull.Value ? 0 : double.Parse(row["creator_bal"].ToString());
+            dataModel.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+            dataModel.AccessChannelId = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
+            dataModel.AccessChannelName = row["access_channel_name"] == DBNull.Value ? string.Empty : row["access_channel_name"].ToString();
+            dataModel.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+            dataModel.TaxPercent = row["tax_per"] == DBNull.Value ? 0 : double.Parse(row["tax_per"].ToString());
+            dataModel.TaxAmount = row["tax_amt"] == DBNull.Value ? 0 : double.Parse(row["tax_amt"].ToString());
+            dataModel.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+            dataModel.BounsAmount = row["bonus_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_amt"].ToString());
+            dataModel.BounsTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+            dataModel.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
+            dataModel.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
+            dataModel.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
+            dataModel.RequestAmount = row["request_amt"] == DBNull.Value ? 0 : double.Parse(row["request_amt"].ToString());
+            dataModel.BillNo = row["bill_no"] == DBNull.Value ? string.Empty : row["bill_no"].ToString();
+            dataModel.RequestNo = row["request_no"] == DBNull.Value ? string.Empty : row["request_no"].ToString();
+            dataModel.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
+            dataModel.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
+            dataModel.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+            return dataModel;
+        }
         public async Task<List<MoneyTransferRpt>> GetStatReportAsync(MoneyTransferRptQueryParam param)
         {
             #region Parameters

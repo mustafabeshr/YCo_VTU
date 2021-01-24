@@ -101,6 +101,7 @@
                         <td style="font-weight:normal">النقطة</td>
                         <td style="font-weight:normal">رصيدها</td>
                         <td style="font-weight:normal">القناة</td>
+                        <td style="font-weight:normal">الحساب</td>
                         <td style="font-weight:normal">التفاصيل</td>
                     </tr>
                 </thead>
@@ -108,14 +109,15 @@
                     @foreach (var item in Model.Results)
                     {
                         <tr>
-                            <td style="font-size:16px;font-weight:bold;">@item.Id</td>
-                            <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-size:13px;">@item.Id</td>
+                            <td style="font-family:Amiri-Regular;font-size:11px;">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-family:Amiri-Regular;color:maroon;font-size: 12px;">@item.Amount.ToString("N0")</td>
                             <td style="font-family:Amiri-Regular;color:blue;">@item.SubsNo</td>
                             <td style="font-family:Amiri-Regular">@item.StatusName</td>
-                            <td style="font-family:Amiri-Regular">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                            <td style="font-family:Amiri-Regular;font-size:11px;">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
                             <td style="font-family:Amiri-Regular">@item.POSId&rArr;@item.POSName</td>
                             <td style="font-size: 13px;">@item.POSBalance.ToString("N2")</td>
-                            <td style="font-size: 13px;">@item.AccessChannelName</td>
+                            <td style="font-size: 11px;">@item.AccessChannelName</td>
                             <td style="font-size: 13px;">@item.POSAccount</td>
                             <td><a asp-action="Detail" asp-controller="Recharge" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
                         </tr>

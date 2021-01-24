@@ -60,7 +60,7 @@ namespace Yvtu.Infra.Data
                 }
                 if (!string.IsNullOrEmpty(param.Message))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " AND (msg LIKE '%' ||  :Message || '%') " : " WHERE (msg LIKE '%' ||  :Message || '%') ");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND (message LIKE '%' ||  :Message || '%') " : " WHERE (message LIKE '%' ||  :Message || '%') ");
                     var p = new OracleParameter { ParameterName = "Message", OracleDbType = OracleDbType.Varchar2, Value = param.Message };
                     parameters.Add(p);
                 }

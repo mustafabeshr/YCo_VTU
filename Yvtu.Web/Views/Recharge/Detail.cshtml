@@ -1,0 +1,102 @@
+﻿@model Yvtu.Core.Queries.RechargeQueryResult
+
+@{
+    ViewData["Title"] = "Recharge Detail";
+    string bColor = Model.Status == 1 ? "green" : "red";
+}
+
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">تفاصيل عملية تحصيل</p>
+        </div>
+    </div>
+</div>
+
+<div class="row bg-white shadow-lg p-4" style="margin-top:1px;border:6px solid @bColor;">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات الحركة</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الرقم :</div>
+                        <div class="col-md-4">@Model.Id</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">وقت الانشاء :</div>
+                        <div class="col-md-4">@Model.CreatedOn.ToString("H:mm:ss yyyy/MM/dd")</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الحالة :</div>
+                        <div class="col-md-4">@Model.StatusName</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">وقت الحالة :</div>
+                        <div class="col-md-4">@Model.StatusOn.ToString("H:mm:ss yyyy/MM/dd")</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم المشترك :</div>
+                        <div class="col-md-4">@Model.SubsNo</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">المبلغ :</div>
+                        <div class="col-md-4">@Model.Amount.ToString("N0")</div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات النقطة</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم النقطة :</div>
+                        <div class="col-md-4">@Model.POSId</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الاسم :</div>
+                        <div class="col-md-4">@Model.POSName</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم الحساب :</div>
+                        <div class="col-md-4">@Model.POSAccount</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الرصيد :</div>
+                        <div class="col-md-4">@Model.POSBalance.ToString("N0")</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">النوع :</div>
+                        <div class="col-md-4">@Model.POSRoleName</div>
+
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-12">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات تنفيذ الطلب</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم المرجع :</div>
+                        <div class="col-md-4">@Model.RefNo</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">نص المرجع :</div>
+                        <div class="col-md-4">@Model.RefMessage</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم الحركة :</div>
+                        <div class="col-md-4">@Model.RefTransNo</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">وقت الانتهاء :</div>
+                        <div class="col-md-4">@Model.RefTime.ToString("H:mm:ss yyyy/MM/dd")</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">القناة :</div>
+                        <div class="col-md-4">@Model.AccessChannelName</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">رقم الدور :</div>
+                        <div class="col-md-4">@Model.QueueNo</div>
+                    </div>
+
+                </fieldset>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-md-2" style="font-size:12px;color:gray;">معلومات اضافية :</div>
+            <div class="col-md-10">@Model.DebugInfo</div>
+        </div>
+    </div>
+</div>

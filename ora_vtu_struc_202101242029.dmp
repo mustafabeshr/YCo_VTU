@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 19/01/2021, 21:32:47 21:32:47  --
+-- Created by mbeshr on 24/01/2021, 20:29:44 20:29:44  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202101192132.log
+spool ora_vtu_struc_202101242029.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -837,7 +837,7 @@ prompt
 create sequence SEQ_COLLECTION_DRAFT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -848,7 +848,7 @@ prompt
 create sequence SEQ_COLLECTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -892,7 +892,7 @@ prompt
 create sequence SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 121
+start with 141
 increment by 1
 cache 20;
 
@@ -903,7 +903,7 @@ prompt
 create sequence SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 141
+start with 161
 increment by 1
 cache 20;
 
@@ -936,7 +936,7 @@ prompt
 create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 221
+start with 241
 increment by 1
 cache 20;
 
@@ -947,7 +947,7 @@ prompt
 create sequence SEQ_PARTNER_REQ_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -969,7 +969,7 @@ prompt
 create sequence SEQ_PFR_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 61
+start with 81
 increment by 1
 cache 20;
 
@@ -1002,7 +1002,7 @@ prompt
 create sequence SEQ_SMS_IN_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 81
+start with 121
 increment by 1
 cache 20;
 
@@ -1013,7 +1013,7 @@ prompt
 create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 241
+start with 261
 increment by 1
 cache 20;
 
@@ -1172,7 +1172,6 @@ prompt ==============================
 prompt
 create or replace force view v_money_transfer as
 select
-rownum seq,
 tr.trans_id,
 tr.part_id,
 p.partner_name part_name,
@@ -2848,7 +2847,7 @@ function fn_ResetPassword(
           return -500;
        end;
       end if;  
-      select * into v_targetPartner from partner where partner_acc = v_creator_acc;
+      select * into v_targetPartner from partner where partner_acc = v_partner_acc;
       v_creator_role := pk_utility.fn_getpartnerrole(v_partner_acc => v_creator_acc);
       if (v_creator_acc < 0) then
        begin

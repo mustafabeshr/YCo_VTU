@@ -283,17 +283,19 @@ namespace Yvtu.Web.Controllers
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new MoneyTransferQueryDto();
-            model.PageNo = 0;
-            model.NoPerPage = 10;
-            model.TotalPages = 0;
+            model.Paging.PageNo = 1;
+            model.Paging.PageSize = 10;
+            model.Paging.Count = 0;
             model.QPartnerId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone).Value;
             return View(model);
         }
         [HttpPost]
-        public IActionResult MoneyTranferQuery(MoneyTransferQueryDto model)
+        
+        public IActionResult MoneyTranferQuery(MoneyTransferQueryDto model, [FromQuery
+        (Name = "direction")] string direction  )
         {
-            //var cur = ++model.PageNo;
-            //ModelState.SetModelValue("PageNo", new ValueProviderResult(""+cur+"", CultureInfo.InvariantCulture));
+          
+            #region Prepare Query
             model.Error = string.Empty;
             Partner targetPartner = null;
             var currUserId = _partnerManager.GetCurrentUserId(this.HttpContext);
@@ -328,10 +330,29 @@ namespace Yvtu.Web.Controllers
                     return View(model);
                 }
             }
+            #endregion
+            ModelState.Clear();
+            if (direction == "pre" && model.Paging.PageNo > 1)
+            {
+                model.Paging.PageNo -= 1;
+            }
+            if (direction == "next")
+            {
+                model.Paging.PageNo += 1;
+            }
 
             model.QueryUser = _partnerManager.GetCurrentUserId(this.HttpContext);
             model.QScope = permission.Scope.Id;
-            var result = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).MTQuery(model);
+            var result = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).MTQueryWithPaging(model);
+            if (result != null && result.Results != null)
+            {
+                model.Paging.Count = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetCount(model);
+            }
+            else
+            {
+                model.Paging.Count = 0;
+            }
+            
             return View(result);
      
         }

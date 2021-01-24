@@ -90,5 +90,11 @@ namespace Yvtu.Web.Controllers
             
            
         }
+
+        public IActionResult Detail(int id)
+        {
+            var model = new RechargeRepo(db, partner).GetRecharge(id);
+            return View(model);
+        }
     }
 }

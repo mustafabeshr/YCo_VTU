@@ -19,5 +19,6 @@ namespace Yvtu.Infra.Data.Interfaces
         int ExecuteStoredProc(string spName, IEnumerable<OracleParameter> parameters);
         Task<int> ExecuteStoredProcAsync(string spName, IEnumerable<OracleParameter> parameters);
         int ExecuteFunction(string spName, IEnumerable<OracleParameter> parameters);
+        int GetIntScalarValue(string sql, IEnumerable<OracleParameter> parameters);
     }
 }

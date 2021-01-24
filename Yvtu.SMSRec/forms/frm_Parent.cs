@@ -9,13 +9,17 @@ namespace Yvtu.SMSRec
     {
         private byte childFormNumber = 0;
         private bool collapseSharedParamPanel = false;
+        private readonly IPartnerManager partnerManager;
+        private readonly IPartnerActivityRepo partnerActivityRepo;
 
         public IAppDbContext Db { get; }
 
-        public frm_Parent(IAppDbContext db)
+        public frm_Parent(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             InitializeComponent();
             Db = db;
+            this.partnerManager = partnerManager;
+            this.partnerActivityRepo = partnerActivityRepo;
         }
         public void RefreshInterfacesCount()
         {
@@ -37,7 +41,7 @@ namespace Yvtu.SMSRec
                 {
                     //if (SharedParams.InterfaceDictionary[inter.Interface_No].Status == "closed")
                     //{
-                        frm_interface childForm = new frm_interface(inter.Interface_No, Db);
+                        frm_interface childForm = new frm_interface(inter.Interface_No, Db, partnerManager, partnerActivityRepo);
                         childForm.MdiParent = this;
                         childForm.Tag = inter.Interface_No.ToString();
                         childForm.Text = "Interface " + childFormNumber++;

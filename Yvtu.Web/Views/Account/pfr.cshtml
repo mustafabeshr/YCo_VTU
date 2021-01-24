@@ -15,7 +15,7 @@
     </div>
 </div>
 <form method="post">
-    <div class="row  shadow-sm mt-2 p-1 bg-white pb-0">
+    <div class="row  shadow-sm  p-1 bg-white pb-0"  style="margin-top:1px;">
         <div class="col-md-12">
             <fieldset class="box-border">
                 <legend class="box-border">بيانات الجهة</legend>
@@ -45,7 +45,7 @@
         </div>
 
     </div>
-    <div class="row  shadow-sm  p-1 bg-white pb-0">
+    <div class="row  shadow-lg  p-1 bg-white pb-0">
         <div class="col-md-12">
             <div class="row">
                 <div class="col-md-10">
@@ -102,23 +102,32 @@
             <tbody>
                 @foreach (var item in Model.results)
                 {
+                    if (item.Amount == 0) continue;
                     string amountColor = "blue";
                     if (@item.Amount < 0) amountColor = "red";
                     accumolator += @item.Amount;
-                    <tr style="font-size:12px;">
-                        <td>@accumolator.ToString("N2")</td>
-                        <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
+                <tr style="font-size:12px;">
+                    <td>@accumolator.ToString("N2")</td>
+                    <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
+                    @if (!@item.CreatedOn.Equals(DateTime.MinValue))
+                    {
                         <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
-                        <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
-                        <td>@item.PartnerAccount</td>
-                        <td>@item.PartnerId</td>
-                        <td>@item.CreatedBy.Account</td>
-                        <td>@item.CreatedBy.Id</td>
-                        <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
-                        <td>@item.TransNo</td>
-                        <td>
-                        </td>
-                    </tr>
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+
+                    <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
+                    <td>@item.PartnerAccount</td>
+                    <td>@item.PartnerId</td>
+                    <td>@item.CreatedBy.Account</td>
+                    <td>@item.CreatedBy.Id</td>
+                    <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
+                    <td>@item.TransNo</td>
+                    <td>
+                    </td>
+                </tr>
                 }
             </tbody>
         </table>

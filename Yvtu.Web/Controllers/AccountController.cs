@@ -105,6 +105,7 @@ namespace Yvtu.Web.Controllers
                 }
                 else
                 {
+                    partnerModel.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
                     var result = partnerManager.ResetPassword(partnerModel);
                     if (result)
                     {

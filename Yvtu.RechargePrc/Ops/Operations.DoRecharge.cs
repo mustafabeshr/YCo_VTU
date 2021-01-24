@@ -22,13 +22,12 @@ namespace Yvtu.RechargePrc.Ops
         }
         public async Task<RechargeResponseDto> DoRecharge(GrappedRecharge recharge)
         {
-
             Thread.Sleep(2000);
             #region Local test
             var result = new RechargeResponseDto()
             {
-                ResultCode = 212,
-                ResultDesc = "Exception has been occured"
+                ResultCode = 0,
+                ResultDesc = "success"
             };
             var watch = System.Diagnostics.Stopwatch.StartNew();
             // Start Send Request -------------------------------

@@ -121,9 +121,10 @@ namespace Yvtu.SMSRec
                 return 1;
             }
         }
-        public frm_interface(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public frm_interface(byte Interface_No,IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             InitializeComponent();
+            _interface_no = Interface_No;
             this.db = db;
             this.partnerManager = partnerManager;
             this.partnerActivityRepo = partnerActivityRepo;

@@ -1,7 +1,11 @@
 ﻿
 $(document).ready(function () {
-    $("#txtPartnerId").on("change", function () {
-        callBasicInfo($("#txtPartnerId").val());
+    $("#txtPartnerId").keyup(function (data) {
+        if ($("#txtPartnerId").val().length == 9) {
+            if (matchString($("#txtPartnerId").val()) === 1) {
+                callBasicInfo($("#txtPartnerId").val());
+            }
+        }
     });
 
     if ($("#txtPartnerId").val().length == 9) {
@@ -36,6 +40,17 @@ $(document).ready(function () {
             }
         });
     }
+    function matchString(value) {
+        //var string = $("#txtId").val();
+        var result = value.match(/^70\d*/);
+        if (result === null) {
+            return 0;
+        }
+        else {
+            return 1;
+        }
+    }  
+
 
     $("#txtPartnerId").on("input", function (e) {
         var input = $(this);

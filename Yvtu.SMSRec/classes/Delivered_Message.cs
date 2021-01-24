@@ -122,6 +122,15 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 2;
                             return ret;
                         }
+                        else if (partnerResult.Partner.Status.Id != 1)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_State";
+                            ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء هذا الطلب ، حالة حسابك )" + partnerResult.Partner.Status.Name + "(";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
+                        }
                         var partner = partnerResult.Partner;
                         if (partner.Balance < double.Parse(Tokens[1]))
                         {
@@ -143,7 +152,7 @@ namespace Yvtu.SMSRec
                             return ret;
                         }
                         var targetPartner = targetPartnerResult.Partner;
-                        var permission = partnerActivityRepo.GetPartAct("Money.Transfer", partner.Role.Id, targetPartner.Role.Id);
+                        var permission = partnerActivityRepo.GetPartAct("MoneyTransfer.Create", partner.Role.Id, targetPartner.Role.Id);
                         if (permission == null)
                         {
                             ret.Ret_ID = -1;
@@ -188,12 +197,12 @@ namespace Yvtu.SMSRec
                             {
                                 #region Do Money Transfer
                                 var moneyTransfer = new MoneyTransfer();
-                                moneyTransfer.Partner.Id = targetPartner.Id;
+                                moneyTransfer.Partner = partnerManager.GetPartnerByAccount(targetPartner.Account);
                                 moneyTransfer.PayType.Id = "cash";
                                 //moneyTransfer.PayNo = "0";
                                 //moneyTransfer.PayBank = "";
                                 //moneyTransfer.PayDate = DateTime.MinValue;
-                                moneyTransfer.CreatedBy.Id = partner.Id;
+                                moneyTransfer.CreatedBy = partnerManager.GetPartnerByAccount(partner.Account);
                                 moneyTransfer.AccessChannel.Id = "sms";
                                 moneyTransfer.Amount = double.Parse(Tokens[1]);
                                 //moneyTransfer.BillNo = "0";
@@ -211,6 +220,10 @@ namespace Yvtu.SMSRec
                                     parsedRequest.MobileNo = partner.Id;
                                     parsedRequest.Shortcode = targetPartner.Id;
                                     parsedRequest.ReplayDesc = moneyTransfer.Amount.ToString("N0");
+                                    moneyTransfer.Partner.Balance += moneyTransfer.Amount;
+                                    moneyTransfer.CreatedBy.Balance -= moneyTransfer.Amount;
+                                    new NotificationRepo(db, partnerManager).SendNotification<MoneyTransfer>("MoneyTransfer.Create", 
+                                        result.AffectedCount, moneyTransfer);
                                     return ret;
                                 }
                                 else if (result.AffectedCount == -500)
@@ -315,9 +328,17 @@ namespace Yvtu.SMSRec
                             ret.Ret_Status = false;
                             parsedRequest.RequestId = 3;
                             return ret;
+                        } else if (partnerResult.Partner.Status.Id != 1)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_State";
+                            ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء هذا الطلب ، حالة حسابك )"+ partnerResult.Partner.Status.Name+ "(";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
                         }
                         var partner = partnerResult.Partner;
-                        var permission = partnerActivityRepo.GetPartAct("Balance.Query", partner.Role.Id);
+                        var permission = partnerActivityRepo.GetPartAct("Balance.QueryBySMS", partner.Role.Id);
                         if (permission == null)
                         {
                             ret.Ret_ID = -1;
@@ -409,6 +430,15 @@ namespace Yvtu.SMSRec
                             ret.Ret_Message_to_Client = "عذرا ليس لديك حساب بالخدمة";
                             ret.Ret_Status = false;
                             parsedRequest.RequestId = 1;
+                            return ret;
+                        }
+                        else if (partnerResult.Partner.Status.Id != 1)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_State";
+                            ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء هذا الطلب ، حالة حسابك )" + partnerResult.Partner.Status.Name + "(";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
                             return ret;
                         }
                         var partner = partnerResult.Partner;
@@ -541,7 +571,7 @@ namespace Yvtu.SMSRec
             {
                 ret.Ret_ID = -1;
                 ret.Ret_Message = "PROCESSING_FAULT";
-                ret.Ret_Message_to_Client = SharedParams.System_Messages["PROCESSING_FAULT"] + ch + ex.Message ;
+                //ret.Ret_Message_to_Client = SharedParams.System_Messages["PROCESSING_FAULT"] + ch + ex.Message ;
                 ret.Ret_Status = false;
                 parsedRequest = reqPack;
                 return ret;

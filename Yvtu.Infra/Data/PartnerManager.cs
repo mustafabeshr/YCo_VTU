@@ -156,7 +156,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Varchar2,  Value = partner.Account },
                  new OracleParameter{ ParameterName = "v_pwd",OracleDbType = OracleDbType.Varchar2,  Value =  hash},
-                 new OracleParameter{ ParameterName = "v_extra",OracleDbType = OracleDbType.Varchar2,  Value = Convert.ToBase64String(salt) }
+                 new OracleParameter{ ParameterName = "v_extra",OracleDbType = OracleDbType.Varchar2,  Value = Convert.ToBase64String(salt) },
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = partner.CreatedBy.Id }
                 };
 
                 #endregion
@@ -178,7 +179,7 @@ namespace Yvtu.Infra.Data
                     return false;
                 }
             }
-            catch 
+            catch (Exception ex)
             {
                 return false;
             }
