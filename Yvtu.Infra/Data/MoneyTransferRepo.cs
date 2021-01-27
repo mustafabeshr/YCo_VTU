@@ -256,7 +256,6 @@ namespace Yvtu.Infra.Data
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
 
-
             var moneyTransfer = new List<MoneyTransferDetailQueryDto>();
             foreach (DataRow row in masterDataTable.Rows)
             {

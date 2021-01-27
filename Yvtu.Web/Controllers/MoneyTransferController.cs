@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authorization;
@@ -97,7 +94,7 @@ namespace Yvtu.Web.Controllers
             model.CreatorBalance = currentPart.Balance - currentPart.Reserved;
             var payTypes = new CommonCodeRepo(_db).GetCodesByType("pay.type");
             model.PayType = payTypes;
-
+            model.PayDate = DateTime.Today;
             return View(model);
         }
 

@@ -46,10 +46,10 @@ namespace Yvtu.Web.Reports
                 partName = partner.Name;
                 partId = partner.Id;
             }
-            var result = new PFRRepo(db).GetList(account, id, includeDates, startDate, endDate);
+            var result = new PFRRepo(db).GetList(account, includeDates, startDate, endDate);
             var resultSb = new StringBuilder();
-            double accumolator = 0;
-            var periodTitle = includeDates ? @"<tr style='font-size:14px;'><td colspan='3'>للفترة من " + startDate.ToShortDateString()+" الى "+endDate.ToShortDateString()+"</td></tr>" : string.Empty;
+            //double accumolator = 0;
+            var periodTitle = @"<tr style='font-size:14px;'><td colspan='3'>للفترة من " + startDate.ToString("yyyy/MM/dd") + " الى " + endDate.ToString("yyyy/MM/dd") + "</td></tr>";
             if (result != null && result.Count > 0)
             {
                 resultSb.Append(@"<table class='detail_table'> <thead> <tr style='font-size:12px;'>
@@ -58,7 +58,6 @@ namespace Yvtu.Web.Reports
                     <th>التاريخ</th>
                     <th>الاجراء</th>
                     <th>الحساب</th>
-                    <th>الرقم</th>
                     <th>الحساب</th>
                     <th>الرقم</th>
                     <th>الاسم</th>
@@ -68,15 +67,14 @@ namespace Yvtu.Web.Reports
                     <tbody>");
                 foreach (var item in result)
                 {
-                    accumolator += item.Amount;
+                    //accumolator += item.Amount;
                     resultSb.Append(@"
                                     <tr style='font-size:14px;'>
-                                    <td style='font-size:14px;width:5%;padding:5px;'>" + accumolator.ToString("N2") + @"</td>
+                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.Balance.ToString("N2") + @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.Amount.ToString("N2")+ @"</td>
                                     <td style='font-size:14px;width:7%;padding:5px;'>" + item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")+ @"</td>
                                     <td style='text-align:right;font-size:14px;width:9%;padding:5px;'>" + item.ActivityName+ @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.PartnerAccount+ @"</td>
-                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.PartnerId+ @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.CreatedBy.Account+ @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.CreatedBy.Id + @"</td>
                                     <td style='text-align:right;font-size:14px;width:10%;padding:5px;'>" + item.CreatedBy.Name + @"</td>

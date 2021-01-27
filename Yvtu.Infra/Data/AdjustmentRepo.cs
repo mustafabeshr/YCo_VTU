@@ -63,10 +63,99 @@ namespace Yvtu.Infra.Data
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
 
-            var adjustment = new Adjustment();
             DataRow row = masterDataTable.Rows[0];
+            var adjustment = ConvertDataRowToAdjustment(row);
+            
+            return adjustment;
+        }
+
+        public List<Adjustment> GetListWithPaging(int id,int moneytransferId, string createdById, string partnerId, DateTime startDate, DateTime endDate, Paging paging)
+        {
+            string criteria = string.Empty;
+            var parameters = BuildCriteria(id, moneytransferId, createdById, partnerId, startDate, endDate, ref criteria);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from ( ");
+            strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
+            strSqlStatment.Append($"Select * from V_ADJUSTMENT t { criteria } order by t.createon desc ");
+            strSqlStatment.Append(") main_data ) ");
+            strSqlStatment.Append($"WHERE seq > ({paging.PageNo - 1}) * {paging.PageSize} AND ROWNUM <= {paging.PageSize}");
+            var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+
+            var adjustList = new List<Adjustment>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToAdjustment(row);
+                adjustList.Add(obj);
+            }
+
+            return adjustList;
+        }
+
+        public int GetCount(int id, int moneytransferId, string createdById, string partnerId, DateTime startDate, DateTime endDate)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildCriteria(id, moneytransferId, createdById, partnerId, startDate, endDate, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from V_ADJUSTMENT t { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+        private List<OracleParameter> BuildCriteria(int id, int moneytransferId, string createdById, string partnerId, DateTime startDate, DateTime endDate, ref string criteria)
+        {
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            if (id > 0)
+            {
+                var parm = new OracleParameter { ParameterName = "TransId", OracleDbType = OracleDbType.Int32, Value = id };
+                WhereClause.Append(" WHERE t.adj_id =:TransId ");
+                parameters.Add(parm);
+            }
+            if (moneytransferId > 0)
+            {
+                var parm = new OracleParameter { ParameterName = "TransferId", OracleDbType = OracleDbType.Int32, Value = moneytransferId };
+                WhereClause.Append(" WHERE t.moneytransferid =:TransferId ");
+                parameters.Add(parm);
+            }
+            if (!string.IsNullOrEmpty(createdById))
+            {
+              WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE t.createdby=:Created " : " AND t.createdby=:Created ");
+              var parm = new OracleParameter { ParameterName = "Created", OracleDbType = OracleDbType.Varchar2, Value = createdById };
+              parameters.Add(parm);
+            }
+            if (!string.IsNullOrEmpty(partnerId))
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) 
+                    ? " WHERE exists(select 1 from money_transfer m where m.trans_id = t.moneytranferid and (m.part_id = :PartId OR m.createdby = :PartId) "
+                    : " AND exists(select 1 from money_transfer m where m.trans_id = t.moneytranferid and (m.part_id = :PartId OR m.createdby = :PartId) ");
+                var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = partnerId };
+                parameters.Add(parm);
+            }
+            if (startDate > DateTime.MinValue && startDate != null)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE t.createon>=:StartDate " : " AND t.createon>=:StartDate   ");
+                var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = startDate };
+                parameters.Add(parm);
+            }
+            if (endDate > DateTime.MinValue && endDate != null)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE t.createon<=:EndDate " : " AND t.createon<=:EndDate   ");
+                var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = endDate };
+                parameters.Add(parm);
+            }
+            criteria = WhereClause.ToString();
+            return parameters;
+        }
+
+        private Adjustment ConvertDataRowToAdjustment(DataRow row)
+        {
+            var adjustment = new Adjustment();
             adjustment.Id = row["adj_id"] == DBNull.Value ? -1 : int.Parse(row["adj_id"].ToString());
-            adjustment.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+            adjustment.MoneyTransferId = row["moneytranferid"] == DBNull.Value ? -1 : int.Parse(row["moneytranferid"].ToString());
+            adjustment.CreatedOn = row["createon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createon"].ToString());
             var accessChannel = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
             adjustment.AccessChannel = new CommonCodeRepo(db).GetCodesById(accessChannel, "access.channel");
             adjustment.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
@@ -100,7 +189,6 @@ namespace Yvtu.Infra.Data
             adjustment.DestPartner.Role.Name = row["dest_role_name"] == DBNull.Value ? string.Empty : row["dest_role_name"].ToString();
             adjustment.DestPartner.Status.Name = row["dest_status_name"] == DBNull.Value ? string.Empty : row["dest_status_name"].ToString();
             adjustment.DestPartner.Status.Id = row["dest_status"] == DBNull.Value ? -1 : int.Parse(row["dest_status"].ToString());
-                
             return adjustment;
         }
     }

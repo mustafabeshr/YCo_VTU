@@ -37,7 +37,7 @@ namespace Yvtu.Infra.Data.Interfaces
         PartBasicInfo GetPartnerBasicInfo(string partnerId);
         OpertionResult Create(Partner partner);
         Task<OpertionResult> CreateAsync(Partner partner);
-
+        List<Partner> GetPartnersWithPaging(PartnerQuery param);
         bool ChangePwd(int PartnerAcc, string PartnerId, string newPwd);
         Task<OpertionResult> ChangePwdAsync(string PartnerId, string newPwd);
         IEnumerable<Claim> GetUserClaims(Partner user);
@@ -56,5 +56,6 @@ namespace Yvtu.Infra.Data.Interfaces
         Partner GetPartnerById(string id);
         Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner);
         Task<List<IdName>> GetAccountsAsync(string id);
+        int GetCount(PartnerQuery param);
     }
 }

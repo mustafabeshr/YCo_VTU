@@ -155,17 +155,16 @@
                     <label asp-for="PayTypeId" class="FormLabel">طريقة الدفع :</label>
                     <select asp-for="PayTypeId" class="form-control RequiredInput" style="padding:0px;"
                             asp-items="@(new SelectList(Model.PayType,"Id","Name"))">
-                        <option></option>
                     </select>
                     <span asp-validation-for="PayTypeId" class="text-danger"></span>
                 </div>
                 <div class="form-group col-3">
                     <label asp-for="PayNo" class="FormLabel">رقم السند/الشيك :</label>
-                    <input  asp-for="PayNo" class="form-control text-center" />
+                    <input  asp-for="PayNo"  class="form-control text-center" />
                 </div>
                 <div class="form-group col-3">
                     <label asp-for="PayDate" class="FormLabel">التاريخ :</label>
-                    <input asp-for="PayDate" class="form-control text-center" />
+                    <input asp-for="PayDate" min="2021-01-01" class="form-control text-center" />
                 </div>
                 <div class="form-group col-3">
                     <label asp-for="PayBank" class="FormLabel">البنك :</label>

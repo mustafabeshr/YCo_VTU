@@ -17,6 +17,7 @@ namespace Yvtu.Core.Entities
         public string PartnerId { get; set; }
         public int PartnerAccount { get; set; }
         public double Amount { get; set; }
+        public double Balance { get; set; }
         public string ActivityId { get; set; }
         public string ActivityName { get; set; }
         public int TransNo { get; set; }

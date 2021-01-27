@@ -8,6 +8,10 @@ namespace Yvtu.Core.Queries
 {
     public class PartnerQuery
     {
+        public PartnerQuery()
+        {
+            Paging = new Paging();
+        }
         //[MaxLength(8)]
         public int? QAccount { get; set; }
         //[MaxLength(9)]
@@ -22,6 +26,7 @@ namespace Yvtu.Core.Queries
         public int? QStatusId { get; set; }
         public string Error { get; set; }
         public string Success { get; set; }
+        public Paging Paging { get; set; }
 
         public virtual List<Role> Roles { get; set; }
         public virtual List<PartnerStatus> Statuses { get; set; }

@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 24/01/2021, 20:29:44 20:29:44  --
+-- Created by mbeshr on 27/01/2021, 21:49:37 21:49:37  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202101242029.log
+spool ora_vtu_struc_202101272148.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -679,6 +679,30 @@ alter table PFINREC
   add constraint PK_PFINREC primary key (PFR_ID);
 
 prompt
+prompt Creating table PFR_ONLINE
+prompt =========================
+prompt
+create table PFR_ONLINE
+(
+  bal           NUMBER default 0 not null,
+  pfr_id        NUMBER not null,
+  createdon     DATE,
+  partner_acc   NUMBER not null,
+  partner_id    VARCHAR2(9),
+  amount        NUMBER(18,2) default 0 not null,
+  act_id        VARCHAR2(100),
+  act_name      NVARCHAR2(200),
+  act_no        NUMBER,
+  createdbyacc  NUMBER,
+  creatorbyid   VARCHAR2(9),
+  creatorbyname NVARCHAR2(200),
+  act_time      DATE,
+  generatedon   DATE default sysdate not null
+)
+;
+create index INDX_PARTNER_ACC on PFR_ONLINE (PARTNER_ACC);
+
+prompt
 prompt Creating table REQUEST
 prompt ======================
 prompt
@@ -903,7 +927,7 @@ prompt
 create sequence SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 161
+start with 181
 increment by 1
 cache 20;
 
@@ -936,7 +960,7 @@ prompt
 create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 241
+start with 261
 increment by 1
 cache 20;
 
@@ -969,7 +993,7 @@ prompt
 create sequence SEQ_PFR_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 81
+start with 101
 increment by 1
 cache 20;
 
@@ -1013,7 +1037,7 @@ prompt
 create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 261
+start with 281
 increment by 1
 cache 20;
 
@@ -1391,37 +1415,6 @@ where d.ref_no = c.cl_id
 order by d.row_id;
 
 prompt
-prompt Creating view V_PFR
-prompt ===================
-prompt
-create or replace force view v_pfr as
-select
-pfr.pfr_id,
-pfr.createdon,
-pfr.partner_acc,
-p.partner_id,
-pfr.amount,
-pfr.act_id,
-act.act_name,
-pfr.act_no,
-pfr.createdbyacc,
-(select partner_id from partner p where p.partner_acc = pfr.createdbyacc) creatorbyid ,
-(select partner_name from partner p where p.partner_acc = pfr.createdbyacc) creatorbyname ,
-pfr.act_time
-from pfinrec pfr, partner p, activities act
-where pfr.partner_acc = p.partner_acc
-and pfr.act_id = act.act_id;
-
-prompt
-prompt Creating view V_SMSOUT
-prompt ======================
-prompt
-create or replace force view v_smsout as
-select row_id, sender, message, receiver, createdon, null backedon from sms_out
-union all
-select row_id, sender, message, receiver, createdon, backedon from sms_out_bak;
-
-prompt
 prompt Creating package PK_FINANCIAL
 prompt =============================
 prompt
@@ -1494,8 +1487,50 @@ v_createdbyacc confiscation.createdbyacc%type,
 v_partner_id   confiscation.partner_id%type,  
 v_partner_acc  confiscation.partner_acc%type,   
 v_note         confiscation.note%type        ) return number;
+
+function fn_BalanceOfPointOfTime(
+  account number , 
+  specificTime date 
+  ) return number ;
+  
+  function fn_Generate_PFR(
+    account number,
+    startDate date,
+    endDate date) return number;
 end pk_financial;
 /
+
+prompt
+prompt Creating view V_PFR
+prompt ===================
+prompt
+create or replace force view v_pfr as
+select
+pk_financial.fn_balanceofpointoftime(pfr.partner_acc,  pfr.createdon) bal,
+pfr.pfr_id,
+pfr.createdon,
+pfr.partner_acc,
+p.partner_id,
+pfr.amount,
+pfr.act_id,
+act.act_name,
+pfr.act_no,
+pfr.createdbyacc,
+(select partner_id from partner p where p.partner_acc = pfr.createdbyacc) creatorbyid ,
+(select partner_name from partner p where p.partner_acc = pfr.createdbyacc) creatorbyname ,
+pfr.act_time
+from pfinrec pfr, partner p, activities act
+where pfr.partner_acc = p.partner_acc
+and pfr.act_id = act.act_id;
+
+prompt
+prompt Creating view V_SMSOUT
+prompt ======================
+prompt
+create or replace force view v_smsout as
+select row_id, sender, message, receiver, createdon, null backedon from sms_out
+union all
+select row_id, sender, message, receiver, createdon, backedon from sms_out_bak;
 
 prompt
 prompt Creating package PK_INFRA
@@ -2508,6 +2543,58 @@ begin
          return SQLCODE;
 end;
 
+function fn_BalanceOfPointOfTime(account number , specificTime date ) return number is
+    tmp number;
+  begin
+    select sum(nvl(amount,0)) into tmp from pfinrec where pfinrec.partner_acc = account and pfinrec.createdon <= specificTime;
+     return nvl(tmp,0); 
+  end;
+  
+function fn_Generate_PFR(
+    account number,
+    startDate date,
+    endDate date) return number is
+      
+      lastAmount number;
+      
+      CURSOR c_pfr is
+      select * from v_pfr p where p.partner_acc = account and p.createdon >= startDate and p.createdon <= endDate order by p.createdon;
+      
+       pfrRow c_pfr%rowtype;
+       
+begin
+      
+        delete from pfr_online  t where t.partner_acc = account;
+        
+        select sum(nvl(amount,0)) into lastAmount from pfinrec  t where t.partner_acc = account and t.createdon < startDate;
+        DBMS_OUTPUT.PUT_LINE('lastAmount = ' || lastAmount || '   ' || startDate || '   ' || account); 
+        insert into pfr_online
+            (bal, pfr_id, createdon, partner_acc, partner_id, amount, act_id, act_name, act_no, createdbyacc, creatorbyid, creatorbyname, act_time, generatedon)
+          values
+            (nvl(lastAmount,0), 0, TO_DATE(startDate - 1)  , account, null, nvl(lastAmount,0), null, 'ÑÕíÏ ÇÝÊÊÇÍí', null, null, null, null, null, sysdate);
+
+        OPEN c_pfr;
+        
+        LOOP
+          
+             FETCH  c_pfr  INTO pfrRow;
+             
+             EXIT WHEN c_pfr%NOTFOUND;
+             
+             lastAmount := nvl(lastAmount,0) + pfrRow.Amount;
+             
+              insert into pfr_online
+                  (bal, pfr_id, createdon, partner_acc, partner_id, amount, act_id, act_name, act_no, createdbyacc, creatorbyid, creatorbyname, act_time, generatedon)
+                values
+                  (nvl(lastAmount,0), pfrRow.Pfr_Id, pfrRow.Createdon, pfrRow.Partner_Acc, pfrRow.Partner_Id, nvl(pfrRow.Amount,0), pfrRow.Act_Id, pfrRow.Act_Name,pfrRow.Act_No, pfrRow.Createdbyacc, pfrRow.Creatorbyid, pfrRow.Creatorbyname, pfrRow.Act_Time, sysdate);
+                  
+        END LOOP;
+        
+        CLOSE c_pfr;
+        
+        return 1;
+        
+end;
 
 END pk_financial;
 /

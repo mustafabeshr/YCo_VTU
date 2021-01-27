@@ -59,6 +59,9 @@ namespace Yvtu.Web.Controllers
             var statuses = new PartnerStatusRepo(db).GetStatusList();
             model.Roles = roles;
             model.Statuses = statuses;
+            model.Paging.PageNo = 1;
+            model.Paging.PageSize = 10;
+            model.Paging.Count = 0;
             return View(model);
         }
 
@@ -122,9 +125,27 @@ namespace Yvtu.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult Index(PartnerQuery model)
+        public IActionResult Index(PartnerQuery model, [FromQuery
+        (Name = "direction")] string direction)
         {
-            model.Partners = partnerManager.GetPartners(model);
+            ModelState.Clear();
+            if (direction == "pre" && model.Paging.PageNo > 1)
+            {
+                model.Paging.PageNo -= 1;
+            }
+            if (direction == "next")
+            {
+                model.Paging.PageNo += 1;
+            }
+            model.Partners = partnerManager.GetPartnersWithPaging(model);
+            if (model != null && model.Partners != null)
+            {
+                model.Paging.Count = partnerManager.GetCount(model);
+            }
+            else
+            {
+                model.Paging.Count = 0;
+            }
             var roles = new RoleRepo(db, partnerActivity).GetRoles();
             var statuses = new PartnerStatusRepo(db).GetStatusList();
             model.Roles = roles;
@@ -826,10 +847,13 @@ namespace Yvtu.Web.Controllers
             var model = new PFRQueryDto();
             model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(30));
             model.EndDate = DateTime.Today;
+            model.Paging.PageNo = 1;
+            model.Paging.PageSize = 10;
             return View(model);
         }
         [HttpPost]
-        public IActionResult PFR(PFRQueryDto model)
+        public IActionResult PFR(PFRQueryDto model, [FromQuery
+        (Name = "direction")] string direction)
         {
             var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = partnerActivity.GetPartAct("Partner.PFR.Query", currentRoleId);
@@ -841,7 +865,24 @@ namespace Yvtu.Web.Controllers
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
-            var results = new PFRRepo(db).GetList(model.PartnerAccount, model.PartnerId, model.IncludeDates, model.StartDate, model.EndDate);
+            ModelState.Clear();
+            if (direction == "pre" && model.Paging.PageNo > 1)
+            {
+                model.Paging.PageNo -= 1;
+            }
+            if (direction == "next")
+            {
+                model.Paging.PageNo += 1;
+            }
+            var results = new PFRRepo(db).GetListWithPaging(model.PartnerAccount, model.IncludeDates, model.StartDate, model.EndDate, model.Paging);
+            if (results != null)
+            {
+                model.Paging.Count = new PFRRepo(db).GetCount(model.PartnerAccount, model.PartnerId, model.IncludeDates, model.StartDate, model.EndDate);
+            }
+            else
+            {
+                model.Paging.Count = 0;
+            }
             model.results = results;
             return View(model);
         }
@@ -850,7 +891,7 @@ namespace Yvtu.Web.Controllers
         {
             var sDate = DateTime.Parse(startDate);
             var eDate = DateTime.Parse(endDate);
-            var model = new PFRRepo(db).GetList(account, id, includeDates, sDate, eDate);
+            var model = new PFRRepo(db).GetList(account, includeDates, sDate, eDate);
             if (model == null) return Ok("غير موجود");
             var roleId = partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = partnerActivity.GetPartAct("Partner.PFR.Print", roleId);
@@ -877,9 +918,8 @@ namespace Yvtu.Web.Controllers
                     DefaultEncoding = "utf-8",UserStyleSheet=Path.Combine(environment.WebRootPath, "css","Reports","PFR.css")
                 },
                 //HeaderSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true},
-                FooterSettings = { FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]", Line = true, Center = "Y Company" },
-
-
+                FooterSettings = { FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]", Line = true, Center = "Y Company" }
+                
             };
 
             var pdf = new HtmlToPdfDocument

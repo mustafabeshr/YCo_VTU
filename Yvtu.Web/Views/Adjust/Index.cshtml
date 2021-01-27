@@ -1,0 +1,143 @@
+﻿@model Yvtu.Web.Dto.AdjustmentQueryDto
+
+@{
+    ViewData["Title"] = "Adjust. Query";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<form asp-controller="Adjust" asp-action="Index" method="post">
+    <div class="row">
+        <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+            <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن التسويات</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="Id" class="FormLabel">رقم التسوية:</label>
+                    <input asp-for="Id" class="form-control" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="MoneyTransferId" class="FormLabel">رقم نقل الرصيد:</label>
+                    <input asp-for="MoneyTransferId" class="form-control text-center" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="CreatedById" class="FormLabel">انشاء بواسطة:</label>
+                    <input asp-for="CreatedById" class="form-control text-center" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="CreatedById" class="FormLabel">رقم الجهة:</label>
+                    <input asp-for="CreatedById" class="form-control text-center" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-3">
+                    <label asp-for="StartDate" class="FormLabel">من تاريخ  :</label>
+                    <input asp-for="StartDate" class="form-control" />
+                </div>
+                <div class="form-group col-md-3">
+                    <label asp-for="EndDate" class="FormLabel">الى تاريخ  :</label>
+                    <input asp-for="EndDate" class="form-control" />
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="FormLabel">&nbsp;</label>
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+                <div class="form-group col-md-5">
+                </div>
+            </div>
+
+            @Html.HiddenFor(m => Model.Paging.Count)
+            @Html.HiddenFor(m => Model.Paging.HasNext)
+            @Html.HiddenFor(m => Model.Paging.HasPrevious)
+            @Html.HiddenFor(m => Model.Paging.PageNo)
+            @Html.HiddenFor(m => Model.Paging.PageSize)
+            @Html.HiddenFor(m => Model.Paging.TotalPages)
+
+        </div>
+    </div>
+
+
+
+    @if (Model != null && Model.Results != null)
+    {
+        var prevDisabled = "";
+        var nextDisabled = "";
+        if (!Model.Paging.HasPrevious)
+        {
+            prevDisabled = "disabled";
+        }
+        if (!Model.Paging.HasNext)
+        {
+            nextDisabled = "disabled";
+        }
+        <div class="row bg-white p-3" style="border-radius:8px;">
+            <div class="col-md-4">
+                <span class="text-muted">  العدد : @Model.Results.Count.ToString("N0")</span>
+            </div>
+            <div class="col-md-4">
+                <nav aria-label="...">
+                    <ul class="pagination  mb-0">
+                        <li class="page-item @prevDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="pre">
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.PageNo</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:10px;">\</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.TotalPages</label>
+                        </li>
+                        <li class="page-item @nextDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="next">
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+
+        <div class="row p-2" style="margin-top:1px;background-color:#EDF0F2;font-size:12px;font-weight:bold;">
+            <div class="col-md-2 text-center">#التسوية</div>
+            <div class="col-md-2 text-center">#نقل رصيد</div>
+            <div class="col-md-2 text-center">التاريخ</div>
+            <div class="col-md-3 text-center">انشاء بواسطة</div>
+            <div class="col-md-2 text-center">المبلغ</div>
+            <div class="col-md-1 text-center"></div>
+        </div>
+        @foreach (var item in Model.Results)
+        {
+            <div class="row bg-white p-3" style="margin-top:1px;font-size:13px;">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-2 text-center">@item.Id</div>
+                        <div class="col-md-2 text-center">
+                            <a asp-action="Detail" asp-controller="MoneyTransfer" asp-route-id="@item.Id">@item.MoneyTransferId</a>
+                        </div>
+                        <div class="col-md-2 text-center">@item.CreatedOn.ToString("ss:mm:HH yyyy/MM/dd")</div>
+                        <div class="col-md-3 text-center">@item.CreatedBy.Id &nbsp; @item.CreatedBy.Name</div>
+                        <div class="col-md-2 text-center">@item.Amount.ToString("N0")</div>
+                        <div class="col-md-1 text-center">
+                            <a asp-action="Detail" asp-controller="Adjust" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+        }
+
+    }
+
+</form>

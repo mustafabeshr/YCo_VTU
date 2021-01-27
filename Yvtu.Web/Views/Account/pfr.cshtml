@@ -1,5 +1,6 @@
 ﻿@model Yvtu.Web.Dto.PFRQueryDto
-
+@using Yvtu.Infra.Data
+@inject Yvtu.Infra.Data.Interfaces.IAppDbContext db
 
 @{
     ViewData["Title"] = "PFR";
@@ -15,7 +16,7 @@
     </div>
 </div>
 <form method="post">
-    <div class="row  shadow-sm  p-1 bg-white pb-0"  style="margin-top:1px;">
+    <div class="row  shadow-sm  p-1 bg-white pb-0" style="margin-top:1px;">
         <div class="col-md-12">
             <fieldset class="box-border">
                 <legend class="box-border">بيانات الجهة</legend>
@@ -30,10 +31,11 @@
                     </div>
                     <div class="col-md-9">
                         <div class="row">
-                            <label asp-for="PartnerAccount" class="col-sm-2 col-form-label FormLabel">الحساب:
+                            <label asp-for="PartnerAccount" class="col-sm-2 col-form-label FormLabel">
+                                الحساب:
                                 <label id="lblCnt" style="color:red;">(0)</label>
                             </label>
-                            
+
                             <div class="col-sm-10">
                                 <select id="selAccounts" asp-for="PartnerAccount" class="form-control" style="padding:0px;">
                                 </select>
@@ -50,7 +52,7 @@
             <div class="row">
                 <div class="col-md-10">
                     <fieldset class="box-border">
-                        <legend class="box-border"><input id="chPeriod" type="checkbox" asp-for="IncludeDates" />&nbsp;الفترة</legend>
+                        <legend class="box-border">الفترة</legend>
                         <div class="row mb-3" id="PeriodDiv">
                             <label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>
                             <div class="col-sm-5">
@@ -79,63 +81,115 @@
             </div>
         </div>
     </div>
+
+    @if (Model.results != null && Model.results.Count > 0)
+    {
+        
+        <div class="row shadow-sm p-1 bg-white">
+            <table class="table table-hover text-center">
+                <thead>
+                    <tr style="font-size:12px;">
+                        <th>الرصيد</th>
+                        <th>المبلغ</th>
+                        <th>التاريخ</th>
+                        <th>الاجراء</th>
+                        <th>الحساب</th>
+                        <th>الرقم</th>
+                        <th>الحساب</th>
+                        <th>الرقم</th>
+                        <th>الاسم</th>
+                        <th>رقم المرجع</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.results)
+                    {
+                        if (item.Amount == 0) continue;
+                        string amountColor = "blue";
+                        if (@item.Amount < 0) amountColor = "red";
+                        <tr style="font-size:12px;">
+                            <td>@item.Balance.ToString("N2")</td>
+                            <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
+                            @if (!@item.CreatedOn.Equals(DateTime.MinValue))
+                            {
+                                <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                            }
+
+                            <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
+                            <td>@item.PartnerAccount</td>
+                            <td>@item.PartnerId</td>
+                            <td>@item.CreatedBy.Account</td>
+                            <td>@item.CreatedBy.Id</td>
+                            <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
+                            <td>@item.TransNo</td>
+                            <td>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        var prevDisabled = "";
+        var nextDisabled = "";
+        if (!Model.Paging.HasPrevious)
+        {
+            prevDisabled = "disabled";
+        }
+        if (!Model.Paging.HasNext)
+        {
+            nextDisabled = "disabled";
+        }
+        <div class="row bg-white p-3" style="border-radius:8px;">
+            <div class="col-md-4">
+                <span class="text-muted">  العدد : @Model.results.Count.ToString("N0")</span>
+            </div>
+            <div class="col-md-4">
+                <nav aria-label="...">
+                    <ul class="pagination  mb-0">
+                        <li class="page-item @prevDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="pre">
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.PageNo</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:10px;">\</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.TotalPages</label>
+                        </li>
+                        <li class="page-item @nextDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="next">
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    }
+    @Html.HiddenFor(m => Model.Paging.Count)
+    @Html.HiddenFor(m => Model.Paging.HasNext)
+    @Html.HiddenFor(m => Model.Paging.HasPrevious)
+    @Html.HiddenFor(m => Model.Paging.PageNo)
+    @Html.HiddenFor(m => Model.Paging.PageSize)
+    @Html.HiddenFor(m => Model.Paging.TotalPages)
+    @Html.HiddenFor(m => Model.StartDate)
+    @Html.HiddenFor(m => Model.EndDate)
+    @Html.HiddenFor(m => Model.IncludeDates)
 </form>
-@if (Model.results != null && Model.results.Count > 0)
-{
-    double accumolator = 0;
-    <div class="row shadow-sm p-1 bg-white">
-        <table class="table table-hover text-center">
-            <thead>
-                <tr style="font-size:12px;">
-                    <th>الرصيد</th>
-                    <th>المبلغ</th>
-                    <th>التاريخ</th>
-                    <th>الاجراء</th>
-                    <th>الحساب</th>
-                    <th>الرقم</th>
-                    <th>الحساب</th>
-                    <th>الرقم</th>
-                    <th>الاسم</th>
-                    <th>رقم المرجع</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.results)
-                {
-                    if (item.Amount == 0) continue;
-                    string amountColor = "blue";
-                    if (@item.Amount < 0) amountColor = "red";
-                    accumolator += @item.Amount;
-                <tr style="font-size:12px;">
-                    <td>@accumolator.ToString("N2")</td>
-                    <td style="color:@amountColor;">@item.Amount.ToString("N2")</td>
-                    @if (!@item.CreatedOn.Equals(DateTime.MinValue))
-                    {
-                        <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
-                    }
-                    else
-                    {
-                        <td></td>
-                    }
-
-                    <td style="font-size:10px;text-align:right;">@item.ActivityName</td>
-                    <td>@item.PartnerAccount</td>
-                    <td>@item.PartnerId</td>
-                    <td>@item.CreatedBy.Account</td>
-                    <td>@item.CreatedBy.Id</td>
-                    <td style="font-size:10px;text-align:right;">@item.CreatedBy.Name</td>
-                    <td>@item.TransNo</td>
-                    <td>
-                    </td>
-                </tr>
-                }
-            </tbody>
-        </table>
-    </div>
-}
-
 @section Scripts {
-    <script>
+    @*<script>
         $('#chPeriod').change(function () {
             if ($(this).prop("checked")) {
                 $("#txtStartDate").prop('disabled', false);
@@ -146,13 +200,13 @@
             }
         });
 
-        if ($(this).prop("checked")) {
+        if ($('#chPeriod').prop("checked")) {
             $("#txtStartDate").prop('disabled', false);
             $("#txtEndDate").prop('disabled', false);
         } else {
             $("#txtStartDate").prop('disabled', true);
             $("#txtEndDate").prop('disabled', true);
         }
-    </script>
+    </script>*@
     <script src="~/js/prf.js"></script>
 } 

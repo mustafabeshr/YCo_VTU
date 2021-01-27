@@ -112,8 +112,21 @@ namespace Yvtu.Infra.Data
             return ds.Tables[0] == null ? 0 : int.Parse(ds.Tables[0].Rows[0]["val"].ToString());
         }
     }
+        public double GetDoubleScalarValue(string sql, IEnumerable<OracleParameter> parameters)
+        {
+            using (var conn = GetConnection("DbConn"))
+            {
+                var cmd = GetCommand(sql, parameters);
+                cmd.Connection = conn;
+                if (conn.State != ConnectionState.Open) conn.Open();
+                var da = new OracleDataAdapter(cmd);
+                var ds = new DataSet();
+                da.Fill(ds);
+                return ds.Tables[0] == null ? 0 : double.Parse(ds.Tables[0].Rows[0]["val"].ToString());
+            }
+        }
 
-    private OracleConnection GetConnection(string connectionStringName)
+        private OracleConnection GetConnection(string connectionStringName)
     {
         var connString = Configuration.GetConnectionString(connectionStringName);
         return new OracleConnection(connString);

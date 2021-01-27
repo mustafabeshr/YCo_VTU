@@ -481,6 +481,57 @@ namespace Yvtu.Infra.Data
 
         public List<Partner> GetPartners(PartnerQuery param)
         {
+            var WhereClause = string.Empty;
+            var parameters = BuildCriteria(param, ref WhereClause);
+
+            var dataTable = this.db.GetData("Select * from partner  " + WhereClause + " order by partner_name ", parameters);
+
+            if (dataTable == null) return null;
+            if (dataTable.Rows.Count == 0) return null;
+
+            var partners = new List<Partner>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var obj = ConvertDataRowToPartner(row);
+                partners.Add(obj);
+            }
+            return partners;
+        }
+        public List<Partner> GetPartnersWithPaging(PartnerQuery param)
+        {
+            var WhereClause = string.Empty;
+            var parameters = BuildCriteria(param, ref WhereClause);
+
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from ( ");
+            strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
+            strSqlStatment.Append("Select * from partner  " + WhereClause + " order by partner_name ");
+            strSqlStatment.Append(") main_data ) ");
+            strSqlStatment.Append($"WHERE seq >= ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
+            var dataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (dataTable == null) return null;
+            if (dataTable.Rows.Count == 0) return null;
+
+            var partners = new List<Partner>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var obj = ConvertDataRowToPartner(row);
+                partners.Add(obj);
+            }
+            return partners;
+        }
+        public int GetCount(PartnerQuery param)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildCriteria(param, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from partner  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+        private List<OracleParameter> BuildCriteria(PartnerQuery param, ref string criteria)
+        {
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
             if (!string.IsNullOrEmpty(param.QPartnerId))
@@ -522,21 +573,8 @@ namespace Yvtu.Infra.Data
                 var parm = new OracleParameter { ParameterName = "QPartnerName", OracleDbType = OracleDbType.NVarchar2, Value = param.QPartnerName };
                 parameters.Add(parm);
             }
-
-            WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ROWNUM <= 200": " AND ROWNUM <= 200 " );
-
-            var dataTable = this.db.GetData("Select * from partner  " + WhereClause + " order by partner_name ", parameters);
-
-            if (dataTable == null) return null;
-            if (dataTable.Rows.Count == 0) return null;
-
-            var partners = new List<Partner>();
-            foreach (DataRow row in dataTable.Rows)
-            {
-                var obj = ConvertDataRowToPartner(row);
-                partners.Add(obj);
-            }
-            return partners;
+            criteria = WhereClause.ToString();
+            return parameters;
         }
 
         public async Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner)

@@ -7,25 +7,24 @@ using Yvtu.Core.Entities;
 
 namespace Yvtu.Web.Dto
 {
-    public class PFRQueryDto
+    public class AdjustmentQueryDto
     {
 
-        public PFRQueryDto()
+        public AdjustmentQueryDto()
         {
             Paging = new Paging();
         }
-        public int PartnerAccount { get; set; }
-        public bool IncludeDates { get; set; }
+        public int Id { get; set; }
+        public int MoneyTransferId { get; set; }
+        [StringLength(9)]
+        public string CreatedById { get; set; }
+        [StringLength(9)]
+        public string PartnerId { get; set; }
         [DataType(DataType.Date)]
         public DateTime StartDate { get; set; }
         [DataType(DataType.Date)]
         public DateTime EndDate { get; set; }
-        [StringLength(9)]
-        public string PartnerId { get; set; }
-        public string PartnerName { get; set; }
-        public string RoleName { get; set; }
         public Paging Paging { get; set; }
-        public double PrevPageaccumolator { get; set; }
-        public virtual List<PFR> results { get; set; }
+        public List<Adjustment> Results { get; set; }
     }
 }
