@@ -74,7 +74,7 @@ namespace Yvtu.Sender
                                 retvalue = connectionManager.SendMessageLarge(OutMsg.Receiver, null, Ton.Unknown, Npi.Unknown, DataCodings.UCS2
                                               , DataCodings.UCS2, OutMsg.Message, out submitSmList, out submitSmRespList);
                             }
-                            AddLog(OutMsg.Receiver, OutMsg.Message, "OUT", OutMsg.Sender, Color.Black);
+                            AddLog(OutMsg.Receiver, OutMsg.Message, "OUT", OutMsg.Sender, "Bw_DoWork", Color.Black);
                             new OutSMSRepo(db).RemoveMessage(OutMsg.Id);
                             //Thread.Sleep(100);
                         }
@@ -104,13 +104,14 @@ namespace Yvtu.Sender
             lvLOG.Columns.Add("Type", 50, HorizontalAlignment.Center);
             lvLOG.Columns.Add("Short Code", 150, HorizontalAlignment.Center);
             lvLOG.Columns.Add("Time", 240, HorizontalAlignment.Center);
+            lvLOG.Columns.Add("Event", 140, HorizontalAlignment.Left);
         }
         private void AddLog(string mobileno, string MessageValue, string TypeValue,
-            string shortcode, Color forecolor)
+            string shortcode, string appEvent, Color forecolor)
         {
            
                 //Add items in the listview
-                string[] arr = new string[5];
+                string[] arr = new string[6];
                 ListViewItem itm;
 
                 //Add first item
@@ -119,6 +120,7 @@ namespace Yvtu.Sender
                 arr[2] = TypeValue;
                 arr[3] = shortcode;
                 arr[4] = DateTime.Now.ToString("ss:mm:H dd/MM/yyyy");
+                arr[5] = appEvent;
                 itm = new ListViewItem(arr);
                 itm.ForeColor = forecolor;
                 itm.ImageIndex = 1;
@@ -136,11 +138,11 @@ namespace Yvtu.Sender
         }
 
         private async Task AddLogAsync(string mobileno, string MessageValue, string TypeValue,
-            string shortcode, Color forecolor)
+            string shortcode, string appEvent, Color forecolor)
         {
 
             //Add items in the listview
-            string[] arr = new string[5];
+            string[] arr = new string[6];
             ListViewItem itm;
 
             //Add first item
@@ -149,6 +151,7 @@ namespace Yvtu.Sender
             arr[2] = TypeValue;
             arr[3] = shortcode;
             arr[4] = DateTime.Now.ToString("ss:mm:H dd/MM/yyyy");
+            arr[5] = appEvent;
             itm = new ListViewItem(arr);
             itm.ForeColor = forecolor;
             itm.ImageIndex = 1;
@@ -172,7 +175,7 @@ namespace Yvtu.Sender
             DataCodings dataCoding = DataCodings.UCS2; // The encoding to use if Default is returned in any PDU or encoding request
 
             // Create a esme manager to communicate with an ESME
-            connectionManager = new ESMEManager("Test",
+            connectionManager = new ESMEManager("Sender",
                                                SharedParams.config.ShortCode,
                                                 new ESMEManager.CONNECTION_EVENT_HANDLER(ConnectionEventHandler),
                                                 new ESMEManager.RECEIVED_MESSAGE_HANDLER(ReceivedMessageHandler),
@@ -196,7 +199,7 @@ namespace Yvtu.Sender
             if (AllowLog)
             {
                 AddLog(logKey, "log Type=" + logEventNotificationType.ToString() + "|message=" + message
-                , "LOG", shortLongCode, Color.Gray);
+                , "LOG", shortLongCode, "LogEventHandler", Color.Gray);
             }
         }
 
@@ -207,7 +210,7 @@ namespace Yvtu.Sender
                 AddLog(logKey, "sequence=" + sequence.ToString() + "|messageId=" + messageId
                + "|finalDate=" + finalDate.ToString("yyyyMMddHmmss") + "|messageState=" + messageState.ToString()
                 + "|errorCode=" + errorCode.ToString()
-                , "QRY", SharedParams.config.ShortCode, Color.Gray);
+                , "QRY", SharedParams.config.ShortCode, "QueryMessageHandler", Color.Gray);
 
             }
         }
@@ -217,7 +220,7 @@ namespace Yvtu.Sender
             if (AllowLog)
             {
 
-                AddLog(logKey, "sequence=" + sequence.ToString() + "|messageId=" + messageId, "SMT", SharedParams.config.ShortCode, Color.Gray);
+                AddLog(logKey, "sequence=" + sequence.ToString() + "|messageId=" + messageId, "SMT", SharedParams.config.ShortCode, "SubmitMessageHandler", Color.Gray);
             }
         }
 
@@ -226,13 +229,13 @@ namespace Yvtu.Sender
             if (AllowLog)
             {
 
-                AddLog(logKey, "sequence=" + sequence.ToString(), "NCK", SharedParams.config.ShortCode, Color.Gray);
+                AddLog(logKey, "sequence=" + sequence.ToString(), "NCK", SharedParams.config.ShortCode, "ReceivedGenericNackHandler", Color.Gray);
             }
         }
 
         private void ReceivedMessageHandler(string logKey, string serviceType, Ton sourceTon, Npi sourceNpi, string shortLongCode, DateTime dateReceived, string phoneNumber, DataCodings dataCoding, string message)
         {
-            AddLogAsync(phoneNumber, message, "IN", shortLongCode, Color.Blue);
+            AddLogAsync(phoneNumber, message, "IN", shortLongCode, "ReceivedMessageHandler", Color.Blue);
             
         }
 
@@ -240,7 +243,7 @@ namespace Yvtu.Sender
         {
             if (AllowLog)
             {
-                AddLog(logKey, connectionEventType.ToString() + "  " + message, "CON", SharedParams.config.ShortCode, Color.Gray);
+                AddLog(logKey, connectionEventType.ToString() + "  " + message, "CON", SharedParams.config.ShortCode, "ConnectionEvent", Color.Gray);
             }
         }
 

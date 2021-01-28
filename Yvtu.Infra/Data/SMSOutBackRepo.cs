@@ -67,8 +67,8 @@ namespace Yvtu.Infra.Data
             }
 
             #endregion
-
-            string strSql = $"select * from v_smsout {whereCluase} order by row_id";
+            whereCluase.Append(string.IsNullOrEmpty(whereCluase.ToString()) ? " WHERE ROWNUM <= 200 " : " AND ROWNUM <= 200 ");
+            string strSql = $"select * from v_smsout {whereCluase} order by row_id desc";
 
             DataTable masterDataTable;
             masterDataTable = db.GetData(strSql, parameters);

@@ -26,13 +26,13 @@
         <div class="col-sm-5">
             <div class="row mb-3 text-center" id="PeriodDiv">
                 <div class="col-sm-1 text-center">
-                    <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
+                    @*<input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />*@
                 </div>
                 <div class="col-sm-5">
-                    <input id="txtStartDate" asp-for="StartDate"  min="2020-11-01"  class="form-control text-center" style="font-size:14px;">
+                    <input id="txtStartDate" asp-for="StartDate"  min="2020-11-01" max="2029-12-31" class="form-control text-center" style="font-size:14px;">
                 </div>
                 <div class="col-sm-5">
-                    <input id="txtEndDate" asp-for="EndDate"  min="2020-11-01"  class="form-control text-center" style="font-size:14px;">
+                    <input id="txtEndDate" asp-for="EndDate"  min="2020-11-01" max="2029-12-31" class="form-control text-center" style="font-size:14px;">
                 </div>
             </div>
         </div>
@@ -41,6 +41,7 @@
                 <i class="fa fa-search"></i>
             </button>
         </div>
+        <span class="text-muted" style="font-size:11px;">الحد الاقصى لعدد السجلات (200) للاستعلام الواحد</span>
     </div>
 </form>
 
@@ -90,7 +91,7 @@
 </div>
 }
 
-@section Scripts{
+@*@section Scripts{
     <script>
             $('#chPeriod').change(function () {
                 if ($(this).prop("checked")) {
@@ -110,4 +111,4 @@
                 $("#txtEndDate").prop('disabled', true);
             }
     </script>
-}
+}*@

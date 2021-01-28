@@ -283,6 +283,8 @@ namespace Yvtu.Web.Controllers
             model.Paging.PageNo = 1;
             model.Paging.PageSize = 10;
             model.Paging.Count = 0;
+            model.QFromDate = DateTime.Today.AddMonths(-1);
+            model.QToDate = DateTime.Today;
             model.QPartnerId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.MobilePhone).Value;
             return View(model);
         }

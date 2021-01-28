@@ -4,13 +4,13 @@
     ViewData["Title"] = "Recharge Query";
 }
 
+<form asp-controller="Recharge" asp-action="Index" method="post">
+    <div class="row">
+        <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+            <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن حركة التحصيل</p>
+            </div>
 
-<div class="row">
-    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
-        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
-            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن حركة التحصيل</p>
-        </div>
-        <form asp-controller="Recharge" asp-action="Index" method="post">
             @await Component.InvokeAsync("NToastNotify")
             <div class="form-row">
                 <div class="form-group col-3  row">
@@ -36,7 +36,7 @@
                     <div class="col-10">
                         <select asp-for="StatusId" class="form-control RequiredInput" style="padding:0px;"
                                 asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
-                            <option></option>
+                            <option value="-1">الكل</option>
                         </select>
                     </div>
                 </div>
@@ -49,20 +49,20 @@
                     <div class="col-10">
                         <select asp-for="AccessChannelId" class="form-control RequiredInput" style="padding:0px;"
                                 asp-items="@(new SelectList(Model.AccessChannel,"Id","Name"))">
-                            <option></option>
+                            <option value="-1">الكل</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group col-4  row">
                     <label asp-for="QFromDate" class="FormLabel pt-2">من:</label>
                     <div class="col-10">
-                        <input asp-for="QFromDate" style="width:100%;" class="form-control text-center" />
+                        <input asp-for="QFromDate" min="2020-12-02" max="2029-12-31" style="width:100%;" class="form-control text-center" />
                     </div>
                 </div>
                 <div class="form-group col-4  row">
                     <label asp-for="QToDate" class="FormLabel pt-2">الى:</label>
                     <div class="col-10">
-                        <input asp-for="QToDate" style="width:100%;" class="form-control text-center" />
+                        <input asp-for="QToDate" min="2020-12-02" max="2029-12-31" style="width:100%;" class="form-control text-center" />
                     </div>
                 </div>
                 <div class="form-group col-1 row">
@@ -78,54 +78,106 @@
                     <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
                 </div>
             }
-        </form>
-    </div>
-</div>
 
-
-
-@if (Model != null && Model.Results != null)
-{
-    <div class="row p-0 bg-white">
-        <div class="col-12 p-0">
-
-            <table class="table">
-                <thead>
-                    <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
-                        <td style="font-weight:normal">#</td>
-                        <td style="font-weight:normal">التاريخ</td>
-                        <td style="font-weight:normal">المبلغ</td>
-                        <td style="font-weight:normal">المشترك</td>
-                        <td style="font-weight:normal">الحالة</td>
-                        <td style="font-weight:normal">وقت الحالة</td>
-                        <td style="font-weight:normal">النقطة</td>
-                        <td style="font-weight:normal">رصيدها</td>
-                        <td style="font-weight:normal">القناة</td>
-                        <td style="font-weight:normal">الحساب</td>
-                        <td style="font-weight:normal">التفاصيل</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.Results)
-                    {
-                        <tr>
-                            <td style="font-size:13px;">@item.Id</td>
-                            <td style="font-family:Amiri-Regular;font-size:11px;">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
-                            <td style="font-family:Amiri-Regular;color:maroon;font-size: 12px;">@item.Amount.ToString("N0")</td>
-                            <td style="font-family:Amiri-Regular;color:blue;">@item.SubsNo</td>
-                            <td style="font-family:Amiri-Regular">@item.StatusName</td>
-                            <td style="font-family:Amiri-Regular;font-size:11px;">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
-                            <td style="font-family:Amiri-Regular">@item.POSId&rArr;@item.POSName</td>
-                            <td style="font-size: 13px;">@item.POSBalance.ToString("N2")</td>
-                            <td style="font-size: 11px;">@item.AccessChannelName</td>
-                            <td style="font-size: 13px;">@item.POSAccount</td>
-                            <td><a asp-action="Detail" asp-controller="Recharge" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
         </div>
     </div>
-}
+
+    @Html.HiddenFor(m => Model.Paging.Count)
+    @Html.HiddenFor(m => Model.Paging.HasNext)
+    @Html.HiddenFor(m => Model.Paging.HasPrevious)
+    @Html.HiddenFor(m => Model.Paging.PageNo)
+    @Html.HiddenFor(m => Model.Paging.PageSize)
+    @Html.HiddenFor(m => Model.Paging.TotalPages)
 
 
+    @if (Model != null && Model.Results != null)
+    {
+        var prevDisabled = "";
+        var nextDisabled = "";
+        if (!Model.Paging.HasPrevious)
+        {
+            prevDisabled = "disabled";
+        }
+        if (!Model.Paging.HasNext)
+        {
+            nextDisabled = "disabled";
+        }
+        <div class="row bg-white p-3" style="border-radius:8px;">
+            <div class="col-md-4">
+                <span class="text-muted">  العدد : @Model.Results.Count.ToString("N0")</span>
+            </div>
+            <div class="col-md-4">
+                <nav aria-label="...">
+                    <ul class="pagination  mb-0">
+                        <li class="page-item @prevDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="pre">
+                                <i class="fas fa-angle-double-right"></i>
+                            </button>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.PageNo</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:10px;">\</label>
+                        </li>
+                        <li class="page-item">
+                            <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.TotalPages</label>
+                        </li>
+                        <li class="page-item @nextDisabled">
+                            <button type="submit" class="page-link"
+                                    style="width:100%;border-radius:18px;" asp-route-direction="next">
+                                <i class="fas fa-angle-double-left"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+
+
+
+        <div class="row p-0 bg-white">
+            <div class="col-12 p-0">
+
+                <table class="table">
+                    <thead>
+                        <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
+                            <td style="font-weight:normal">#</td>
+                            <td style="font-weight:normal">التاريخ</td>
+                            <td style="font-weight:normal">المبلغ</td>
+                            <td style="font-weight:normal">المشترك</td>
+                            <td style="font-weight:normal">الحالة</td>
+                            <td style="font-weight:normal">وقت الحالة</td>
+                            <td style="font-weight:normal">النقطة</td>
+                            <td style="font-weight:normal">رصيدها</td>
+                            <td style="font-weight:normal">القناة</td>
+                            <td style="font-weight:normal">الحساب</td>
+                            <td style="font-weight:normal">التفاصيل</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Results)
+                        {
+                            <tr>
+                                <td style="font-size:13px;">@item.Id</td>
+                                <td style="font-family:Amiri-Regular;font-size:11px;">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                                <td style="font-family:Amiri-Regular;color:maroon;font-size: 12px;">@item.Amount.ToString("N0")</td>
+                                <td style="font-family:Amiri-Regular;color:blue;">@item.SubsNo</td>
+                                <td style="font-family:Amiri-Regular">@item.StatusName</td>
+                                <td style="font-family:Amiri-Regular;font-size:11px;">@item.StatusOn.ToString("yyyy/MM/dd H:mm:ss")</td>
+                                <td style="font-family:Amiri-Regular">@item.POSId&rArr;@item.POSName</td>
+                                <td style="font-size: 13px;">@item.POSBalance.ToString("N2")</td>
+                                <td style="font-size: 11px;">@item.AccessChannelName</td>
+                                <td style="font-size: 13px;">@item.POSAccount</td>
+                                <td><a asp-action="Detail" asp-controller="Recharge" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+</form>

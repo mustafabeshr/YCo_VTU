@@ -34,11 +34,11 @@
             <div class="form-row">
                 <div class="form-group col-md-3">
                     <label asp-for="StartDate" class="FormLabel">من تاريخ  :</label>
-                    <input asp-for="StartDate" class="form-control" />
+                    <input asp-for="StartDate" min="2020-12-01" max="2029-12-31" class="form-control" />
                 </div>
                 <div class="form-group col-md-3">
                     <label asp-for="EndDate" class="FormLabel">الى تاريخ  :</label>
-                    <input asp-for="EndDate" class="form-control" />
+                    <input asp-for="EndDate" min="2020-12-01"  max="2029-12-31" class="form-control" />
                 </div>
                 <div class="form-group col-md-1">
                     <label class="FormLabel">&nbsp;</label>
@@ -124,7 +124,7 @@
                     <div class="row">
                         <div class="col-md-2 text-center">@item.Id</div>
                         <div class="col-md-2 text-center">
-                            <a asp-action="Detail" asp-controller="MoneyTransfer" asp-route-id="@item.Id">@item.MoneyTransferId</a>
+                            <a asp-action="Detail" asp-controller="MoneyTransfer" asp-route-id="@item.MoneyTransferId">@item.MoneyTransferId</a>
                         </div>
                         <div class="col-md-2 text-center">@item.CreatedOn.ToString("ss:mm:HH yyyy/MM/dd")</div>
                         <div class="col-md-3 text-center">@item.CreatedBy.Id &nbsp; @item.CreatedBy.Name</div>

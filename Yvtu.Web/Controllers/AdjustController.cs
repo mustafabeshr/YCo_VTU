@@ -67,11 +67,11 @@ namespace Yvtu.Web.Controllers
                 model.Paging.PageNo += 1;
             }
 
-            var results = new AdjustmentRepo(db, partnerManager).GetListWithPaging(model.Id, model.MoneyTransferId, model.CreatedById,
+            var results = new AdjustmentRepo(db, partnerManager, partnerActivity).GetListWithPaging(model.Id, model.MoneyTransferId, model.CreatedById,
                 model.PartnerId, model.StartDate, model.EndDate, model.Paging);
             if (results != null)
             {
-                model.Paging.Count = new AdjustmentRepo(db, partnerManager).GetCount(model.Id, model.MoneyTransferId, model.CreatedById,
+                model.Paging.Count = new AdjustmentRepo(db, partnerManager, partnerActivity).GetCount(model.Id, model.MoneyTransferId, model.CreatedById,
                 model.PartnerId, model.StartDate, model.EndDate);
             }
             else
@@ -132,7 +132,7 @@ namespace Yvtu.Web.Controllers
                 adj.Amount = model.Amount;
                 adj.AccessChannel.Id = "web";
                 adj.Note = model.Note;
-                var result = new AdjustmentRepo(db, partnerManager).Create(adj);
+                var result = new AdjustmentRepo(db, partnerManager, partnerActivity).Create(adj);
                 if (result.Success)
                 {
                     return RedirectToAction("Index", "Home");
@@ -171,5 +171,10 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
 
+        public IActionResult Detail(int id)
+        {
+            var model = new AdjustmentRepo(db, partnerManager, partnerActivity).GetSingleOrDefault(id);
+            return View(model);
+        }
     }
 }

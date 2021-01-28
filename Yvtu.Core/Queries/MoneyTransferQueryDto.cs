@@ -16,7 +16,9 @@ namespace Yvtu.Core.Queries
         [StringLength(9)]
         public string QPartnerId { get; set; }
         public int QPartnerAccount { get; set; }
+        [DataType(DataType.Date)]
         public DateTime QFromDate { get; set; }
+        [DataType(DataType.Date)]
         public DateTime QToDate { get; set; }
         public string QListTypeId { get; set; }
         public int QShortItems { get; set; }

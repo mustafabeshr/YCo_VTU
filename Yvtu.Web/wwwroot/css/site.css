@@ -139,6 +139,17 @@ body {
     border-radius: 15px;
     background-color: white;
 }
+.LoginGlassBox {
+    border: solid 1px #474747;
+    padding: 30px 30px 70px 30px;
+    height: 100%;
+    border-radius: 15px;
+    background-color: white;
+    background: linear-gradient(to right bottom,
+    rgba(255,255,255,0.7),
+    rgba(255,255,255,0.3)
+    );
+}
 .MainLink {
     background-color: #ffffff;
     width: 120px;

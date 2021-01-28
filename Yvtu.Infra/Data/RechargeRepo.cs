@@ -23,7 +23,63 @@ namespace Yvtu.Infra.Data
 
         public RechargeQuery Query(RechargeQuery param)
         {
-           
+
+            var WhereClause = string.Empty;
+            var parameters = BuildParameters(param, ref WhereClause);
+
+            var masterDataTable = this.db.GetData("Select * from v_collection t " + WhereClause + " order by createdon desc", parameters);
+
+            if (masterDataTable == null) return param;
+            if (masterDataTable.Rows.Count == 0) return param;
+
+            var results = new List<RechargeQueryResult>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToRechargeQueryResult(row);
+                results.Add(obj);
+            }
+            param.Results = results;
+            return param;
+        }
+        public RechargeQuery QueryWithPaging(RechargeQuery param)
+        {
+
+            var WhereClause = string.Empty;
+            var parameters = BuildParameters(param, ref WhereClause);
+
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from ( ");
+            strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
+            strSqlStatment.Append("Select * from v_collection t  " + WhereClause + " order by createdon desc ");
+            strSqlStatment.Append(") main_data ) ");
+            strSqlStatment.Append($"WHERE seq > ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
+
+            var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (masterDataTable == null) return param;
+            if (masterDataTable.Rows.Count == 0) return param;
+
+            var results = new List<RechargeQueryResult>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToRechargeQueryResult(row);
+                results.Add(obj);
+            }
+            param.Results = results;
+            return param;
+        }
+
+        public int GetCount(RechargeQuery param)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildParameters(param, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from v_collection  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+        private List<OracleParameter> BuildParameters(RechargeQuery param, ref string criteria)
+        {
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
             if (param.QPosAccount > 0)
@@ -50,7 +106,7 @@ namespace Yvtu.Infra.Data
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");
                 parameters.Add(parm);
             }
-            if (!string.IsNullOrEmpty(param.AccessChannelId))
+            if (!string.IsNullOrEmpty(param.AccessChannelId) && param.AccessChannelId != "-1")
             {
                 var parm = new OracleParameter { ParameterName = "AccessChannelId", OracleDbType = OracleDbType.Varchar2, Value = param.AccessChannelId };
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE access_channel=:AccessChannelId " : " AND access_channel=:AccessChannelId ");
@@ -76,7 +132,7 @@ namespace Yvtu.Infra.Data
                 var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.CurrentUserId };
                 parameters.Add(parm);
             }
-            else if(param.QueryScope == "Exclusive")
+            else if (param.QueryScope == "Exclusive")
             {
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ?
                     " WHERE (exists (select 1 from partner where (partner.partner_id = t.pos_id) and partner.ref_partner = '" + param.CurrentUserId + "'))"
@@ -86,19 +142,8 @@ namespace Yvtu.Infra.Data
             }
             WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ROWNUM <= 200 " : " AND ROWNUM <= 200 ");
 
-            var masterDataTable = this.db.GetData("Select * from v_collection t " + WhereClause + " order by createdon desc", parameters);
-
-            if (masterDataTable == null) return param;
-            if (masterDataTable.Rows.Count == 0) return param;
-
-            var results = new List<RechargeQueryResult>();
-            foreach (DataRow row in masterDataTable.Rows)
-            {
-                var obj = ConvertDataRowToRechargeQueryResult(row);
-                results.Add(obj);
-            }
-            param.Results = results;
-            return param;
+            criteria = WhereClause.ToString();
+            return parameters;
         }
         public RechargeQueryResult GetRecharge(int id)
         {

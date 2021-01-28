@@ -13,7 +13,9 @@ namespace Yvtu.Core.Queries
         [StringLength(9)]
         public string QSubsId { get; set; }
         public int QPosAccount { get; set; }
+        [DataType(DataType.Date)]
         public DateTime QFromDate { get; set; }
+        [DataType(DataType.Date)]
         public DateTime QToDate { get; set; }
         public int? StatusId { get; set; }
         public  List<CommonCode> Statuses { get; set; }
@@ -23,11 +25,12 @@ namespace Yvtu.Core.Queries
         public string QueryScope { get; set; }
         public string CurrentUserId { get; set; }
         public int CurrentUserAccount { get; set; }
-
+        public Paging Paging { get; set; }
         public RechargeQuery()
         {
             Statuses = new List<CommonCode>();
             AccessChannel = new List<CommonCode>();
+            Paging = new Paging();
         }
 
         public virtual List<RechargeQueryResult> Results { get; set; }

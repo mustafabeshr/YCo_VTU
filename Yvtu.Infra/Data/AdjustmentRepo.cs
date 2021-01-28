@@ -12,11 +12,13 @@ namespace Yvtu.Infra.Data
     {
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
+        private readonly IPartnerActivityRepo partnerActivityRepo;
 
-        public AdjustmentRepo(IAppDbContext db, IPartnerManager partnerManager)
+        public AdjustmentRepo(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             this.db = db;
             this.partnerManager = partnerManager;
+            this.partnerActivityRepo = partnerActivityRepo;
         }
 
         public OpertionResult Create(Adjustment adjust)
@@ -189,6 +191,7 @@ namespace Yvtu.Infra.Data
             adjustment.DestPartner.Role.Name = row["dest_role_name"] == DBNull.Value ? string.Empty : row["dest_role_name"].ToString();
             adjustment.DestPartner.Status.Name = row["dest_status_name"] == DBNull.Value ? string.Empty : row["dest_status_name"].ToString();
             adjustment.DestPartner.Status.Id = row["dest_status"] == DBNull.Value ? -1 : int.Parse(row["dest_status"].ToString());
+            adjustment.MoneyTransfer = new MoneyTransferRepo(db, partnerManager, partnerActivityRepo).GetSingleOrDefault(adjustment.MoneyTransferId);
             return adjustment;
         }
     }

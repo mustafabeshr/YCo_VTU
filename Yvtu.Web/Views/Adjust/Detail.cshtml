@@ -1,0 +1,302 @@
+﻿@model Yvtu.Core.Entities.Adjustment
+
+@{
+    ViewData["Title"] = "Adjust. Detail";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+    <div class="row">
+        <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+            <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">تفاصيل التسوية</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row bg-white shadow-lg p-4" style="margin-top:1px;">
+        <div class="col-md-12">
+            <div class="row">
+                <div class="col-md-12">
+                    <fieldset class="box-border">
+                        <legend class="box-border">البيانات الرئيسية</legend>
+                        <div class="row">
+                            <div class="col-md-2" style="font-size:12px;color:gray;">الرقم :</div>
+                            <div class="col-md-4">@Model.Id</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">تاريخ الانشاء :</div>
+                            <div class="col-md-4">@Model.CreatedOn.ToString("ss:mm:H yyyy/MM/dd")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1" style="font-size:12px;color:gray;">المستخدم :</div>
+                            <div class="col-md-2">@Model.CreatedBy.Id</div>
+                            <div class="col-md-1" style="font-size:12px;color:gray;">الحساب :</div>
+                            <div class="col-md-2">@Model.CreatedBy.Account</div>
+                            <div class="col-md-1" style="font-size:12px;color:gray;">الاسم :</div>
+                            <div class="col-md-5">@Model.CreatedBy.Name</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-1" style="font-size:12px;color:gray;">القناة :</div>
+                            <div class="col-md-2">@Model.AccessChannel.Name</div>
+                            <div class="col-md-1" style="font-size:12px;color:gray;">ملاحظات :</div>
+                            <div class="col-md-8">@Model.Note</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2" style="font-size:12px;color:gray;">مدة التسوية :</div>
+                            <div class="col-md-4">@Model.PeriodDays</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">المدة المسموح بها :</div>
+                            <div class="col-md-4">@Model.SettingsPeriodDays</div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="col-md-12 mt-3">
+                    <fieldset class="box-border">
+                        <legend class="box-border">البيانات المالية للتسوية</legend>
+                        <div class="row">
+                            <div class="col-md-2" style="font-size:12px;color:gray;">المبلغ :</div>
+                            <div class="col-md-2">@Model.Amount.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة الضريبة :</div>
+                            <div class="col-md-2">@Model.TaxPercent.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ الضريبة :</div>
+                            <div class="col-md-2">@Model.TaxAmount.ToString("N0")</div>
+                        </div>
+                        <div class="row">
+
+                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة العمولة :</div>
+                            <div class="col-md-2">@Model.BonusPercent.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ العمولة :</div>
+                            <div class="col-md-2">@Model.BounsAmount.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة ض العمولة :</div>
+                            <div class="col-md-2">@Model.BounsTaxPercent.ToString("N0")</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ ض العمولة :</div>
+                            <div class="col-md-2">@Model.BounsTaxAmount.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">الصافي :</div>
+                            <div class="col-md-2">@Model.NetAmount.ToString("N0")</div>
+                            <div class="col-md-2" style="font-size:12px;color:gray;">المبلغ المطلوب :</div>
+                            <div class="col-md-2">@Model.ReceivedAmount.ToString("N0")</div>
+                        </div>
+                    </fieldset>
+                </div>
+
+               
+                        <div class="col-md-6 mt-3">
+                            <fieldset class="box-border">
+                                <legend class="box-border">قبل التسوية</legend>
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">صافي الايراد :</div>
+                                    <div class="col-md-8">@Model.MoneyTransfer.NetAmount.ToString("N2")</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">المبلغ المطلوب :</div>
+                                    <div class="col-md-8">@Model.MoneyTransfer.ReceivedAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ الضريبة :</div>
+                                    <div class="col-md-8">@Model.MoneyTransfer.TaxAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ العمولة :</div>
+                                    <div class="col-md-8">@Model.MoneyTransfer.BounsAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ ضريبة العمولة :</div>
+                                    <div class="col-md-8">@Model.MoneyTransfer.BounsTaxAmount.ToString("N2")</div>
+                                </div>
+                            </fieldset>
+                        </div>
+                        <div class="col-md-6 mt-3">
+                            <fieldset class="box-border">
+                                <legend class="box-border">بعد التسوية</legend>
+                                @{ 
+                                    var nxtNetAmount = Model.MoneyTransfer.NetAmount - Model.NetAmount;
+                                    var nxtReceivedAmount = Model.MoneyTransfer.ReceivedAmount - Model.ReceivedAmount;
+                                    var nxtTaxAmount = Model.MoneyTransfer.TaxAmount - Model.TaxAmount;
+                                    var nxtBounsAmount = Model.MoneyTransfer.BounsAmount - Model.BounsAmount;
+                                    var nxtBounsTaxAmount = Model.MoneyTransfer.BounsTaxAmount - Model.BounsTaxAmount;
+                                }
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">صافي الايراد :</div>
+                                    <div class="col-md-8">@nxtNetAmount.ToString("N2")</div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">المبلغ المطلوب :</div>
+                                    <div class="col-md-8">@nxtReceivedAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ الضريبة :</div>
+                                    <div class="col-md-8">@nxtTaxAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ العمولة :</div>
+                                    <div class="col-md-8">@nxtBounsAmount.ToString("N2")</div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-4" style="font-size:12px;color:gray;">مبلغ ضريبة العمولة :</div>
+                                    <div class="col-md-8">@nxtBounsTaxAmount.ToString("N2")</div>
+                                </div>
+                            </fieldset>
+                        </div>
+
+            </div>
+
+            <div class="col-md-12 mt-4">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات عملية نقل رصيد</legend>
+
+                    <div class="row bg-white shadow-lg p-4" style="margin-top:1px;">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <fieldset class="box-border">
+                                        <legend class="box-border">البيانات الرئيسية</legend>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">الرقم :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.Id</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">المبلغ :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.Amount.ToString("N2")</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">تاريخ الانشاء :</div>
+                                            <div class="col-md-10">@Model.MoneyTransfer.CreatedOn.ToString("ss:mm:H yyyy/MM/dd")</div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <fieldset class="box-border" style="background-color:#ffffc9;">
+                                        <legend class="box-border">من</legend>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الرقم :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.CreatedBy.Id</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الاسم :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.CreatedBy.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">النوع :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.CreatedBy.Role.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الحساب :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.CreatedBy.Account</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الرصيد :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.CreatedBy.Balance.ToString("N2")</div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-6 mt-3">
+                                    <fieldset class="box-border" style="background-color:#e1ffd1;">
+                                        <legend class="box-border">الى</legend>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الرقم :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.Partner.Id</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الاسم :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.Partner.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">النوع :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.Partner.Role.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الحساب :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.Partner.Account</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-4" style="font-size:12px;color:gray;">الرصيد :</div>
+                                            <div class="col-md-8">@Model.MoneyTransfer.Partner.Balance.ToString("N2")</div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <fieldset class="box-border">
+                                        <legend class="box-border">البيانات المالية</legend>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">صافي الايراد :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.NetAmount.ToString("N2")</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">المبلغ المطلوب :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.ReceivedAmount.ToString("N2")</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة الضريبة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.TaxPercent.ToString("N2")</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ الضريبة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.TaxAmount.ToString("N2")</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة العمولة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.BonusPercent.ToString("N2")</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ العمولة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.BounsAmount.ToString("N2")</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">نسبة ضريبة العمولة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.BounsTaxPercent.ToString("N2")</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ ضريبة العمولة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.BounsTaxAmount.ToString("N2")</div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                                <div class="col-md-12 mt-3">
+                                    <fieldset class="box-border">
+                                        <legend class="box-border">أخرى</legend>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">رقم الفاتورة :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.BillNo</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">رقم الطلبية :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.RequestNo</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">مبلغ الطلبية :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.RequestAmount.ToString("N2")</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">طريقة الدفع :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.PayType.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">رقم الدفع :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.PayNo</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">التاريخ :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.PayDate.ToShortDateString()</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">البنك :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.PayBank</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">التسوية :</div>
+                                            <div class="col-md-4">
+                                                @if (Model.MoneyTransfer.Adjusted)
+                                                {<p class="text-success"><i class="fa fa-check"></i></p> }
+                                                else
+                                                { <p class="text-danger"><i class="fa fa-times"></i></p>}
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">رقم التسوية :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.AdjustmentNo</div>
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">قناة الوصول :</div>
+                                            <div class="col-md-4">@Model.MoneyTransfer.AccessChannel.Name</div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-2" style="font-size:12px;color:gray;">ملاحظات :</div>
+                                            <div class="col-md-10">@Model.MoneyTransfer.Note</div>
+                                        </div>
+                                    </fieldset>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </fieldset>
+            </div>
+            </div>
+        </div>
+

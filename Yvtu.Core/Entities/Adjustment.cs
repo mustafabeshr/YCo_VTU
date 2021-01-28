@@ -12,11 +12,13 @@ namespace Yvtu.Core.Entities
             SrcPartner = new Partner();
             DestPartner = new Partner();
             AccessChannel = new CommonCode();
+            MoneyTransfer = new MoneyTransfer();
         }
         public int Id { get; set; }
         public DateTime CreatedOn { get; set; }
         public AppUser CreatedBy { get; set; }
         public int MoneyTransferId { get; set; }
+        public MoneyTransfer MoneyTransfer { get; set; }
         public Partner SrcPartner { get; set; }
         public Partner DestPartner { get; set; }
         public double Amount { get; set; }

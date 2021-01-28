@@ -250,7 +250,7 @@ namespace Yvtu.Infra.Data
             strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
             strSqlStatment.Append("Select * from v_money_transfer  " + WhereClause + " order by createdon desc ");
             strSqlStatment.Append(") main_data ) ");
-            strSqlStatment.Append($"WHERE seq >= ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
+            strSqlStatment.Append($"WHERE seq > ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
             var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
 
             if (masterDataTable == null) return null;

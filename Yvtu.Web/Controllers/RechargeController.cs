@@ -38,10 +38,15 @@ namespace Yvtu.Web.Controllers
             var model = new RechargeQuery();
             model.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
             model.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
+            model.QFromDate = DateTime.Today.AddMonths(-1);
+            model.QToDate = DateTime.Today;
+            model.Paging.PageNo = 1;
+            model.Paging.PageSize = 10;
+            model.Paging.Count = 0;
             return View(model);
         }
         [HttpPost]
-        public IActionResult Index(RechargeQuery model)
+        public IActionResult Index(RechargeQuery model, [FromQuery (Name = "direction")] string direction)
         {
             model.Error = string.Empty;
             
@@ -73,19 +78,35 @@ namespace Yvtu.Web.Controllers
                     return View(model);
                 }
             }
-
+            ModelState.Clear();
+            if (direction == "pre" && model.Paging.PageNo > 1)
+            {
+                model.Paging.PageNo -= 1;
+            }
+            if (direction == "next")
+            {
+                model.Paging.PageNo += 1;
+            }
             model.QueryScope = permission.Scope.Id;
             model.CurrentUserId = currUserId;
             model.CurrentUserAccount = currAccountId;
             var result = new RechargeQuery();  
-            result = new RechargeRepo(db, partner).Query(model);
+            result = new RechargeRepo(db, partner).QueryWithPaging(model);
             result.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
             result.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
             if (result.Results == null)
             {
                 toastNotification.AddInfoToastMessage("عذرا لا توجد بيانات");
             }
-            
+            if (result != null && result.Results != null)
+            {
+                model.Paging.Count = new RechargeRepo(db, partner).GetCount(model);
+            }
+            else
+            {
+                model.Paging.Count = 0;
+            }
+
             return View(result);
             
            
