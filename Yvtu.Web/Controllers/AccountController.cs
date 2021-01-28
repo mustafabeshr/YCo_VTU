@@ -201,7 +201,7 @@ namespace Yvtu.Web.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> Login(LoginDto model)
+        public async Task<IActionResult> Login(LoginDto model, string returnUrl = "")
         {
             model.Error = string.Empty;
             if (ModelState.IsValid)
@@ -243,6 +243,9 @@ namespace Yvtu.Web.Controllers
                         await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal
                             , new AuthenticationProperties() { IsPersistent = model.RememberMe });
 
+                    if (!String.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                        return Redirect(returnUrl);
+                    else
                         return RedirectToAction("Index", "Home");
                     
                 }
