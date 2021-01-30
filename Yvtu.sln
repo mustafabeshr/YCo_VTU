@@ -42,7 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yvtu.BgService", "Yvtu.BgService\Yvtu.BgService.csproj", "{A0587389-CA58-4BF0-B034-21F03F9247FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Yvtu.BgService", "Yvtu.BgService\Yvtu.BgService.csproj", "{A0587389-CA58-4BF0-B034-21F03F9247FA}"
 	ProjectSection(ProjectDependencies) = postProject
 		{7CDCD67B-A4AC-4F00-BF21-3AAB25264D00} = {7CDCD67B-A4AC-4F00-BF21-3AAB25264D00}
 		{09C81D88-9366-41B6-92EE-87ED1B022149} = {09C81D88-9366-41B6-92EE-87ED1B022149}

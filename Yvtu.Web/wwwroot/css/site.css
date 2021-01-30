@@ -106,6 +106,7 @@ body {
     direction: rtl;
     text-align: right;
     font-family: 'DroidKufi-Normal';
+  
     /*background: White;*/ /*#ece2ff;*/ /* #dcdcdc fallback for old browsers */
     /*background: -webkit-linear-gradient(to top, #c31432, #240b36);*/ /* Chrome 10-25, Safari 5.1-6 */
     /*background: linear-gradient(to top, #c31432, #240b36);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
@@ -267,7 +268,9 @@ legend.box-border {
 
 
 .circle1,
-.circle2 {
+.circle2,
+.circle3,
+.circle4{
     background: white;
     background: linear-gradient(to right bottom, 
                 rgba(255,255,255,0.3), 
@@ -286,4 +289,20 @@ legend.box-border {
 .circle2 {
     bottom: 5%;
     left: 32%;
+}
+.circle3 {
+    bottom: -0%;
+    right: -15%;
+    height: 25rem;
+    width: 25rem;
+    overflow:hidden;
+}
+.circle4 {
+    top: 8%;
+    left: 2%;
+    height: 5rem;
+    width: 5rem;
+    overflow: hidden;
+    background: linear-gradient(to right bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.1) );
+    backdrop-filter: blur(12rem);
 }

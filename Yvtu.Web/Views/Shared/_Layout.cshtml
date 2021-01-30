@@ -17,9 +17,11 @@
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="~/lib/font-awesome/css/all.css" rel="stylesheet" />
+    <link href="~/css/choices.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body>
+   
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark  border-bottom box-shadow" style="min-height:100px;background-color:#f3f1f1">
             <div class="container">
@@ -27,18 +29,22 @@
                     <img src="~/images/Y-Logo2.png" alt="YCo Logo" class="brand-image" width="70" height="70" style="opacity: .8">
                     <span class="brand-text font-weight-light" style="font-family: 'ArefRuqaa-Bold'; font-size:1.5em;color:purple;">إدارة الشاحن الفوري</span>
                 </a>
-               
+
                 @*<div style="font-size:20px;font-weight:bold;">
-                        @{
-                            var partId = UserManager.GetCurrentUserId(this.Context);
-                            var part = UserManager.Validate(partId).Partner;
-                            var bal = (part.Balance - part.Reserved);
-                            <p>@bal.ToString("N0")</p>
-                            }
+            @{
+                var partId = UserManager.GetCurrentUserId(this.Context);
+                var part = UserManager.Validate(partId).Partner;
+                var bal = (part.Balance - part.Reserved);
+                <p>@bal.ToString("N0")</p>
+                }
 
-                    </div>*@
-
-                <div class="float-left" style="font-size:12px; border-right:solid 1px #e9e5e5;">
+        </div>*@
+                <div>
+                    <a href="#" style="vertical-align:middle;z-index:0;position:absolute;top:2%;">
+                        <span class="badge badge-danger" style="z-index: 1;position:absolute;top:2%;right:90%; border-radius:50%;font-weight:normal;">+9</span>
+                    <i class="far fa-envelope"></i></a>
+                </div>
+                <div class="float-left" style="font-size:12px;">
                     <div style="display:block;font-size:20px;font-weight:bold;text-align:center;padding-right:40px;color:gray;">
                         @if (this.User.Identity.IsAuthenticated)
                         {
@@ -53,10 +59,14 @@
                             </p>
                         }
                     </div>
+
                     <div style="display:block;text-align:center;">
+
                         @if (this.User.Identity.IsAuthenticated)
                         {
                             <div style="display:inline-flex">
+
+
                                 <ul class="navbar-nav flex-grow-1">
                                     <li class="nav-item dropdown">
                                         <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" style="color:gray;"
@@ -106,13 +116,13 @@
                 &copy; 2020 - Yvtu.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
             </div>
         </footer>*@
-                <script src="~/lib/jquery/dist/jquery.min.js"></script>
-                <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-                <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 
-                @if (IsSectionDefined("Scripts"))
-{
-                    @RenderSection("Scripts", required: true)
-}
+    @if (IsSectionDefined("Scripts"))
+    {
+        @RenderSection("Scripts", required: true)
+    }
 </body>
 </html>

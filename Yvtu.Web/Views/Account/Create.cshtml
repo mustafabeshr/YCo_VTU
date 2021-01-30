@@ -3,7 +3,25 @@
 @{
     ViewData["Title"] = "Create";
 }
-
+<div class="row d-flex justify-content-center mt-100">
+    <div class="col-md-6">
+        <select id="choices-multiple-remove-button" placeholder="Select upto 5 tags" multiple>
+            <option value="HTML">HTML</option>
+            <option value="Jquery">Jquery</option>
+            <option value="CSS">CSS</option>
+            <option value="Bootstrap 3">Bootstrap 3</option>
+            <option value="Bootstrap 4">Bootstrap 4</option>
+            <option value="Java">Java</option>
+            <option value="Javascript">Javascript</option>
+            <option value="Angular">Angular</option>
+            <option value="Python">Python</option>
+            <option value="Hybris">Hybris</option>
+            <option value="SQL">SQL</option>
+            <option value="NOSQL">NOSQL</option>
+            <option value="NodeJS">NodeJS</option>
+        </select>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-12 shadow-sm LoginBox">
         <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
@@ -152,10 +170,10 @@
                     <span asp-validation-for="ExtraAddressInfo" class="text-danger"></span>
                 </div>
             </div>
-                <button type="submit" class="btn btn-outline-success"
-                        style="width:100%;border-radius:10px;">
-                    <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
-                </button>
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
 
         </form>
     </div>
@@ -163,5 +181,19 @@
 
 @section Scripts
 {
+    <script>
+        $(document).ready(function () {
+
+            var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+                removeItemButton: true,
+                maxItemCount: 15,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+
+
+        });
+    </script>
+    <script src="@Url.Content("~/js/choices.min.js")"></script>
     <script src="@Url.Content("~/js/CreatePartner.js")"></script>
 }
