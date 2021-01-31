@@ -1,0 +1,91 @@
+﻿@model Yvtu.Web.Dto.UserNotifyDto
+
+@{
+    ViewData["Title"] = "Create Notify";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm LoginBox">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">انشاء تعميم جديد</p>
+        </div>
+        <form method="post">
+            <div class="form-group col-md-12">
+                <label asp-for="Content" class="FormLabel">نص التعميم :</label>
+                <label id="lblMessageCount" class="FormLabel float-left" style="font-size:16px;">0</label>
+                <textarea id="txtMessage" asp-for="Content" class="form-control RequiredInput" style="height:200px;"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+            <div class="form-group col-12">
+                <label asp-for="PriorityId" class="FormLabel">درجة الاهمية  :</label>
+                <select asp-for="PriorityId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
+                        asp-items="@(new SelectList(Model.Priorities,"Id","Name"))">
+                </select>
+            </div>
+            <div class="form-group col-12">
+                <label asp-for="ExpireOn" class="FormLabel">تاريخ الانتهاء :</label>
+                <input asp-for="ExpireOn" class="form-control RequiredInput" style="color:darkgreen;" />
+                <span asp-validation-for="ExpireOn" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-12">
+                <label asp-for="NotifyToList" class="FormLabel">المستخدمين :</label>
+                <div class="row d-flex justify-content-center mt-100">
+                    <div class="col-md-12">
+                        <select id="choices-multiple-remove-button" multiple asp-for="NotifyToList"
+                                class="form-control RequiredInput" asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
+                            <option></option>
+                        </select>
+                        <span asp-validation-for="SelectedRoles" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <input id="TargetRoles" hidden asp-for="SelectedRoles" />
+            <button type="submit" class="btn btn-outline-success"
+                    style="width:100%;border-radius:10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+            </button>
+            @Html.HiddenFor(m => m.Id)
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function wordClicked(data) {
+            var cursorPos = $('#txtMessage').prop('selectionStart');
+            var v = $('#txtMessage').val();
+            var textBefore = v.substring(0, cursorPos);
+            var textAfter = v.substring(cursorPos, v.length);
+            $('#txtMessage').val(textBefore + data + textAfter);
+        }
+        $("#txtMessage").keyup(function () {
+            $("#lblMessageCount").text($(this).val().length);
+            //console.log($("#txtMessage").val().length);
+        });
+
+    </script>
+    <script>
+        $(document).ready(function () {
+            var multipleCancelButton = new Choices('#choices-multiple-remove-button', {
+                removeItemButton: true,
+                maxItemCount: 15,
+                searchResultLimit: 15,
+                renderChoiceLimit: 15
+            });
+            $("#choices-multiple-remove-button").change(function () {
+                var val = $(this).val();
+                console.log(val);
+                document.getElementById('TargetRoles').value = val;
+                //val.forEach(function (value, index, array) {
+                //    console.log("value = " + value);
+                //    console.log("index = " + index);
+                //    console.log("array = " + array);
+                //    $('#TargetRoles').val = array;
+                //});
+                //
+            });
+        });
+    </script>
+    <script src="@Url.Content("~/js/choices.min.js")"></script>
+}

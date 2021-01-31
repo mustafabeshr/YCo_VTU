@@ -11,8 +11,10 @@ namespace Yvtu.Core.Entities
             Status = new CommonCode();
             CreatedBy = new AppUser();
             Priority = new CommonCode();
+            NotifyToList = new List<UserNotifyTo>();
         }
         public int Id { get; set; }
+        public int UserNotifyHistoryCount { get; set; }
         public DateTime CreatedOn { get; set; }
         public string Content { get; set; }
         public CommonCode Priority { get; set; }

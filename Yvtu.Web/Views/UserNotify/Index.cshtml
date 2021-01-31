@@ -1,0 +1,162 @@
+﻿@model Yvtu.Web.Dto.UserNotifyQueryDto
+
+@{
+    ViewData["Title"] = "User Notify Query";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+
+<form asp-controller="UserNotify" asp-action="Index" method="post">
+    <div class="row">
+        <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+            <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+                <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن التعاميم</p>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group col-md-2">
+                    <label asp-for="Id" class="FormLabel">رقم التعميم:</label>
+                    <input asp-for="Id" class="form-control" />
+                </div>
+                <div class="form-group col-md-4">
+                    <label asp-for="Content" class="FormLabel">النص:</label>
+                    <input asp-for="Content" class="form-control text-center" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="StartDate" class="FormLabel">من تاريخ  :</label>
+                    <input asp-for="StartDate" min="2020-12-01" max="2029-12-31" class="form-control" />
+                </div>
+                <div class="form-group col-md-2">
+                    <label asp-for="EndDate" class="FormLabel">الى تاريخ  :</label>
+                    <input asp-for="EndDate" min="2020-12-01" max="2029-12-31" class="form-control" />
+                </div>
+                <div class="form-group col-md-1">
+                    <label asp-for="StatusId" class="FormLabel">الحالة  :</label>
+                    <select asp-for="StatusId" class="form-control" style="padding:0px;font-size:12px;"
+                            asp-items="@(new SelectList(Model.Statuses,"Id","Name"))">
+                        <option value="-1">الكل</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-1">
+                    <label class="FormLabel">&nbsp;</label>
+                    <button type="submit" class="btn btn-outline-success"
+                            style="width:100%;border-radius:18px;">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.HiddenFor(m => Model.Paging.Count)
+    @Html.HiddenFor(m => Model.Paging.HasNext)
+    @Html.HiddenFor(m => Model.Paging.HasPrevious)
+    @Html.HiddenFor(m => Model.Paging.PageNo)
+    @Html.HiddenFor(m => Model.Paging.PageSize)
+    @Html.HiddenFor(m => Model.Paging.TotalPages)
+
+</form>
+
+@if (Model != null && Model.Results != null)
+{
+    var prevDisabled = "";
+    var nextDisabled = "";
+    if (!Model.Paging.HasPrevious)
+    {
+        prevDisabled = "disabled";
+    }
+    if (!Model.Paging.HasNext)
+    {
+        nextDisabled = "disabled";
+    }
+    <div class="row bg-white p-3" style="border-radius:8px;">
+        <div class="col-md-4">
+            <span class="text-muted">  العدد : @Model.Results.Count.ToString("N0")</span>
+        </div>
+        <div class="col-md-4">
+            <nav aria-label="...">
+                <ul class="pagination  mb-0">
+                    <li class="page-item @prevDisabled">
+                        <button type="submit" class="page-link"
+                                style="width:100%;border-radius:18px;" asp-route-direction="pre">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                    </li>
+                    <li class="page-item">
+                        <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.PageNo</label>
+                    </li>
+                    <li class="page-item">
+                        <label class="text-center mb-0 mt-1" style="width:10px;">\</label>
+                    </li>
+                    <li class="page-item">
+                        <label class="text-center mb-0 mt-1" style="width:40px;">@Model.Paging.TotalPages</label>
+                    </li>
+                    <li class="page-item @nextDisabled">
+                        <button type="submit" class="page-link"
+                                style="width:100%;border-radius:18px;" asp-route-direction="next">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+
+    @foreach (var item in Model.Results)
+    {
+        var bColor = "#EDF0F2";
+        var postColor = "green";
+        if (item.Status.Id == "post")
+        {
+            postColor = "blue";
+        }
+
+        <div class="row bg-white p-3" style="margin-top:1px;font-size:13px;">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-6 text-center">
+                        <textarea class="form-control shadow-sm" readonly asp-for="@item.Content" 
+                                  style="font-size:12px;height:160px;background:transparent;text-align:center;color:rebeccapurple;border:1px solid white;"></textarea>
+                    </div>
+                    <div class="col-md-6 text-center">
+                        <div class="row">
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">الرقم :</div>
+                            <div class="col-md-4 text-center">@item.Id</div>
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">التاريخ :</div>
+                            <div class="col-md-4 text-center">@item.CreatedOn.ToString("ss:mm:HH yyyy/MM/dd")</div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">الاهمية :</div>
+                            <div class="col-md-4 text-center">@item.Priority.Name</div>
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">الحالة :</div>
+                            <div class="col-md-4 text-center" style="font-weight:bold;color:@postColor;">@item.Status.Name</div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;vertical-align:middle;">الانتهاء في :</div>
+                            <div class="col-md-4 text-center">@item.ExpireOn.ToString("yyyy/MM/dd")</div>
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">المستخدمين :</div>
+                            <div class="col-md-4 text-center">@item.UserNotifyHistoryCount</div>
+                        </div>
+                        <div class="row mt-1">
+                            <div class="col-md-2 text-center" style="font-size:12px;color:gray;background:@bColor;">انشاء :</div>
+                            <div class="col-md-10 text-center">@item.CreatedBy.Id &nbsp; @item.CreatedBy.Name</div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-md-6"></div>
+                                <div class="col-md-6">
+                                    <a href="#" class="btn btn-outline-primary" style="font-size:11px;">
+                                        <i class="fab fa-telegram-plane"></i> ترحيل
+                                    </a>
+                                    <a href="#" class="btn btn-outline-danger" style="font-size:11px;">
+                                        <i class="far fa-trash-alt"></i> حذف
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+        </div>
+    }
+}

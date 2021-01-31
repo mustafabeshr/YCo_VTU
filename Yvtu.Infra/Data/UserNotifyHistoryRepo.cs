@@ -134,5 +134,26 @@ namespace Yvtu.Infra.Data
             obj.HistoryOn = row["historyon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["historyon"].ToString());
             return obj;
         }
+        public int GetCount(int id, string content, string status, DateTime startDate, DateTime endDate)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildParameters(id, content, status, startDate, endDate, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from v_users_instruct_his  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+        public int GetUserNotifyHisCount(int userNotifyId)
+        {
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "InstructId", OracleDbType = OracleDbType.Int32, Value = userNotifyId };
+            WhereClause.Append(" WHERE ins_id=:InstructId ");
+            parameters.Add(parm);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from v_users_instruct_his  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
     }
 }

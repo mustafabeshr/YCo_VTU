@@ -38,6 +38,7 @@ namespace Yvtu.Infra.Data
                 {
                     foreach (var item in obj.NotifyToList)
                     {
+                        item.UserNotifyId = result;
                         CreateUserNotifyTo(item);
                     }
                     return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
@@ -110,7 +111,7 @@ namespace Yvtu.Infra.Data
                 WhereClause.Append(" WHERE ins_id=:NId ");
                 parameters.Add(parm);
             }
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status) && status != "-1")
             {
                 var parm = new OracleParameter { ParameterName = "StatusId", OracleDbType = OracleDbType.Varchar2, Value = status };
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");
@@ -157,9 +158,25 @@ namespace Yvtu.Infra.Data
             obj.CreatedBy.Name = row["createdby_name"] == DBNull.Value ? string.Empty : row["createdby_name"].ToString();
             obj.ExpireOn = row["expire_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["expire_time"].ToString());
             obj.NotifyToList = GetUserNotifyToList(obj.Id);
+            if(obj.Status.Id == "post")
+            {
+                obj.UserNotifyHistoryCount = new UserNotifyHistoryRepo(db).GetUserNotifyHisCount(obj.Id);
+            }
+            else
+            {
+                obj.UserNotifyHistoryCount = 0;
+            }
             return obj;
         }
-
+        public int GetCount(int id, string content, string status, DateTime startDate, DateTime endDate)
+        {
+            string WhereClause = string.Empty;
+            var parameters = BuildParameters(id, content, status, startDate, endDate, ref WhereClause);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from v_users_instruct  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
         private List<UserNotifyTo> GetUserNotifyToList(int id)
         {
             if (id <= 0) return null;
