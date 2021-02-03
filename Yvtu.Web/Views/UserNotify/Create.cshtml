@@ -13,6 +13,11 @@
         </div>
         <form method="post">
             <div class="form-group col-md-12">
+                <label asp-for="Subject" class="FormLabel">الموضوع :</label>
+                <input asp-for="Subject" class="form-control RequiredInput" style="color:darkgreen;" />
+                <span asp-validation-for="Subject" class="text-danger"></span>
+            </div>
+            <div class="form-group col-md-12">
                 <label asp-for="Content" class="FormLabel">نص التعميم :</label>
                 <label id="lblMessageCount" class="FormLabel float-left" style="font-size:16px;">0</label>
                 <textarea id="txtMessage" asp-for="Content" class="form-control RequiredInput" style="height:200px;"></textarea>

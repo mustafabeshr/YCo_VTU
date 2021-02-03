@@ -57,5 +57,7 @@ namespace Yvtu.Infra.Data.Interfaces
         Task<OpertionResult> EditAsync(Partner oldPartner, Partner newPartner);
         Task<List<IdName>> GetAccountsAsync(string id);
         int GetCount(PartnerQuery param);
+        Task<int> GetUnreadUserNotifyCountAsync(string id);
+        Task<List<UserNotifyHistory>> GetUnreadUserNotifyListAsync(string id);
     }
 }

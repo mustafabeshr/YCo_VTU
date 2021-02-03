@@ -283,25 +283,31 @@ namespace Yvtu.Infra.Data
                 {
                     if (param.QScope == "CurOpOnly")
                     {
-                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId OR createdby=:PartId "
-                        : " AND part_id=:PartId OR createdby=:PartId  ");
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE (part_id=:PartId OR createdby=:PartId) "
+                        : " AND (part_id=:PartId OR createdby=:PartId2)  ");
                         var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        var parm2 = new OracleParameter { ParameterName = "PartId2", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
                         parameters.Add(parm);
+                        parameters.Add(parm2);
                     }
                     else if (param.QScope == "Exclusive")
                     {
                         WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString())
-                        ? " WHERE (part_id=:PartId OR createdby=:PartId) AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))"
-                        : " AND (part_id=:PartId OR createdby=:PartId)  AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))");
+                        ? " WHERE (part_id=:PartId OR createdby=:PartId2) AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))"
+                        : " AND (part_id=:PartId OR createdby=:PartId2)  AND (exists (select 1 from partner where (partner.partner_id = t.part_id or partner.partner_id = t.createdby) and partner.ref_partner = '" + param.QueryUser + "'))");
                         var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
+                        var parm2 = new OracleParameter { ParameterName = "PartId2", OracleDbType = OracleDbType.Varchar2, Value = param.QueryUser };
                         parameters.Add(parm);
+                        parameters.Add(parm2);
                     }
                     else
                     {
-                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE part_id=:PartId OR createdby=:PartId "
-                          : " AND part_id=:PartId OR createdby=:PartId  ");
+                        WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE (part_id=:PartId OR createdby=:PartId2) "
+                          : " AND (part_id=:PartId OR createdby=:PartId2)  ");
                         var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
+                        var parm2 = new OracleParameter { ParameterName = "PartId2", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
                         parameters.Add(parm);
+                        parameters.Add(parm2);
                     }
                 }
                 else if (param.QListTypeId == "debit")

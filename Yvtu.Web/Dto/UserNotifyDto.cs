@@ -21,6 +21,9 @@ namespace Yvtu.Web.Dto
         [StringLength(250, ErrorMessage = "طول النص يجب ان لايزيد عن 250 حرف ")]
         [Required(ErrorMessage = "يجب كتابة نص التعميم")]
         public string Content { get; set; }
+        [StringLength(200, ErrorMessage = "طول الموضوع يجب ان لايزيد عن 200 حرف ")]
+        [Required(ErrorMessage = "يجب كتابة الموضوع")]
+        public string Subject { get; set; }
         public string PriorityId { get; set; }
         public List<CommonCode> Priorities { get; set; }
         public string StatusId { get; set; }
@@ -44,6 +47,7 @@ namespace Yvtu.Web.Dto
         }
         public int Id { get; set; }
         public string Content { get; set; }
+        public string Subject { get; set; }
         public string StatusId { get; set; }
         public List<CommonCode> Statuses { get; set; }
         [DataType(DataType.Date)]

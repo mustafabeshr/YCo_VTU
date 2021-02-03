@@ -24,8 +24,9 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                 new OracleParameter{ ParameterName = "v_subject",OracleDbType = OracleDbType.Varchar2,  Value = obj.Subject },
                  new OracleParameter{ ParameterName = "v_content",OracleDbType = OracleDbType.Varchar2,  Value = obj.Content },
-                 new OracleParameter{ ParameterName = "v_priority",OracleDbType = OracleDbType.Varchar2,  Value = obj.Priority },
+                 new OracleParameter{ ParameterName = "v_priority",OracleDbType = OracleDbType.Varchar2,  Value = obj.Priority.Id },
                  new OracleParameter{ ParameterName = "v_createdbyid",OracleDbType = OracleDbType.Varchar2,  Value = obj.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_expire_time",OracleDbType = OracleDbType.Date,  Value =  obj.ExpireOn },
                  new OracleParameter{ ParameterName = "v_post_it",OracleDbType = OracleDbType.Int32,  Value = thenPostIt ? 1 : 0 }
@@ -120,10 +121,11 @@ namespace Yvtu.Infra.Data
             if (!string.IsNullOrEmpty(content))
             {
                 var parm = new OracleParameter { ParameterName = "Cntnt", OracleDbType = OracleDbType.Varchar2, Value = content };
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE content LIKE  '%' ||  :Cntnt || '%'  " : " AND content LIKE  '%' ||  :Cntnt || '%' ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE subject LIKE  '%' ||  :Cntnt || '%'  " : " AND subject LIKE  '%' ||  :Cntnt || '%' ");
                 parameters.Add(parm);
             }
-            
+
+
             if (startDate > DateTime.MinValue && startDate != null)
             {
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate   ");
@@ -148,6 +150,7 @@ namespace Yvtu.Infra.Data
             obj.Id = row["ins_id"] == DBNull.Value ? -1 : int.Parse(row["ins_id"].ToString());
             obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
             obj.Content = row["content"] == DBNull.Value ? string.Empty : row["content"].ToString();
+            obj.Subject = row["subject"] == DBNull.Value ? string.Empty : row["subject"].ToString();
             obj.Priority.Id = row["priority"] == DBNull.Value ? string.Empty : row["priority"].ToString();
             obj.Priority.Name = row["priority_name"] == DBNull.Value ? string.Empty : row["priority_name"].ToString();
             obj.Status.Id = row["status"] == DBNull.Value ? string.Empty : row["status"].ToString();
@@ -271,5 +274,7 @@ namespace Yvtu.Infra.Data
                 return -1;
             }
         }
+
+        
     }
 }

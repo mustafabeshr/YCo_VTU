@@ -90,7 +90,7 @@ namespace Yvtu.Infra.Data
             if (!string.IsNullOrEmpty(content))
             {
                 var parm = new OracleParameter { ParameterName = "Cntnt", OracleDbType = OracleDbType.Varchar2, Value = content };
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE content LIKE  '%' ||  :Cntnt || '%'  " : " AND content LIKE  '%' ||  :Cntnt || '%' ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE subject LIKE  '%' ||  :Cntnt || '%'  " : " AND subject LIKE  '%' ||  :Cntnt || '%' ");
                 parameters.Add(parm);
             }
 
@@ -119,6 +119,7 @@ namespace Yvtu.Infra.Data
             obj.UserNotifyId = row["ins_id"] == DBNull.Value ? -1 : int.Parse(row["ins_id"].ToString());
             obj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
             obj.Content = row["content"] == DBNull.Value ? string.Empty : row["content"].ToString();
+            obj.Subject = row["subject"] == DBNull.Value ? string.Empty : row["subject"].ToString();
             obj.Partner.Id = row["partner_id"] == DBNull.Value ? string.Empty : row["partner_id"].ToString();
             obj.Partner.Account = row["partner_acc"] == DBNull.Value ? 0 :int.Parse(row["partner_acc"].ToString());
             obj.Partner.Name = row["partner_name"] == DBNull.Value ? string.Empty : row["partner_name"].ToString();
@@ -154,6 +155,70 @@ namespace Yvtu.Infra.Data
             strSqlStatment.Append($"Select count(*) val from v_users_instruct_his  { WhereClause }");
             var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
             return count;
+        }
+        public int UserNotifyHisCount(string id, string status = "unread")
+        {
+            if (string.IsNullOrEmpty(id)) return 0;
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "PartId", OracleDbType = OracleDbType.Varchar2, Value = id };
+            WhereClause.Append(" WHERE partner_id=:PartId ");
+            parameters.Add(parm);
+            var parm2 = new OracleParameter { ParameterName = "StatusId", OracleDbType = OracleDbType.Varchar2, Value = status };
+            WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");
+            parameters.Add(parm2);
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append($"Select count(*) val from USERS_INSTRUCT_HIS  { WhereClause }");
+            var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
+            return count;
+        }
+
+        public List<UserNotifyHistory> GetUnreadListForPartner(string partnerId)
+        {
+            if (string.IsNullOrEmpty(partnerId)) return null;
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = partnerId };
+            WhereClause.Append(" WHERE partner_id=:PartnerId AND status = 'unread' ");
+            parameters.Add(parm);
+
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from (  " );
+            strSqlStatment.Append("Select * from v_users_instruct_his t  " + WhereClause + " order by his_id desc ");
+            strSqlStatment.Append(" ) WHERE ROWNUM <= 6 ");
+
+            var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var results = new List<UserNotifyHistory>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToUserNotify(row);
+                results.Add(obj);
+            }
+            return results;
+        }
+        public UserNotifyHistory GetSingle(int id)
+        {
+            if (id <= 0) return null;
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var parm = new OracleParameter { ParameterName = "HId", OracleDbType = OracleDbType.Int32, Value = id };
+            WhereClause.Append(" WHERE his_id=:HId ");
+            parameters.Add(parm);
+
+            var strSqlStatment = new StringBuilder();
+            strSqlStatment.Append("Select * from v_users_instruct_his " + WhereClause );
+
+            var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+            
+            var result = ConvertDataRowToUserNotify(masterDataTable.Rows[0]);
+            return result;
         }
     }
 }

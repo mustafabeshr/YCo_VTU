@@ -17,6 +17,7 @@ namespace Yvtu.Core.Entities
         public int UserNotifyHistoryCount { get; set; }
         public DateTime CreatedOn { get; set; }
         public string Content { get; set; }
+        public string Subject { get; set; }
         public CommonCode Priority { get; set; }
         public CommonCode Status { get; set; }
         public DateTime StatusOn { get; set; }

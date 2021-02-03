@@ -18,7 +18,8 @@ namespace Yvtu.Core.Entities
             public AppUser Partner { get; set; }
             public DateTime CreatedOn { get; set; }
             public string Content { get; set; }
-            public CommonCode Priority { get; set; }
+        public string Subject { get; set; }
+        public CommonCode Priority { get; set; }
             public CommonCode Status { get; set; }
             public DateTime StatusOn { get; set; }
             public AppUser CreatedBy { get; set; }

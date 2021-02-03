@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 30/01/2021, 21:33:59 21:33:59  --
+-- Created by mbeshr on 03/02/2021, 22:25:06 22:25:06  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202101302133.log
+spool ora_vtu_struc_202102032224.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -822,6 +822,19 @@ alter table SYS_SUBITEM
   references SYS_ITEM (ITEM_ID) on delete cascade;
 
 prompt
+prompt Creating table TMP_LOG
+prompt ======================
+prompt
+create table TMP_LOG
+(
+  log_time DATE default sysdate not null,
+  log      NVARCHAR2(500),
+  act      VARCHAR2(200),
+  log_id   NUMBER
+)
+;
+
+prompt
 prompt Creating table USERS_INSTRUCT
 prompt =============================
 prompt
@@ -835,7 +848,8 @@ create table USERS_INSTRUCT
   status_time  DATE not null,
   createdbyid  VARCHAR2(9) not null,
   createdbyacc NUMBER not null,
-  expire_time  DATE
+  expire_time  DATE,
+  subject      NVARCHAR2(300) not null
 )
 ;
 alter table USERS_INSTRUCT
@@ -859,7 +873,8 @@ create table USERS_INSTRUCT_HIS
   expire_time  DATE not null,
   createdon    DATE not null,
   historyon    DATE default sysdate not null,
-  partner_acc  NUMBER
+  partner_acc  NUMBER,
+  subject      NVARCHAR2(300) not null
 )
 ;
 alter table USERS_INSTRUCT_HIS
@@ -980,7 +995,7 @@ prompt
 create sequence SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 141
+start with 161
 increment by 1
 cache 20;
 
@@ -1106,13 +1121,24 @@ increment by 1
 cache 20;
 
 prompt
+prompt Creating sequence SEQ_TMP_LOG_ID
+prompt ================================
+prompt
+create sequence SEQ_TMP_LOG_ID
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 101
+increment by 1
+cache 20;
+
+prompt
 prompt Creating sequence SEQ_USERS_INSTRUCT_HIS_ID
 prompt ===========================================
 prompt
 create sequence SEQ_USERS_INSTRUCT_HIS_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 1
+start with 41
 increment by 1
 cache 20;
 
@@ -1123,7 +1149,7 @@ prompt
 create sequence SEQ_USER_INST_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 1
+start with 61
 increment by 1
 cache 20;
 
@@ -1625,6 +1651,7 @@ prompt
 create or replace force view v_users_instruct as
 select ins_id,
        t.createdon,
+       t.subject,
        t.content,
        t.priority,
         (select c.code_name  from common_code c where c.code_type = 'priority' and c.code_id = t.priority) priority_name,
@@ -1648,6 +1675,7 @@ select t.his_id,
        t.partner_acc,
         (select p.partner_name from partner p where p.partner_acc = t.partner_acc) partner_name,
        t.content,
+       t.subject,
        t.priority,
         (select c.code_name  from common_code c where c.code_type = 'priority' and c.code_id = t.priority) priority_name,
        t.status,
@@ -1838,6 +1866,7 @@ function fn_ResetPassword(
  ) return number;
  
  function fn_Create_UsersInstruct(
+  v_subject       users_instruct.subject%type,
   v_content       users_instruct.content%type,
   v_priority      users_instruct.priority%type,
   v_createdbyid   users_instruct.createdbyid%type,
@@ -1852,6 +1881,7 @@ function fn_ResetPassword(
    
  function fn_Create_UsersInstruct_his(
   v_ins_id        users_instruct_his.ins_id%type,
+   v_subject       users_instruct_his.subject%type,
   v_content       users_instruct_his.content%type,
   v_partner_id  users_instruct_his.partner_id%type,
   v_createdon     users_instruct_his.createdon%type,
@@ -2012,6 +2042,10 @@ function fn_GetPartnerRole(v_partner_acc partner.partner_acc%type) return partne
   
 function fn_GetPartnerStatus(v_partner_acc partner.partner_acc%type) return partner.status%type;
 
+procedure sp_tmp_log(
+  v_log tmp_log.log%type,
+  v_act  tmp_log.act%type
+  );
 end pk_Utility;
 /
 
@@ -3495,6 +3529,7 @@ function fn_ResetPassword(
    end;
  
   function fn_Create_UsersInstruct(
+  v_subject       users_instruct.subject%type,
   v_content       users_instruct.content%type,
   v_priority      users_instruct.priority%type,
   v_createdbyid   users_instruct.createdbyid%type,
@@ -3512,6 +3547,7 @@ function fn_ResetPassword(
   (ins_id,
    createdon,
    content,
+   subject,
    priority,
    status,
    status_time,
@@ -3522,6 +3558,7 @@ values
   (v_ins_id,
    sysdate,
    v_content,
+   v_subject,
    v_priority,
    'new',
    sysdate,
@@ -3568,6 +3605,7 @@ values
      end;
  function fn_Create_UsersInstruct_his(
   v_ins_id        users_instruct_his.ins_id%type,
+     v_subject       users_instruct_his.subject%type,
   v_content       users_instruct_his.content%type,
   v_partner_id  users_instruct_his.partner_id%type,
   v_createdon     users_instruct_his.createdon%type,
@@ -3587,6 +3625,7 @@ values
    partner_id,
    partner_acc,
    content,
+   subject,
    priority,
    status,
    status_time,
@@ -3601,6 +3640,7 @@ values
    v_partner_id,
    v_partner_acc,
    v_content,
+   v_subject,
    v_priority,
    'unread',
    sysdate,
@@ -3609,6 +3649,7 @@ values
    v_expire_time,
    v_createdon,
    sysdate);
+   return v_his_id;
        EXCEPTION
       WHEN OTHERS THEN
          sp_add_exception(v_exp_code => SQLCODE,
@@ -3638,7 +3679,7 @@ function fn_UserInstruct_post(
  v_partnerId users_instruct_his.partner_id%type;
  v_tmp number;
  cursor c_to is
- select * from users_instruct_to t where t.ins_id = v_ins_id;
+ select * from users_instruct_to t where t.ins_id = v_ins_id ;
  
  cursor c_partners(role number) is
  select partner_id 
@@ -3649,12 +3690,9 @@ function fn_UserInstruct_post(
  and  act.act_id = 'System.Login';
  
 begin
-  update users_instruct
-   set   status = 'post',
-       status_time = sysdate
- where ins_id = v_ins_id;
+
  
- select *  into instruct_row from users_instruct where ins_id =  v_ins_id;
+ select *  into instruct_row from users_instruct t where t.ins_id =  v_ins_id and t.status = 'new';
  if (sql%notfound) then
     return -1;
  end if;
@@ -3666,13 +3704,18 @@ begin
  LOOP
         FETCH c_to INTO instructTo_row;
         EXIT WHEN c_to%notfound;
-        
+        --------------------------------------------------------------------------------------------
+          pk_utility.sp_tmp_log('instructTo_row.Role_Id' || instructTo_row.Role_Id, 'c_to loop');
+        --------------------------------------------------------------------------------------------
         OPEN c_partners(instructTo_row.Role_Id);
         LOOP
           FETCH c_partners INTO v_partnerId;
           EXIT WHEN c_partners%notfound;
-             
+          --------------------------------------------------------------------------------------------
+          pk_utility.sp_tmp_log('c_partners' || v_partnerId, 'c_partners loop');
+        --------------------------------------------------------------------------------------------
              v_tmp :=  pk_infra.fn_create_usersinstruct_his(v_ins_id => instruct_row.ins_id,
+                                                  v_subject => instruct_row.subject,
                                                   v_content => instruct_row.content,
                                                   v_partner_id => v_partnerId,
                                                   v_createdon => instruct_row.createdon,
@@ -3680,13 +3723,30 @@ begin
                                                   v_createdbyid => instruct_row.createdbyid,
                                                   v_createdbyacc => instruct_row.createdbyacc,
                                                   v_expire_time => instruct_row.expire_time);
-              
+          --------------------------------------------------------------------------------------------
+          pk_utility.sp_tmp_log('v_tmp', v_tmp);
+        --------------------------------------------------------------------------------------------
         END LOOP;
+        close c_partners;
  END LOOP;
- 
-  
+ close c_to;
+     --------------------------------------------------------------------------------------------
+          pk_utility.sp_tmp_log('update statue to post', 'post');
+        --------------------------------------------------------------------------------------------
+   update users_instruct
+   set   status = 'post',
+       status_time = sysdate
+ where ins_id = v_ins_id;
  
  return 1;
+ 
+       EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'post',
+                 v_exp_object => 'UsersInstruct');
+         return SQLCODE;   
 end;
 
 function fn_UserInstruct_Delete(
@@ -4114,6 +4174,19 @@ function fn_GetPartnerRole(v_partner_acc partner.partner_acc%type) return partne
           return -1;
  end;  
  
+ 
+ procedure sp_tmp_log(
+  v_log tmp_log.log%type,
+  v_act  tmp_log.act%type
+  ) is
+  v_logId number;
+  begin
+    v_logId := seq_tmp_log_id.nextval();
+    insert into tmp_log
+  (log_id,log_time, log, act)
+values
+  (v_logId, sysdate, v_log, v_act);
+  end;
 end pk_Utility;
 /
 

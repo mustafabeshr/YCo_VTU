@@ -660,5 +660,20 @@ namespace Yvtu.Infra.Data
             }
             return partners;
         }
+
+        public async Task<int> GetUnreadUserNotifyCountAsync(string id)
+        {
+            return await Task.Run(() => {
+                return new UserNotifyHistoryRepo(db).UserNotifyHisCount(id);
+                });
+            ;
+        }
+        public async Task<List<UserNotifyHistory>> GetUnreadUserNotifyListAsync(string id)
+        {
+            return await Task.Run(() => {
+                return new UserNotifyHistoryRepo(db).GetUnreadListForPartner(id);
+            });
+            ;
+        }
     }
 }

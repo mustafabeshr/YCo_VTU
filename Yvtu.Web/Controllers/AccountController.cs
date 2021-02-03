@@ -209,6 +209,15 @@ namespace Yvtu.Web.Controllers
                 var partnerResult = this.partnerManager.Validate(model.Id);
                 if (partnerResult.Success)
                 {
+                    var permission = partnerActivity.GetPartAct("System.Login", partnerResult.Partner.Role.Id);
+                    if (permission == null)
+                    {
+                        toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                        {
+                            Title = "تنبيه"
+                        });
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
                     if (partnerResult.Partner.Status.Id > 2)
                     {
                         toastNotification.AddInfoToastMessage("عذرا ، بحسب حالة الحساب لايمكنك استخدام النظام حاليا");

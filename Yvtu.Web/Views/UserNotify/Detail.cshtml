@@ -1,0 +1,78 @@
+﻿@model Yvtu.Core.Entities.UserNotifyHistory
+
+@{
+    ViewData["Title"] = "تعميم للمستخدمين";
+}
+
+
+<div class="row bg-white">
+    <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
+        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple;border-radius:8px;color:white;">
+            <p style="font-family: 'Janna-Blod'; font-size: 22px;">تفاصيل تعميم للمستخدمين</p>
+        </div>
+    </div>
+</div>
+
+<div class="row bg-white shadow-lg p-4" style="margin-top:1px;">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-md-12">
+                <fieldset class="box-border">
+                    <legend class="box-border">البيانات الرئيسية</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الرقم :</div>
+                        <div class="col-md-4">@Model.Id</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الاهمية :</div>
+                        <div class="col-md-4">@Model.Priority.Name</div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الموضوع :</div>
+                        <div class="col-md-10">
+                            <textarea class="form-control" readonly asp-for="Subject"
+                                      style="font-size:14px;background:#fdffad;text-align:center;
+                             color:rebeccapurple;border:1px solid white;
+                             box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">النص :</div>
+                        <div class="col-md-10"><textarea class="form-control" readonly asp-for="Content"
+                            style="font-size:14px;height:145px;background:transparent;text-align:center;
+                             color:rebeccapurple;border:1px solid white;
+                             box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 4px;"></textarea></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">تاريخ الارسال :</div>
+                        <div class="col-md-10">@Model.HistoryOn.ToString("yyyy/MM/dd ss:mm:H")</div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-md-12 mt-3">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات الحالة</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">الحالة :</div>
+                        <div class="col-md-4">@Model.Status.Name</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">التاريخ :</div>
+                        <div class="col-md-4">@Model.StatusOn.ToString("yyyy/MM/dd ss:mm:H")</div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="col-md-12 mt-3">
+                <fieldset class="box-border">
+                    <legend class="box-border">بيانات الانشاء</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">التاريخ :</div>
+                        <div class="col-md-4">@Model.CreatedBy.Name</div>
+                        <div class="col-md-2" style="font-size:12px;color:gray;">بواسطة :</div>
+                        <div class="col-md-4">@Model.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">تاريخ الانتهاء :</div>
+                        <div class="col-md-10">@Model.ExpireOn.ToString("yyyy/MM/dd")</div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </div>
+</div>

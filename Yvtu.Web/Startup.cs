@@ -38,7 +38,8 @@ namespace Yvtu.Web
             services.AddScoped<IDataAuditRepo, DataAuditRepo>();
             services.AddSingleton<IAppDbContext,AppDbContext>();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
-            services.AddControllersWithViews().AddNToastNotifyNoty(new NToastNotify.NotyOptions()
+            services.AddControllersWithViews()
+                .AddNToastNotifyNoty(new NToastNotify.NotyOptions()
             {
                 ProgressBar = true,
                 Text = "",
@@ -50,7 +51,8 @@ namespace Yvtu.Web
                 Title = "",
                 TimeOut = 2000,
                 PositionClass = ToastPositions.TopCenter
-            });
+            })
+            .AddRazorRuntimeCompilation();
             services.AddControllersWithViews();
         }
 

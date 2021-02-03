@@ -120,6 +120,7 @@ namespace Yvtu.Web.Controllers
             {
                 var created = new UserNotify();
                 created.Content = model.Content;
+                created.Subject = model.Subject;
                 created.ExpireOn = model.ExpireOn;
                 created.Priority.Id = model.PriorityId;
                 created.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
@@ -147,6 +148,34 @@ namespace Yvtu.Web.Controllers
             }
             model.Priorities = new CommonCodeRepo(db).GetCodesByType("priority");
             model.Roles = new RoleRepo(db, partnerActivity).GetRoles();
+            return View(model);
+        }
+        public string delete(int id)
+        {
+            var result = new UserNotifyRepo(db).Delete(id);
+            if (result > 0)
+            {
+                return "suceess";
+            }
+            return "failed";
+        }
+        public string PostNotify(int id)
+        {
+            var result = new UserNotifyRepo(db).Post(id);
+            if (result.Success)
+            {
+                toastNotification.AddSuccessToastMessage("تم ترحيل التعميم على كافة المستخدمين", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return "suceess";
+            }
+            return "failed";
+        }
+        public IActionResult Detail(int id)
+        {
+            var model = new UserNotifyHistoryRepo(db).GetSingle(id);
+            var markRead = new UserNotifyHistoryRepo(db).Read(id);
             return View(model);
         }
     }
