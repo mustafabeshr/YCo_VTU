@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Yvtu.Web.Logger;
 
 namespace Yvtu.Web
 {
@@ -17,10 +18,17 @@ namespace Yvtu.Web
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
+           Host.CreateDefaultBuilder(args)
+               .ConfigureWebHostDefaults(webBuilder =>
+               {
+                   webBuilder.UseStartup<Startup>();
+               })
+               .ConfigureLogging((hostBuilderContext, logging) =>
+               {
+                   logging.AddFileLogger(options =>
+                   {
+                       hostBuilderContext.Configuration.GetSection("Logging").GetSection("VTUWeb").GetSection("Options").Bind(options);
+                   });
+               });
     }
 }

@@ -1,7 +1,7 @@
 ﻿@inject Yvtu.Infra.Data.Interfaces.IPartnerManager UserManager
 @using System.Security.Claims
 
-@{ 
+@{
     double currentPartnerBalance = 0;
     string currentPartnerId = string.Empty;
     string currentPartnerRoleName = string.Empty;
@@ -22,23 +22,14 @@
 </head>
 <body>
 
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark  border-bottom box-shadow" style="min-height:100px;background-color:#f3f1f1">
+    <header style="height:100px;">
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark  border-bottom box-shadow" style="min-height:80px;background-color:#f3f1f1">
             <div class="container">
                 <a asp-action="Index" asp-controller="Home" class="brand-link" style="text-decoration: none;font-size:18px;">
                     <img src="~/images/Y-Logo2.png" alt="YCo Logo" class="brand-image" width="70" height="70" style="opacity: .8">
                     <span class="brand-text font-weight-light" style="font-family: 'ArefRuqaa-Bold'; font-size:1.5em;color:purple;">إدارة الشاحن الفوري</span>
                 </a>
 
-                @*<div style="font-size:20px;font-weight:bold;">
-                        @{
-                            var partId = UserManager.GetCurrentUserId(this.Context);
-                            var part = UserManager.Validate(partId).Partner;
-                            var bal = (part.Balance - part.Reserved);
-                            <p>@bal.ToString("N0")</p>
-                            }
-
-                    </div>*@
                 @if (this.User.Identity.IsAuthenticated)
                 {
                     currentPartnerAccount = UserManager.GetCurrentUserAccount(this.Context);
@@ -48,6 +39,7 @@
                     currentPartnerRoleName = part.Role.Name;
                     var unreadUserNotifyMessagesFormat = "0";
                     var unreadUserNotifyMessages = await UserManager.GetUnreadUserNotifyCountAsync(currentPartnerId);
+                    var UnreadMessagesList = await UserManager.GetUnreadUserNotifyListAsync(currentPartnerId);
                     if (unreadUserNotifyMessages > 9)
                     {
                         unreadUserNotifyMessagesFormat = "+9";
@@ -61,84 +53,93 @@
                             <li class="dropdown">
                                 <a href="#" style="vertical-align:middle;z-index:0;" data-toggle="dropdown"
                                    role="button" aria-haspopup="true" aria-expanded="false">
-                                    <span class="badge badge-danger" style="font-family:'Arial'; z-index: 1;
-                                     position:absolute;top:2%;right:90%;border-radius:50%;font-weight:normal;
-                                     "data-toggle="tooltip" data-placement="left" title="@unreadUserNotifyMessages">@unreadUserNotifyMessagesFormat</span>
-                        <i class="far fa-envelope"></i>
-                    </a>
-                    <div class="dropdown-menu text-right shadow-lg" style="font-size:12px;left:-60px;min-width:45rem;left:-350px;border-radius:10px;">
-                        @foreach (var item in await UserManager.GetUnreadUserNotifyListAsync(currentPartnerId))
-                        {
-                            <a class="dropdown-item p-4" asp-action="Detail" asp-controller="UserNotify" asp-route-id="@item.Id">
-                                <div class="row">
-                                    <div class="col-md-12" style="font-weight:bold;font-size:13px;color:rebeccapurple;">
-                                        @if (item.Subject.Length > 100)
+                                    @if (unreadUserNotifyMessages > 0)
+                                    {
+                                        <span class="badge badge-danger" style="font-family:'Arial'; z-index: 1;
+                                         position:absolute;top:2%;right:90%;border-radius:50%;font-weight:normal;
+                                         " data-toggle="tooltip" data-placement="left" title="@unreadUserNotifyMessages">@unreadUserNotifyMessagesFormat</span>
+                                    }
+                                    <i class="far fa-envelope"></i>
+                                </a>
+                                <div class="dropdown-menu text-right" style="font-size:12px;left:-60px;min-width:45rem;left:-350px;border-radius:10px;
+                                        box-shadow:0 18px 24px rgb(2 8 20 / 20%), 0 8px 8px rgb(2 8 20 / 10%)">
+                                    @if (UnreadMessagesList != null && UnreadMessagesList.Count > 0)
+                                    {
+                                        var msgCount = 0;
+
+                                        @foreach (var item in UnreadMessagesList)
                                         {
-                                            @string.Concat(item.Subject.Substring(0, 100), " ... ")
+                                            ++msgCount;
+                                            if (msgCount > 1)
+                                            {
+                                                <hr style="margin:0px;" />
+                                            }
+                                            <a class="dropdown-item p-4" asp-action="Detail" asp-controller="UserNotify" asp-route-id="@item.Id">
+                                                <div class="row">
+                                                    <div class="col-md-12" style="font-weight:bold;font-size:13px;color:rebeccapurple;">
+                                                        @if (item.Subject.Length > 100)
+                                                        {
+                                                            @string.Concat(item.Subject.Substring(0, 100), " ... ")
+                                                        }
+                                                        else
+                                                        {
+                                                            @item.Subject
+                                                        }
+                                                    </div>
+                                                    <div class="col-md-12 mt-3" style="color:gray;">
+                                                        <div class="row">
+                                                            <div class="col-md-4" style="direction:ltr;">
+                                                                @item.HistoryOn.ToString("ss:mm:HH") @item.HistoryOn.ToString("yyyy-MM-dd") @item.HistoryOn.ToString("ddd")
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                @item.CreatedBy.Name
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <i class="fas fa-exclamation" style="color:red;font-size:10px;"></i>
+                                                                @item.Priority.Name
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </a>
+
                                         }
-                                        else
-                                        {
-                                            @item.Subject
-                                        }
-                                    </div>
-                                    <div class="col-md-12 mt-3" style="color:gray;">
-                                        <div class="row">
-                                            <div class="col-md-1" style="font-size:11px;">
-                                                الانشاء :
-                                            </div>
-                                            <div class="col-md-3">
-                                                @item.CreatedOn.ToString("yyyy-MM-dd HH:mm:ss")
-                                            </div>
-                                            <div class="col-md-1" style="font-size:11px;">
-                                                الاهمية :
-                                            </div>
-                                            <div class="col-md-2">
-                                                @item.Priority.Name
-                                            </div>
-                                            <div class="col-md-1" style="font-size:11px;">
-                                                بواسطة :
-                                            </div>
-                                            <div class="col-md-4">
-                                                @item.CreatedBy.Name
-                                            </div>
-                                        </div>
-                                    </div>
+                                    }
+                                    else
+                                    {
+                                        <p class="text-center text-muted p-2"><i class="far fa-tired fa-2x"></i><br />لا توجد رسائل</p>
+                                    }
+
                                 </div>
-
-                            </a>
-                            <hr style="margin:0px;" />
-                        }
-
+                            </li>
+                        </ul>
                     </div>
-                </li>
-            </ul>
-        </div>
-        <div class="float-left" style="font-size:12px;">
-            <div style="display:block;font-size:20px;font-weight:bold;text-align:center;padding-right:40px;color:gray;">
-                @if (this.User.Identity.IsAuthenticated)
-                {
-                    <p>
-                        @*<i class="fas fa-dollar-sign" style="font-size:12px;"></i>*@@currentPartnerBalance.ToString("N0")
-                        <span style="font-size:12px;">ر.ي</span>
-                    </p>
-                }
-            </div>
+                    <div class="float-left" style="font-size:12px;">
+                        <div style="display:block;font-size:20px;font-weight:bold;text-align:center;padding-right:40px;color:gray;">
+                            @if (this.User.Identity.IsAuthenticated)
+                            {
+                                <p>
+                                    @*<i class="fas fa-dollar-sign" style="font-size:12px;"></i>*@@currentPartnerBalance.ToString("N0")
+                                    <span style="font-size:12px;">ر.ي</span>
+                                </p>
+                            }
+                        </div>
 
-            <div style="display:block;text-align:center;">
+                        <div style="display:block;text-align:center;">
 
-                @if (this.User.Identity.IsAuthenticated)
-                {
-                    <div style="display:inline-flex">
+                            @if (this.User.Identity.IsAuthenticated)
+                            {
+                                <div style="display:inline-flex">
 
 
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" style="color:gray;"
-                                   role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" style="color:gray;"></i>&nbsp;&nbsp;@User.Identity.Name</a>
+                                    <ul class="navbar-nav flex-grow-1">
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" style="color:gray;"
+                                               role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user" style="color:gray;"></i>&nbsp;&nbsp;@User.Identity.Name</a>
 
-                                <div class="dropdown-menu text-right" style="font-size:12px;">
+                                            <div class="dropdown-menu text-right" style="font-size:12px;">
 
-                                    <p class="dropdown-item" style="user-select:none;text-align:center;font-size:17px;
+                                                <p class="dropdown-item" style="user-select:none;text-align:center;font-size:17px;
                                             font-weight:bold;color:rebeccapurple;"><i class="fas fa-mobile-alt"></i> @currentPartnerId</p>
                                             <p class="dropdown-item" style="user-select:none;text-align:center;font-size:17px;
                                             font-weight:bold;color:forestgreen;">@currentPartnerAccount</p>
@@ -164,12 +165,11 @@
                         {
                             @*<a asp-action="Login" asp-controller="Account" class="nav-link">تسجيل دخول</a>*@
                         }
-            </div>
-        </div>
-    }
+                        </div>
+                    </div>
+                }
             </div>
         </nav>
-        }
     </header>
     <div class="container">
         <main role="main" class="pb-3">

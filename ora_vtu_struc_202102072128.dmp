@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 03/02/2021, 22:25:06 22:25:06  --
+-- Created by mbeshr on 07/02/2021, 21:28:35 21:28:35  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202102032224.log
+spool ora_vtu_struc_202102072128.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -973,7 +973,7 @@ prompt
 create sequence SEQ_DATA_AUDIT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 101
+start with 121
 increment by 1
 cache 20;
 
@@ -1039,7 +1039,7 @@ prompt
 create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 261
+start with 301
 increment by 1
 cache 20;
 
@@ -1127,7 +1127,7 @@ prompt
 create sequence SEQ_TMP_LOG_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 101
+start with 121
 increment by 1
 cache 20;
 
@@ -1138,7 +1138,7 @@ prompt
 create sequence SEQ_USERS_INSTRUCT_HIS_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 41
+start with 61
 increment by 1
 cache 20;
 
@@ -1149,7 +1149,7 @@ prompt
 create sequence SEQ_USER_INST_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 61
+start with 81
 increment by 1
 cache 20;
 
@@ -3705,14 +3705,14 @@ begin
         FETCH c_to INTO instructTo_row;
         EXIT WHEN c_to%notfound;
         --------------------------------------------------------------------------------------------
-          pk_utility.sp_tmp_log('instructTo_row.Role_Id' || instructTo_row.Role_Id, 'c_to loop');
+       --   pk_utility.sp_tmp_log('instructTo_row.Role_Id' || instructTo_row.Role_Id, 'c_to loop');
         --------------------------------------------------------------------------------------------
         OPEN c_partners(instructTo_row.Role_Id);
         LOOP
           FETCH c_partners INTO v_partnerId;
           EXIT WHEN c_partners%notfound;
           --------------------------------------------------------------------------------------------
-          pk_utility.sp_tmp_log('c_partners' || v_partnerId, 'c_partners loop');
+        --  pk_utility.sp_tmp_log('c_partners' || v_partnerId, 'c_partners loop');
         --------------------------------------------------------------------------------------------
              v_tmp :=  pk_infra.fn_create_usersinstruct_his(v_ins_id => instruct_row.ins_id,
                                                   v_subject => instruct_row.subject,
@@ -3724,14 +3724,14 @@ begin
                                                   v_createdbyacc => instruct_row.createdbyacc,
                                                   v_expire_time => instruct_row.expire_time);
           --------------------------------------------------------------------------------------------
-          pk_utility.sp_tmp_log('v_tmp', v_tmp);
+        --  pk_utility.sp_tmp_log('v_tmp', v_tmp);
         --------------------------------------------------------------------------------------------
         END LOOP;
         close c_partners;
  END LOOP;
  close c_to;
      --------------------------------------------------------------------------------------------
-          pk_utility.sp_tmp_log('update statue to post', 'post');
+        --  pk_utility.sp_tmp_log('update statue to post', 'post');
         --------------------------------------------------------------------------------------------
    update users_instruct
    set   status = 'post',

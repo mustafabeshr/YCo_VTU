@@ -58,4 +58,25 @@ namespace Yvtu.Web.Dto
         public List<UserNotify> Results { get; set; }
     }
 
+    public class UserNotifyHisQueryDto
+    {
+        public UserNotifyHisQueryDto()
+        {
+            Statuses = new List<CommonCode>();
+            Paging = new Paging();
+        }
+        public int Id { get; set; }
+        public string Content { get; set; }
+        [StringLength(9)]
+        public string PartnerId { get; set; }
+        public string Subject { get; set; }
+        public string StatusId { get; set; }
+        public List<CommonCode> Statuses { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime StartDate { get; set; }
+        [DataType(DataType.Date)]
+        public DateTime EndDate { get; set; }
+        public Paging Paging { get; set; }
+        public List<UserNotifyHistory> Results { get; set; }
+    }
 }

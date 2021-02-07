@@ -46,10 +46,10 @@ namespace Yvtu.Infra.Data
             }
         }
 
-        public List<UserNotifyHistory> QueryWithPaging(int id, string content, string status, DateTime startDate, DateTime endDate, Paging paging)
+        public List<UserNotifyHistory> QueryWithPaging(string partnerId, string content, string status, DateTime startDate, DateTime endDate, Paging paging)
         {
             var WhereClause = string.Empty;
-            var parameters = BuildParameters(id, content, status, startDate, endDate, ref WhereClause);
+            var parameters = BuildParameters(partnerId, content, status, startDate, endDate, ref WhereClause);
 
             var strSqlStatment = new StringBuilder();
             strSqlStatment.Append("Select * from ( ");
@@ -71,17 +71,17 @@ namespace Yvtu.Infra.Data
             }
             return results;
         }
-        private List<OracleParameter> BuildParameters(int id, string content, string status, DateTime startDate, DateTime endDate, ref string criteria)
+        private List<OracleParameter> BuildParameters(string partnerId, string content, string status, DateTime startDate, DateTime endDate, ref string criteria)
         {
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
-            if (id > 0)
+            if (!string.IsNullOrEmpty(partnerId))
             {
-                var parm = new OracleParameter { ParameterName = "NId", OracleDbType = OracleDbType.Int32, Value = id };
-                WhereClause.Append(" WHERE ins_id=:NId ");
+                var parm = new OracleParameter { ParameterName = "partnerId", OracleDbType = OracleDbType.Int32, Value = partnerId };
+                WhereClause.Append(" WHERE partner_id=:partnerId ");
                 parameters.Add(parm);
             }
-            if (!string.IsNullOrEmpty(status))
+            if (!string.IsNullOrEmpty(status) && status != "-1")
             {
                 var parm = new OracleParameter { ParameterName = "StatusId", OracleDbType = OracleDbType.Varchar2, Value = status };
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");
@@ -135,10 +135,10 @@ namespace Yvtu.Infra.Data
             obj.HistoryOn = row["historyon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["historyon"].ToString());
             return obj;
         }
-        public int GetCount(int id, string content, string status, DateTime startDate, DateTime endDate)
+        public int GetCount(string partnerId, string content, string status, DateTime startDate, DateTime endDate)
         {
             string WhereClause = string.Empty;
-            var parameters = BuildParameters(id, content, status, startDate, endDate, ref WhereClause);
+            var parameters = BuildParameters(partnerId, content, status, startDate, endDate, ref WhereClause);
             var strSqlStatment = new StringBuilder();
             strSqlStatment.Append($"Select count(*) val from v_users_instruct_his  { WhereClause }");
             var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);

@@ -161,21 +161,128 @@ namespace Yvtu.Web.Controllers
         }
         public string PostNotify(int id)
         {
-            var result = new UserNotifyRepo(db).Post(id);
-            if (result.Success)
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("UserNotify.Post", currentRoleId);
+            if (permission == null)
             {
-                toastNotification.AddSuccessToastMessage("تم ترحيل التعميم على كافة المستخدمين", new ToastrOptions
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
                     Title = "تنبيه"
                 });
-                return "suceess";
+                //return Redirect(Request.Headers["Referer"].ToString());
+            }else
+            {
+                var result = new UserNotifyRepo(db).Post(id);
+                if (result.Success)
+                {
+                    toastNotification.AddSuccessToastMessage("تم ترحيل التعميم على كافة المستخدمين", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return "suceess";
+                }
             }
             return "failed";
         }
         public IActionResult Detail(int id)
         {
             var model = new UserNotifyHistoryRepo(db).GetSingle(id);
-            var markRead = new UserNotifyHistoryRepo(db).Read(id);
+            var currentUserId = partnerManager.GetCurrentUserId(this.HttpContext);
+            if (model.Partner.Id == currentUserId)
+            {
+                var markRead = new UserNotifyHistoryRepo(db).Read(id);
+            }
+            return View(model);
+        }
+
+
+        public IActionResult MyMsg()
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("UserNotifyHis.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            var model = new UserNotifyHisQueryDto();
+            model.Statuses = new CommonCodeRepo(db).GetCodesByType("UserInstructHisStatus");
+            model.StartDate = DateTime.Today.AddMonths(-1);
+            model.EndDate = DateTime.Today.AddDays(1);
+            model.Paging.PageNo = 1;
+            model.Paging.PageSize = 10;
+            model.Paging.Count = 0;
+            model.PartnerId = partnerManager.GetCurrentUserId(this.HttpContext);
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult MyMsg(UserNotifyHisQueryDto model, [FromQuery(Name = "direction")] string direction)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var currUserId = partnerManager.GetCurrentUserId(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("UserNotifyHis.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            Partner targetPartner = null;
+            if (!string.IsNullOrEmpty(model.PartnerId) && model.PartnerId != currUserId)
+            {
+                var validateTargetPartnerResult = partnerManager.Validate(model.PartnerId);
+                targetPartner = validateTargetPartnerResult.Success ? validateTargetPartnerResult.Partner : null;
+                if (targetPartner == null)
+                {
+                    toastNotification.AddErrorToastMessage("يرجى التأكد من الرقم المراد الاستعلام عنه", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+            }
+            if (permission.Scope.Id == "CurOpOnly" && model.PartnerId != currUserId)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            else if (permission.Scope.Id == "Exclusive" && targetPartner != null && targetPartner.RefPartner.Id != currUserId)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            ModelState.Clear();
+            if (direction == "pre" && model.Paging.PageNo > 1)
+            {
+                model.Paging.PageNo -= 1;
+            }
+            if (direction == "next")
+            {
+                model.Paging.PageNo += 1;
+            }
+            var result = new UserNotifyHistoryRepo(db).QueryWithPaging(model.PartnerId, model.Content, model.StatusId, model.StartDate, model.EndDate, model.Paging);
+            if (result != null)
+            {
+                model.Paging.Count = new UserNotifyHistoryRepo(db).GetCount(model.PartnerId, model.Content, model.StatusId, model.StartDate, model.EndDate);
+            }
+            else
+            {
+                model.Paging.Count = 0;
+            }
+            model.Statuses = new CommonCodeRepo(db).GetCodesByType("UserInstructHisStatus");
+            model.Results = result;
             return View(model);
         }
     }

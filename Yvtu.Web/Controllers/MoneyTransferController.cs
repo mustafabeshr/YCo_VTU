@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.Extensions.Logging;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
@@ -26,15 +27,18 @@ namespace Yvtu.Web.Controllers
         private readonly IPartnerActivityRepo _partnerActivity;
         private readonly IConverter converter;
         private readonly IWebHostEnvironment environment;
+        private readonly ILogger<MoneyTransferController> logger;
 
         public MoneyTransferController(IAppDbContext db, IPartnerManager partnerManager
-            , IPartnerActivityRepo partnerActivity, IConverter converter, IWebHostEnvironment environment)
+            , IPartnerActivityRepo partnerActivity, IConverter converter, IWebHostEnvironment environment,
+            ILogger<MoneyTransferController> logger)
         {
             this._db = db;
             this._partnerManager = partnerManager;
             this._partnerActivity = partnerActivity;
             this.converter = converter;
             this.environment = environment;
+            this.logger = logger;
         }
         //[HttpGet]
         public IActionResult CreatePDF(int id)
@@ -293,7 +297,6 @@ namespace Yvtu.Web.Controllers
         public IActionResult MoneyTranferQuery(MoneyTransferQueryDto model, [FromQuery
         (Name = "direction")] string direction  )
         {
-          
             #region Prepare Query
             model.Error = string.Empty;
             Partner targetPartner = null;
@@ -307,7 +310,16 @@ namespace Yvtu.Web.Controllers
                 model.Error = "ليس لديك الصلاحيات الكافية";
                 return View(model);
             }
-
+            if (!string.IsNullOrEmpty(model.QPartnerId) && model.QPartnerId != currUserId)
+            {
+                var validateTargetPartnerResult = _partnerManager.Validate(model.QPartnerId);
+                targetPartner = validateTargetPartnerResult.Success ? validateTargetPartnerResult.Partner : null;
+                if (targetPartner == null)
+                {
+                    model.Error = "يرجى التأكد من الرقم المراد الاستعلام عنه";
+                    return View(model);
+                }
+            }
             if (permission.Scope.Id == "CurOpOnly" && model.QPartnerId != currUserId)
             {
                 model.Error = "ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم";
@@ -319,16 +331,7 @@ namespace Yvtu.Web.Controllers
                 return View(model);
             }
 
-            if (!string.IsNullOrEmpty(model.QPartnerId) && model.QPartnerId != currUserId)
-            {
-                var validateTargetPartnerResult = _partnerManager.Validate(model.QPartnerId);
-                targetPartner = validateTargetPartnerResult.Success ? validateTargetPartnerResult.Partner : null;
-                if (targetPartner == null)
-                {
-                    model.Error = "يرجى التأكد من الرقم المراد الاستعلام عنه";
-                    return View(model);
-                }
-            }
+            
             #endregion
             ModelState.Clear();
             if (direction == "pre" && model.Paging.PageNo > 1)
