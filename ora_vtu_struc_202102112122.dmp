@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 07/02/2021, 21:28:35 21:28:35  --
+-- Created by mbeshr on 11/02/2021, 21:23:04 21:23:04  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202102072128.log
+spool ora_vtu_struc_202102112122.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -1039,7 +1039,7 @@ prompt
 create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 301
+start with 321
 increment by 1
 cache 20;
 

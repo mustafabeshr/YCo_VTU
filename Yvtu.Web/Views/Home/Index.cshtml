@@ -1,382 +1,600 @@
-﻿@{
+﻿@inject Yvtu.Infra.Data.Interfaces.IPartnerManager UserManager
+@inject Yvtu.Infra.Data.Interfaces.IPartnerActivityRepo  partnerActivity
+
+
+
+@{
     ViewData["Title"] = "Home";
+    var currentPartnerRoleId = UserManager.GetCurrentUserRole(this.Context);
+    var hasInfoTabPageRight = partnerActivity.GetPartAct("System.HotInfo", currentPartnerRoleId) != null;
 }
 
 @await Component.InvokeAsync("NToastNotify")
-<div class="row">
-    <div class="col-md-12">
-        <div id="accordion">
-            @* الوظائف الاساسية *@
-            <div class="card mt-0">
-                <div class="card-header p-1" id="headingOne"
-                     style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
-                    <h6 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"
-                                style="text-decoration:none;color:white;">
-                            الوظائف الاساسية
-                        </button>
-                        <i class="fab fa-buromobelexperte fa-2x float-left" style="color:gray;"></i>
-                    </h6>
-                </div>
 
-                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
-                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
-                    <div class="card-body ">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <a asp-action="Create" asp-controller="MoneyTransfer" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto text-center MainLink">
-                                        <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
-                                        <br /> نقل رصيد
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Create" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fa fa-user-plus fa-3x" style="color:green;"></i> <br /> إنشاء جهة
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Edit" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fas fa-user-edit fa-3x" style="color:Highlight;"></i> <br /> تعديل بيانات جهة
-                                    </div>
-                                </a>
-                            </div>
+<ul class="nav nav-tabs nav-fill justify-content-center p-0" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <a class="nav-link active tab_btn" id="home-tab" data-bs-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" style="border-radius:50px 50px 0 0;">الرئيسية</a>
+    </li>
+    @if (hasInfoTabPageRight)
+    {
+        <li class="nav-item" role="presentation">
+            <a class="nav-link  tab_btn" id="profile-tab" data-bs-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" style="border-radius:50px 50px 0 0;">معلومات</a>
+        </li>
+    }
+</ul>
 
-                            <div class="col-md-2">
-                                <a asp-action="Suspend" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-user-slash fa-3x" style="color:magenta;"></i>
-                                        <br /> ايقاف نشاط
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Cancel" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-user-minus fa-3x" style="color:red;"></i>
-                                        <br /> ايقاف نهائي
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Reactive" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-user-check fa-3x" style="color:green;"></i>
-                                        <br /> اعادة تفعيل الخدمة
-                                    </div>
-                                </a>
-                            </div>
-
+<div class="tab-content" id="myTabContent">
+    <!-- Main Tab Page-->
+    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+        <div class="row">
+            <div class="col-md-12">
+                <div id="accordion">
+                    @* الوظائف الاساسية *@
+                    <div class="card mt-0">
+                        <div class="card-header p-1" id="headingOne"
+                             style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
+                            <h6 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne"
+                                        style="text-decoration:none;color:white;">
+                                    الوظائف الاساسية
+                                </button>
+                                <i class="fab fa-buromobelexperte fa-2x float-left" style="color:gray;"></i>
+                            </h6>
                         </div>
-                        <div class="row  mt-4">
-                            <div class="col-md-2">
-                                <a  asp-action="Create" asp-controller="UserNotify"  style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fa fa-bullhorn fa-3x"></i>
-                                        <br /> التعاميم
+
+                        <div id="collapseOne" class="collapse show" aria-labelledby="headingOne"
+                             style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <a asp-action="Create" asp-controller="MoneyTransfer" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto text-center MainLink">
+                                                <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
+                                                <br /> نقل رصيد
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
+                                    <div class="col-md-2">
+                                        <a asp-action="Create" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fa fa-user-plus fa-3x" style="color:green;"></i> <br /> إنشاء جهة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Edit" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fas fa-user-edit fa-3x" style="color:Highlight;"></i> <br /> تعديل بيانات جهة
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <a asp-action="Suspend" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-user-slash fa-3x" style="color:magenta;"></i>
+                                                <br /> ايقاف نشاط
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Cancel" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-user-minus fa-3x" style="color:red;"></i>
+                                                <br /> ايقاف نهائي
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Reactive" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-user-check fa-3x" style="color:green;"></i>
+                                                <br /> اعادة تفعيل الخدمة
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div class="row  mt-4">
+                                    <div class="col-md-2">
+                                        <a asp-action="Create" asp-controller="UserNotify" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fa fa-bullhorn fa-3x"></i>
+                                                <br /> التعاميم
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Confiscate" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-gavel fa-3x" style="color:brown;"></i>
+                                                <br /> مصادرة رصيد
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Create" asp-controller="Bgserv" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-database fa-3x"></i>
+                                                <br /> معالج البيانات
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="SendSMSOne" asp-controller="msg" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-sms fa-3x" style="color:purple;"></i>
+                                                <br /> إرسال رسالة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="CreateRule" asp-controller="PartActivity" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fa fa-user-shield fa-3x" style="color:dodgerblue;"></i> <br /> إنشاء صلاحية جديدة
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-2">
-                                <a asp-action="Confiscate" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-gavel fa-3x"  style="color:brown;"></i>
-                                        <br /> مصادرة رصيد
+                        </div>
+                    </div>
+                    @* الاستعلامات *@
+                    <div class="card mt-0">
+                        <div class="card-header p-1" id="heading2"
+                             style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
+                            <h6 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapseOne"
+                                        style="text-decoration:none;color:white;">
+                                    الاستعلامات
+                                </button>
+                                <i class="fa fa-eye fa-2x float-left" style="color:gray;"></i>
+                            </h6>
+                        </div>
+
+                        <div id="collapse2" class="collapse show" aria-labelledby="heading2"
+                             style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <a asp-action="RoleList" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink" style="width:135px;">
+                                                <i class="fas fa-crown fa-3x" style="color:rebeccapurple;"></i>
+                                                <br /> المستويات و انواع الجهات
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a  asp-action="Create" asp-controller="Bgserv"  style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-database fa-3x"></i>
-                                        <br /> معالج البيانات
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink" style="width:125px;">
+                                                <i class="fa fa-users fa-3x" style="color:black;"></i> <br /> الجهات و المستخدمين
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="SendSMSOne" asp-controller="msg" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-sms fa-3x"  style="color:purple;"></i>
-                                        <br /> إرسال رسالة
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="PartActivity" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fa fa-shield-alt fa-3x" style="color:dodgerblue;"></i> <br /> الصلاحيات
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="CreateRule" asp-controller="PartActivity" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fa fa-user-shield fa-3x" style="color:dodgerblue;"></i> <br /> إنشاء صلاحية جديدة
+                                    <div class="col-md-2">
+
+                                        <a asp-action="MoneyTranferQuery" asp-controller="MoneyTransfer" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
+
+                                                <br /> نقل رصيد
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Recharge" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-money-bill-wave fa-3x" style="color:darkcyan;"></i>
+
+                                                <br /> التحصيل
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Notification" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-bell fa-3x" style="color:goldenrod;"></i>
+
+                                                <br /> الاشعارات
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row  mt-4">
+                                    <div class="col-md-2">
+                                        <a asp-action="pfr" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-book-reader fa-3x" style="color:orchid;"></i>
+                                                <br /> كشف حساب
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="msg" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
+                                                <br /> نصوص الرسائل
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Activity" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="far fa-dot-circle fa-3x" style="color:blue;"></i>
+                                                <br /> الاجراءات
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="ChgStateQuery" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-user-clock fa-3x" style="color:indianred;"></i>
+                                                <br /> تغيير حالة جهة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="ConfiscationQuery" asp-controller="Account" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-gavel fa-3x" style="color:brown;"></i>
+                                                <br /> مصادرة رصيد
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Bgserv" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-database fa-3x"></i>
+                                                <br /> معالج البيانات
+                                            </div>
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="UserNotify" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fa fa-bullhorn fa-3x"></i>
+                                                <br /> التعاميم
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="SendSMSOneQuery" asp-controller="msg" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-sms fa-3x" style="color:purple;"></i>
+                                                <br /> إرسال رسالة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a href="#" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
+                                                <i class="fas fa-user-edit fa-3x" style="color:Highlight;"></i> <br /> تعديل بيانات جهة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="globalparam" asp-controller="Home" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fas fa-globe fa-3x" style="color:#15aabf;"></i> <br /> المتغيرات العامة
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="AuditQuery" asp-controller="PartActivity" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع التعديلات
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="SMSInQuery" asp-controller="msg" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fas fa-sms fa-3x" style="color:black;"></i> <br /> الرسائل الواردة للخدمة
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="row mt-4">
+                                    <div class="col-md-2">
+                                        <a asp-action="Index" asp-controller="Adjust" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="fas fa-sliders-h fa-3x" style="color:darkcyan;"></i>
+                                                <br /> التسويات
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <a asp-action="MyMsg" asp-controller="UserNotify" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto  text-center MainLink">
+                                                <i class="far fa-envelope-open  fa-3x" style="color:blue;"></i>
+                                                <br /> تعاميمي
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            @* الاستعلامات *@
-            <div class="card mt-0">
-                <div class="card-header p-1" id="heading2"
-                     style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
-                    <h6 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse2" aria-expanded="true" aria-controls="collapseOne"
-                                style="text-decoration:none;color:white;">
-                            الاستعلامات
-                        </button>
-                        <i class="fa fa-eye fa-2x float-left" style="color:gray;"></i>
-                    </h6>
-                </div>
-
-                <div id="collapse2" class="collapse show" aria-labelledby="heading2"
-                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <a asp-action="RoleList" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink" style="width:135px;">
-                                        <i class="fas fa-crown fa-3x" style="color:rebeccapurple;"></i>
-                                        <br /> المستويات و انواع الجهات
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink" style="width:125px;">
-                                        <i class="fa fa-users fa-3x" style="color:black;"></i> <br /> الجهات و المستخدمين
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="PartActivity" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fa fa-shield-alt fa-3x" style="color:dodgerblue;"></i> <br /> الصلاحيات
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-
-                                <a asp-action="MoneyTranferQuery" asp-controller="MoneyTransfer" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
-
-                                        <br /> نقل رصيد
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Recharge" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-money-bill-wave fa-3x" style="color:darkcyan;"></i>
-
-                                        <br /> التحصيل
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Notification" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-bell fa-3x" style="color:goldenrod;"></i>
-
-                                        <br /> الاشعارات
-                                    </div>
-                                </a>
-                            </div>
+                    @* الإعدادات *@
+                    <div class="card mt-0">
+                        <div class="card-header p-1" id="heading3"
+                             style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
+                            <h6 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapseOne"
+                                        style="text-decoration:none;color:white;">
+                                    الإعدادات
+                                </button>
+                                <i class="fa fa-cogs fa-2x float-left" style="color:gray;"></i>
+                            </h6>
                         </div>
-                        <div class="row  mt-4">
-                            <div class="col-md-2">
-                                <a asp-action="pfr" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-book-reader fa-3x" style="color:orchid;"></i>
-                                        <br /> كشف حساب
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="msg" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
-                                        <br /> نصوص الرسائل
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Activity" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="far fa-dot-circle fa-3x" style="color:blue;"></i>
-                                        <br /> الاجراءات
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="ChgStateQuery" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-user-clock fa-3x" style="color:indianred;"></i>
-                                        <br /> تغيير حالة جهة
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="ConfiscationQuery" asp-controller="Account" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-gavel fa-3x" style="color:brown;"></i>
-                                        <br /> مصادرة رصيد
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Bgserv" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-database fa-3x"></i>
-                                        <br /> معالج البيانات
-                                    </div>
-                                </a>
-                            </div>
 
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="UserNotify"  style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fa fa-bullhorn fa-3x"></i>
-                                        <br /> التعاميم
+                        <div id="collapse3" class="collapse show" aria-labelledby="heading3"
+                             style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
+                            <div class="card-body">
+                                <div class="row">
+
+                                    <div class="col-md-2">
+                                        <a asp-action="Create" asp-controller="msg" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
+                                                <br /> نصوص الرسائل
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="SendSMSOneQuery" asp-controller="msg" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-sms fa-3x" style="color:purple;"></i>
-                                        <br /> إرسال رسالة
+                                    <div class="col-md-2">
                                     </div>
-                                </a>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-2"></div>
+                                </div>
                             </div>
-                            <div class="col-md-2">
-                                <a href="#" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink" style="background-color:#c2c5c7;cursor:not-allowed;">
-                                        <i class="fas fa-user-edit fa-3x" style="color:Highlight;"></i> <br /> تعديل بيانات جهة
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="globalparam" asp-controller="Home" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fas fa-globe fa-3x" style="color:#15aabf;"></i> <br /> المتغيرات العامة
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="AuditQuery" asp-controller="PartActivity" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fas fa-paw fa-3x" style="color:black;"></i> <br /> تتبع التعديلات
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="SMSInQuery" asp-controller="msg" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fas fa-sms fa-3x" style="color:black;"></i> <br /> الرسائل الواردة للخدمة
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-md-2">
-                                <a asp-action="Index" asp-controller="Adjust" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="fas fa-sliders-h fa-3x" style="color:darkcyan;"></i>
-                                        <br /> التسويات
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="MyMsg" asp-controller="UserNotify" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto  text-center MainLink">
-                                        <i class="far fa-envelope-open  fa-3x" style="color:blue;"></i>
-                                        <br /> تعاميمي
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
                         </div>
                     </div>
-            </div>
-            @* الإعدادات *@
-            <div class="card mt-0">
-                <div class="card-header p-1" id="heading3"
-                     style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
-                    <h6 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse3" aria-expanded="true" aria-controls="collapseOne"
-                                style="text-decoration:none;color:white;">
-                            الإعدادات
-                        </button>
-                        <i class="fa fa-cogs fa-2x float-left" style="color:gray;"></i>
-                    </h6>
-                </div>
-
-                <div id="collapse3" class="collapse show" aria-labelledby="heading3"
-                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
-                    <div class="card-body">
-                        <div class="row">
-                           
-                            <div class="col-md-2">
-                                <a asp-action="Create" asp-controller="msg" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="far fa-comment-alt fa-3x" style="color:crimson;"></i>
-                                        <br /> نصوص الرسائل
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                            </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
+                    @* احصائيات *@
+                    <div class="card mt-0">
+                        <div class="card-header p-1" id="heading5"
+                             style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
+                            <h6 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse5" aria-expanded="true" aria-controls="collapseOne"
+                                        style="text-decoration:none;color:white;">
+                                    إحصائيات
+                                </button>
+                                <i class="fas fa-chart-pie fa-2x float-left" style="color:gray;"></i>
+                            </h6>
                         </div>
-                    </div>
-                </div>
-            </div>
-            @* احصائيات *@
-            <div class="card mt-0">
-                <div class="card-header p-1" id="heading5"
-                     style="background: rgb(115,34,182); background: linear-gradient(274deg, rgba(115,34,182,1) 0%, rgba(237,240,242,1) 22%, rgba(255,255,255,1) 100%); ">
-                    <h6 class="mb-0">
-                        <button class="btn btn-link" data-toggle="collapse" data-target="#collapse5" aria-expanded="true" aria-controls="collapseOne"
-                                style="text-decoration:none;color:white;">
-                            إحصائيات
-                        </button>
-                        <i class="fas fa-chart-pie fa-2x float-left" style="color:gray;"></i>
-                    </h6>
-                </div>
 
-                <div id="collapse5" class="collapse show" aria-labelledby="heading5"
-                     style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-2">
-                                <a asp-action="Collection" asp-controller="Stat" style="text-decoration:none;">
-                                    <div class="pt-2 m-auto text-center MainLink">
-                                        <i class="fas fa-chart-line fa-3x" style="color:black;"></i> <br /> حركة التحصيلات
+                        <div id="collapse5" class="collapse show" aria-labelledby="heading5"
+                             style="font-family: 'DroidKufi-Normal';background-color: #f8f9fa;">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <a asp-action="Collection" asp-controller="Stat" style="text-decoration:none;">
+                                            <div class="pt-2 m-auto text-center MainLink">
+                                                <i class="fas fa-chart-line fa-3x" style="color:black;"></i> <br /> حركة التحصيلات
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
-                            </div>
-                            <div class="col-md-2">
-                                <a asp-action="MoneyTransfer" asp-controller="Stat" style="text-decoration:none;">
-                                    <div class="pt-2  m-auto text-center MainLink">
-                                        <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
-                                        <br /> نقل رصيد
+                                    <div class="col-md-2">
+                                        <a asp-action="MoneyTransfer" asp-controller="Stat" style="text-decoration:none;">
+                                            <div class="pt-2  m-auto text-center MainLink">
+                                                <i class="fas fa-gas-pump fa-3x" style="color:blue;"></i>
+                                                <br /> نقل رصيد
+                                            </div>
+                                        </a>
                                     </div>
-                                </a>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-2"></div>
+                                    <div class="col-md-2"></div>
+                                </div>
                             </div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
-                            <div class="col-md-2"></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Hot Informations Tab Page-->
+    @if (hasInfoTabPageRight)
+    {
+        <div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+            <div class="row m-0 p-4" style="background:#F8F9FA;min-height:570px;width:100%">
+                <div class="col-md-12">
+                    <fieldset class="box-border">
+                        <legend class="box-border" style="color:maroon;">التحصيل</legend>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">المبلغ</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                    </div>
+
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط الكلي</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-flag"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط النشطة</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-smile"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-danger">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط الخاملة</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-angry"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </fieldset>
+                    <br />
+                    <fieldset class="box-border">
+                        <legend class="box-border" style="color:maroon;">نقل رصيد</legend>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="small-box bg-info">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">المبلغ</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-warning">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط الكلي</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-flag"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-success">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط النشطة</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-smile"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="small-box bg-danger">
+                                    <div class="inner">
+                                        <h3>150</h3>
+                                        <p style="font-family: 'DroidKufi-Normal';">عدد النقاط الخاملة</p>
+                                    </div>
+                                    <div class="icon">
+                                        <i class="fas fa-angry"></i>
+                                    </div>
+                                    <p style="font-size:12px;background-color: rgba(0, 0, 0, 0.1);
+                                    color: rgba(255, 255, 255, 0.8);
+                                    display: block;
+                                    padding: 3px 0;
+                                    position: relative;
+                                    text-align: center;
+                                    z-index: 10;">@DateTime.Now.ToString("yyyy.MM.dd")</p>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    }
+
 </div>
+
+    @section Scripts {
+        <script>
+            $(document).ready(function () {
+                var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
+                triggerTabList.forEach(function (triggerEl) {
+                    var tabTrigger = new bootstrap.Tab(triggerEl)
+
+                    triggerEl.addEventListener('click', function (event) {
+                        event.preventDefault()
+                        tabTrigger.show()
+                    })
+                })
+            });
+        </script>
+        <style>
+            .tab_btn {
+                color: purple;
+            }
+
+                .tab_btn .active {
+                    color: black;
+                }
+        </style>
+    }

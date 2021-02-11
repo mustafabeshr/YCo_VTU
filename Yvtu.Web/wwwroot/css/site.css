@@ -100,13 +100,12 @@ html {
 body {
     /* Margin bottom by footer height */
     /*background-image:url("/images/bg1.webp");*/
-    background-color: #b793db;
-    background: linear-gradient(to right top, #673EE5, #b5a0f3 );
+    background-color: #F8F9FA;
+    /*background: linear-gradient(to right top, #673EE5, #b5a0f3 );*/
     margin-bottom: 60px;
     direction: rtl;
     text-align: right;
     font-family: 'DroidKufi-Normal';
-  
     /*background: White;*/ /*#ece2ff;*/ /* #dcdcdc fallback for old browsers */
     /*background: -webkit-linear-gradient(to top, #c31432, #240b36);*/ /* Chrome 10-25, Safari 5.1-6 */
     /*background: linear-gradient(to top, #c31432, #240b36);*/ /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
@@ -155,7 +154,7 @@ body {
     backdrop-filter: blur(2rem);
 }
 .MainLink {
-    background-color: #ffffff;
+    /*background-color: #ffffff;*/
     width: 120px;
     height: 80px;
     font-size: 11px;
@@ -306,3 +305,50 @@ legend.box-border {
     background: linear-gradient(to right bottom, rgba(255,255,255,0.1), rgba(255,255,255,0.1) );
     backdrop-filter: blur(12rem);
 }
+
+.small-box {
+    border-radius: 0.25rem;
+    box-shadow: 0 0 1px rgba(0, 0, 0, 0.125), 0 1px 3px rgba(0, 0, 0, 0.2);
+    display: block;
+    margin-bottom: 20px;
+    position: relative;
+    color:white;
+    font-family:Arial;
+}
+
+    .small-box > .inner {
+        padding: 10px;
+    }
+
+    .small-box > .small-box-footer {
+        background-color: rgba(0, 0, 0, 0.1);
+        color: rgba(255, 255, 255, 0.8);
+        display: block;
+        padding: 3px 0;
+        position: relative;
+        text-align: center;
+        text-decoration: none;
+        z-index: 10;
+    }
+
+        .small-box > .small-box-footer:hover {
+            background-color: rgba(0, 0, 0, 0.15);
+            color: #fff;
+        }
+
+    .small-box h3 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin: 0 0 10px;
+        padding: 0;
+        white-space: nowrap;
+    }
+    .small-box .icon {
+        color: rgba(0, 0, 0, 0.15);
+        z-index: 0;
+        font-size: 70px;
+        top: 20px;
+        position: absolute;
+        left: 15px;
+        transition :transform .3s linear;
+    }
