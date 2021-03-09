@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmMain));
             this.statusStrip = new System.Windows.Forms.StatusStrip();
             this.lblCount = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblHelp = new System.Windows.Forms.ToolStripStatusLabel();
@@ -451,6 +452,7 @@
             this.Controls.Add(this.pnl_btns);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.statusStrip);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.IsMdiContainer = true;
             this.Margin = new System.Windows.Forms.Padding(5);
             this.Name = "frmMain";

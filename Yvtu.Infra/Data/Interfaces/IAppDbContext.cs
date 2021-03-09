@@ -9,8 +9,6 @@ namespace Yvtu.Infra.Data.Interfaces
 {
     public interface IAppDbContext
     {
-        
-
         int ExecuteSqlCommand(string sql, IEnumerable<OracleParameter> parameters);
         DataTable GetData(string sql, IEnumerable<OracleParameter> parameters);
         Task<DataTable> GetDataAsync(string sql, IEnumerable<OracleParameter> parameters);

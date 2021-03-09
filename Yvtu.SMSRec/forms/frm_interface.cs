@@ -15,12 +15,12 @@ namespace Yvtu.SMSRec
 
         class CurrentLogMessage
         {
-            private  string _trafficType;
-            private  string _shortCode;
-            private  string _mobile;
-            private  string _message;
-            private  string _type;
-            public  string TrafficType
+            private string _trafficType;
+            private string _shortCode;
+            private string _mobile;
+            private string _message;
+            private string _type;
+            public string TrafficType
             {
                 get
                 {
@@ -32,7 +32,7 @@ namespace Yvtu.SMSRec
                     _trafficType = value;
                 }
             }
-            public  string ShortCode
+            public string ShortCode
             {
                 get
                 {
@@ -44,7 +44,7 @@ namespace Yvtu.SMSRec
                     _shortCode = value;
                 }
             }
-            public  string Mobile
+            public string Mobile
             {
                 get
                 {
@@ -56,7 +56,7 @@ namespace Yvtu.SMSRec
                     _mobile = value;
                 }
             }
-            public  string Message
+            public string Message
             {
                 get
                 {
@@ -68,7 +68,7 @@ namespace Yvtu.SMSRec
                     _message = value;
                 }
             }
-            public  string Type
+            public string Type
             {
                 get
                 {
@@ -81,7 +81,7 @@ namespace Yvtu.SMSRec
                 }
             }
 
-            public CurrentLogMessage(string traffictype,string shortcode,string mobile,string message,string type)
+            public CurrentLogMessage(string traffictype, string shortcode, string mobile, string message, string type)
             {
                 _trafficType = traffictype;
                 _shortCode = shortcode;
@@ -92,9 +92,9 @@ namespace Yvtu.SMSRec
         }
         private BackgroundWorker bw_Delivery;
         private BackgroundWorker bw_Sender = new BackgroundWorker();
-        
+
         private bool SMSCConnected = false;
-        private byte currentChannel=0;
+        private byte currentChannel = 0;
         //-----------------------------------------------------------
         byte _interface_no;
         frm_Parent _parentForm;
@@ -111,9 +111,9 @@ namespace Yvtu.SMSRec
         {
             try
             {
-                currentChannel = byte.Parse(((currentChannel % SharedParams.ChannelsCount)+1).ToString());
+                currentChannel = byte.Parse(((currentChannel % SharedParams.ChannelsCount) + 1).ToString());
                 return currentChannel;
-             }
+            }
             catch (Exception ex)
             {
                 CurrentLogMessage c = new CurrentLogMessage(string.Empty, SharedParams.Short_Code.ToString(), "", "Could not get channel no", "error");
@@ -121,7 +121,7 @@ namespace Yvtu.SMSRec
                 return 1;
             }
         }
-        public frm_interface(byte Interface_No,IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public frm_interface(byte Interface_No, IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
         {
             InitializeComponent();
             _interface_no = Interface_No;
@@ -146,9 +146,9 @@ namespace Yvtu.SMSRec
             //bw_Delivery.ProgressChanged += new ProgressChangedEventHandler(bw_Delivery_ProgressChanged);
             //bw_Delivery.RunWorkerCompleted += new RunWorkerCompletedEventHandler(bw_Delivery_RunWorkerCompleted);
 
-           
+
         }
-        public frm_interface(byte Interface_No,frm_Parent ParentForm, IAppDbContext db)
+        public frm_interface(byte Interface_No, frm_Parent ParentForm, IAppDbContext db)
         {
             _interface_no = Interface_No;
             _parentForm = ParentForm;
@@ -157,7 +157,8 @@ namespace Yvtu.SMSRec
         }
         private void bw_Delivery_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            try {
+            try
+            {
                 WriteLog((CurrentLogMessage)e.UserState);
             }
             catch (Exception ex)
@@ -170,7 +171,7 @@ namespace Yvtu.SMSRec
         {
             try
             {
-                if (e.Result!=null) WriteLog((CurrentLogMessage)e.Result);
+                if (e.Result != null) WriteLog((CurrentLogMessage)e.Result);
                 bw_Delivery.Dispose();
             }
             catch (Exception ex)
@@ -181,22 +182,23 @@ namespace Yvtu.SMSRec
         }
         private void bw_Delivery_DoWork(object sender, DoWorkEventArgs e)
         {       // Delivered message start parsing ...
-            try {
+            try
+            {
                 bool res;
-                
+
                 CurrentLogMessage c2 = null;
                 DeliverMessage.Delivered_Message delmsg = (DeliverMessage.Delivered_Message)e.Argument;
                 if (delmsg.Short_code == SharedParams.Short_Code.ToString())
                 {
-                DeliverMessage DeliverMsg = new DeliverMessage(db, partnerManager, partnerActivityRepo);
-                DeliverMessage.RequestReturnValue RQretuenvalue = new DeliverMessage.RequestReturnValue();
+                    DeliverMessage DeliverMsg = new DeliverMessage(db, partnerManager, partnerActivityRepo);
+                    DeliverMessage.RequestReturnValue RQretuenvalue = new DeliverMessage.RequestReturnValue();
                     var RQpack = new PartnerRequest();
                     var queueNo = getCurrentChannelNo();
                     RQretuenvalue = DeliverMsg.Parse_Request(delmsg, queueNo, out RQpack);
                     if (RQretuenvalue.Ret_Status == true)
                     {
                         c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo,
-                            RQpack.RequestName +" - " + RQpack.Shortcode + " - " + RQpack.ReplayDesc +" success ("+ RQpack .Id+ ") Q("+ queueNo + ")", "partnerok");
+                            RQpack.RequestName + " - " + RQpack.Shortcode + " - " + RQpack.ReplayDesc + " success (" + RQpack.Id + ") Q(" + queueNo + ")", "partnerok");
                         bw_Delivery.ReportProgress(0, c2);
                         if (RQpack.RequestId == 3)
                         {
@@ -207,7 +209,7 @@ namespace Yvtu.SMSRec
                     {
                         if (RQretuenvalue.Ret_ID == -1)
                         {
-                            CurrentLogMessage c = new CurrentLogMessage("S",SharedParams.Short_Code.ToString(), RQpack.MobileNo, RQretuenvalue.Ret_Message_to_Client,"partnererror");
+                            CurrentLogMessage c = new CurrentLogMessage("S", SharedParams.Short_Code.ToString(), RQpack.MobileNo, RQretuenvalue.Ret_Message_to_Client, "partnererror");
                             e.Result = c;
                             var BadRequest = new PartnerRequest();
                             BadRequest.MobileNo = RQpack.MobileNo;
@@ -222,10 +224,10 @@ namespace Yvtu.SMSRec
                             BadRequest.Status = 2;
 
                             res = (new PartnerRequestRepo(db).Create(BadRequest).Success);
-                            
+
                             if (res == false)
                             {
-                                 c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo, "failed to create bad request [" + RQretuenvalue.Ret_Message_to_Client + "]", "error");
+                                c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo, "failed to create bad request [" + RQretuenvalue.Ret_Message_to_Client + "]", "error");
                                 e.Result = c2;
                             }
                             if (!string.IsNullOrEmpty(RQretuenvalue.Ret_Message_to_Client))
@@ -236,20 +238,20 @@ namespace Yvtu.SMSRec
                                 res = (new OutSMSRepo(db).Create(outmessage).Success);
                                 if (res == false)
                                 {
-                                     c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo, "failed to create sms to client [" + RQretuenvalue.Ret_Message_to_Client + "]", "error");
+                                    c2 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo, "failed to create sms to client [" + RQretuenvalue.Ret_Message_to_Client + "]", "error");
                                     e.Result = c2;
                                 }
                             }
                         }
                         else if (RQretuenvalue.Ret_ID == -2)
                         {
-                            CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),RQpack.MobileNo,RQretuenvalue.Ret_Message,"partnererror");
+                            CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), RQpack.MobileNo, RQretuenvalue.Ret_Message, "partnererror");
                             e.Result = c;
                         }
                     }//res==true
-            }
+                }
                 delmsg = null;
-        }
+            }
             catch (Exception ex)
             {
                 CurrentLogMessage c1 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", ex.Message, "error");
@@ -270,11 +272,12 @@ namespace Yvtu.SMSRec
             if (CurrentInterface.Auto_Start)
             {
                 if (_bindtype == (int)smpp.SMPPBindType.BINDReciave)
-                { _bindtype = (int)smpp.SMPPBindType.BINDReciave;
+                {
+                    _bindtype = (int)smpp.SMPPBindType.BINDReciave;
                     pnl_bindtypecolor.BackColor = Color.Blue;
                 }
                 smppclient.Connect(SharedParams.SMSC_IP, SharedParams.Port_No);
-                if (SMSCConnected) smppclient.SMPPBind(SharedParams.Account_ID, SharedParams.Password, "EXT_SME",(smpp.SMPPBindType) _bindtype);
+                if (SMSCConnected) smppclient.SMPPBind(SharedParams.Account_ID, SharedParams.Password, "EXT_SME", (smpp.SMPPBindType)_bindtype);
             }
             ch_checkconnection.Checked = true;
         }
@@ -301,7 +304,7 @@ namespace Yvtu.SMSRec
                 {
                     if (dgv.Rows.Count > 25) dgv.Rows.Clear();
                     dgv.Rows.Add(DateTime.Now.ToString("HH:mm:ss"), clm.TrafficType, clm.ShortCode, clm.Mobile, clm.Message);
-                    
+
                     switch (clm.Type)
                     {
                         case "sys": dgv.Rows[dgv.Rows.Count - 2].DefaultCellStyle.ForeColor = Color.FromArgb(64, 64, 64); break;
@@ -312,7 +315,7 @@ namespace Yvtu.SMSRec
                         case "invaliddeliver": dgv.Rows[dgv.Rows.Count - 2].DefaultCellStyle.ForeColor = Color.Red; break;
                         case "sender": dgv.Rows[dgv.Rows.Count - 2].DefaultCellStyle.ForeColor = Color.DarkGreen; break;
                     }
-                    if (clm.Type=="sys" || clm.Type == "error")
+                    if (clm.Type == "sys" || clm.Type == "error")
                     {
                         if (dgv_Warnings.Rows.Count > 200) dgv.Rows.Clear();
                         dgv_Warnings.Rows.Add(DateTime.Now.ToString("dd HH:mm:ss"), clm.TrafficType, clm.ShortCode, clm.Mobile, clm.Message);
@@ -322,10 +325,10 @@ namespace Yvtu.SMSRec
                 }
                 catch (Exception ex)
                 {
-                    CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception in WriteLog [" + ex.Message + "]","error");
+                    CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in WriteLog [" + ex.Message + "]", "error");
                     WriteLog(c);
                 }
-                
+
             }
         }
         void LoadSharedParameters()
@@ -368,18 +371,18 @@ namespace Yvtu.SMSRec
             {
                 if (bindstatus)
                 {
-                    CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Bind succeeded","sys");
+                    CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Bind succeeded", "sys");
                     WriteLog(c);
                 }
                 else
                 {
-                    CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Bind failed","sys");
+                    CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Bind failed", "sys");
                     WriteLog(c);
                 }
             }
             catch (Exception ex)
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception in bind event [" + ex.Message + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in bind event [" + ex.Message + "]", "error");
                 WriteLog(c);
             }
         }
@@ -410,15 +413,16 @@ namespace Yvtu.SMSRec
         }
         private void smppclient_Connected(bool connected)
         {
-            try {
+            try
+            {
                 if (connected)
                 {
                     SMSCConnected = true;
                     btnConnect.Text = "Disconnect";
                     timer_QueryLink.Enabled = true;
-                    CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Connected","sys");
+                    CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Connected", "sys");
                     WriteLog(c);
-                    
+
                 }
                 else
                 {
@@ -450,7 +454,7 @@ namespace Yvtu.SMSRec
                 Regex regex = new Regex("[ ]{2,}", options);
                 text_message = regex.Replace(text_message, " ");
 
-                
+
 
                 var SMSReception = new SMSIn();
                 SMSReception.Sender = mobile_no;
@@ -526,15 +530,15 @@ namespace Yvtu.SMSRec
             }
             catch (Exception ex)
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception in deliver event [" + ex.Message + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in deliver event [" + ex.Message + "]", "error");
                 WriteLog(c);
             }
         }
         private void smppclient_Exception(Exception ex)
         {
-            CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception [" + ex.Message + "]","error");
+            CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception [" + ex.Message + "]", "error");
             WriteLog(c);
-           
+
         }
         private void smppclient_QueryLink(bool querystatus)
         {
@@ -555,12 +559,12 @@ namespace Yvtu.SMSRec
         {
             try
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Submit [" + msg_id + "]", "partnerok");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Submit [" + msg_id + "]", "partnerok");
                 WriteLog(c);
             }
             catch (Exception ex)
             {
-                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(),"","Exception in submit event [" + ex.Message + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in submit event [" + ex.Message + "]", "error");
                 WriteLog(c);
             }
 
@@ -571,7 +575,7 @@ namespace Yvtu.SMSRec
             {
                 StopLog = false;
                 btnStartStopLog.Text = "Stop Log";
-                
+
             }
             else
             {
@@ -593,17 +597,17 @@ namespace Yvtu.SMSRec
         private void btnBind_Click(object sender, EventArgs e)
         {
             try
-            { 
-            smppclient.SMPPBind(SharedParams.Account_ID, SharedParams.Password, "EXT_SME", (smpp.SMPPBindType)_bindtype);
+            {
+                smppclient.SMPPBind(SharedParams.Account_ID, SharedParams.Password, "EXT_SME", (smpp.SMPPBindType)_bindtype);
 
-            if (_bindtype == (int)smpp.SMPPBindType.BINDReciave)
-            {pnl_bindtypecolor.BackColor = Color.Blue; }
-            else if (_bindtype == (int)smpp.SMPPBindType.BINDSender)
-            {pnl_bindtypecolor.BackColor = Color.Yellow; }
+                if (_bindtype == (int)smpp.SMPPBindType.BINDReciave)
+                { pnl_bindtypecolor.BackColor = Color.Blue; }
+                else if (_bindtype == (int)smpp.SMPPBindType.BINDSender)
+                { pnl_bindtypecolor.BackColor = Color.Yellow; }
             }
             catch (Exception ex)
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception in bind method [" + ex.Message + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in bind method [" + ex.Message + "]", "error");
                 WriteLog(c);
             }
         }
@@ -624,17 +628,17 @@ namespace Yvtu.SMSRec
             else
             {
                 timer_checkConnection.Interval = 1000;
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Try to connect...","sys");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Try to connect...", "sys");
                 WriteLog(c);
                 try
                 {
                     smppclient.Connect(SharedParams.SMSC_IP, SharedParams.Port_No);
                     if (SMSCConnected) btnBind_Click(sender, e);
-                    
+
                 }
                 catch (Exception ex)
                 {
-                    CurrentLogMessage c1 = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"",ex.Message,"error");
+                    CurrentLogMessage c1 = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", ex.Message, "error");
                     WriteLog(c1);
                 }
             }
@@ -643,18 +647,18 @@ namespace Yvtu.SMSRec
         {
             try
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","SMSC Error [" + err_no + "] " + "[" + err_desc + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "SMSC Error [" + err_no + "] " + "[" + err_desc + "]", "error");
                 WriteLog(c);
             }
             catch (Exception ex)
             {
-                CurrentLogMessage c = new CurrentLogMessage("",SharedParams.Short_Code.ToString(),"","Exception in SMSC Error event [" + ex.Message + "]","error");
+                CurrentLogMessage c = new CurrentLogMessage("", SharedParams.Short_Code.ToString(), "", "Exception in SMSC Error event [" + ex.Message + "]", "error");
                 WriteLog(c);
             }
         }
         private void txtMobileNo_KeyPress(object sender, KeyPressEventArgs e)
         {
-            e.Handled =Util.OnlyNumber(e.KeyChar, false, sender);
+            e.Handled = Util.OnlyNumber(e.KeyChar, false, sender);
         }
         private void dgv_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
@@ -673,7 +677,7 @@ namespace Yvtu.SMSRec
             catch
             { }
         }
-    
+
         private void timer_QueryLink_Tick(object sender, EventArgs e)
         {
             smppclient.QuerySMPPLink();

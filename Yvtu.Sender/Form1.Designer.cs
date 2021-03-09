@@ -306,6 +306,7 @@
             this.ClientSize = new System.Drawing.Size(1150, 879);
             this.Controls.Add(this.splitContainer2);
             this.Controls.Add(this.toolStrip1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(3, 4, 3, 4);
             this.Name = "Form1";
             this.Text = "Form1";

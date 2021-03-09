@@ -36,7 +36,7 @@ namespace Yvtu.RechargePrc
 
             SharedParams.Load();
             this.lblDaiyReportSendTime.Text = SharedParams.DailyReportSendTime;
-            this.Text = "RM.bg." + SharedParams.Short_Code + "." + SharedParams.Application_Title;
+            this.Text = "Recharge bg " + SharedParams.Short_Code + "." + SharedParams.Application_Title;
         }
 
        

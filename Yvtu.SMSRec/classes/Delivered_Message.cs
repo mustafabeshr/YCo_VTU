@@ -561,6 +561,16 @@ namespace Yvtu.SMSRec
                         
                         #endregion
                         #endregion
+                    } else
+                    {
+                        #region Unkown Request
+                        ret.Ret_ID = -1;
+                        ret.Ret_Message = "incorrect_request";
+                        ret.Ret_Message_to_Client = "عذرا طلب غير معروف ";
+                        ret.Ret_Status = false;
+                        parsedRequest.RequestId = 1;
+                        return ret;
+                        #endregion
                     }
 
                 }
