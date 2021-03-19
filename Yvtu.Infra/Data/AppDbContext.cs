@@ -126,7 +126,7 @@ namespace Yvtu.Infra.Data
             }
         }
 
-        private OracleConnection GetConnection(string connectionStringName)
+    private OracleConnection GetConnection(string connectionStringName)
     {
         var connString = Configuration.GetConnectionString(connectionStringName);
         return new OracleConnection(connString);

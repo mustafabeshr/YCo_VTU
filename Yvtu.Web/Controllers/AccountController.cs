@@ -35,7 +35,8 @@ namespace Yvtu.Web.Controllers
             ,IPartnerManager partner
             ,IPartnerActivityRepo partnerActivity
             , IToastNotification toastNotification
-            , IConverter converter, IWebHostEnvironment environment)
+            , IConverter converter, 
+            IWebHostEnvironment environment)
         {
             this.db = db;
             this.partnerManager = partner;
@@ -251,6 +252,7 @@ namespace Yvtu.Web.Controllers
 
                         await this.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal
                             , new AuthenticationProperties() { IsPersistent = model.RememberMe });
+
 
                     if (!String.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
                         return Redirect(returnUrl);

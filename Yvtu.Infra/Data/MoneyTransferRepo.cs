@@ -17,7 +17,8 @@ namespace Yvtu.Infra.Data
         private readonly IPartnerManager partnerManager;
         private readonly IPartnerActivityRepo partnerActivityRepo;
 
-        public MoneyTransferRepo(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public MoneyTransferRepo(IAppDbContext db, IPartnerManager partnerManager, 
+            IPartnerActivityRepo partnerActivityRepo)
         {
             this.db = db;
             this.partnerManager = partnerManager;
@@ -37,14 +38,14 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_pay_date",OracleDbType = OracleDbType.Date,  Value = transfer.PayDate },
                  new OracleParameter{ ParameterName = "v_bank_name",OracleDbType = OracleDbType.Varchar2,  Value = transfer.PayBank },
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = transfer.CreatedBy.Id },
-                 new OracleParameter{ ParameterName = "v_access_channel",OracleDbType = OracleDbType.Varchar2,  Value = "web" },
+                 new OracleParameter{ ParameterName = "v_access_channel",OracleDbType = OracleDbType.Varchar2,  Value = transfer.AccessChannel.Id },
                  new OracleParameter{ ParameterName = "v_amount",OracleDbType = OracleDbType.Decimal,  Value = transfer.Amount },
                  new OracleParameter{ ParameterName = "v_bill_no",OracleDbType = OracleDbType.Varchar2,  Value = transfer.BillNo },
                  new OracleParameter{ ParameterName = "v_request_no",OracleDbType = OracleDbType.Varchar2,  Value = transfer.RequestNo },
                  new OracleParameter{ ParameterName = "v_request_amt",OracleDbType = OracleDbType.Decimal,  Value = transfer.RequestAmount },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = transfer.Note }
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = transfer.Note },
+                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int32,  Value = transfer.ApiTransaction }
                 };
-
                 #endregion
                 db.ExecuteStoredProc("pk_financial.fn_MoneyTransfer", parameters);
                 var result = int.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
@@ -107,6 +108,7 @@ namespace Yvtu.Infra.Data
             moneyTransfer.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
             moneyTransfer.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             moneyTransfer.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+            moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
             moneyTransfer.Partner = partnerManager.GetPartnerByAccount(partAccount);
             if (moneyTransfer.Partner != null)
             {
@@ -427,6 +429,7 @@ namespace Yvtu.Infra.Data
             dataModel.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
             dataModel.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             dataModel.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+            dataModel.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
             return dataModel;
         }
         public async Task<List<MoneyTransferRpt>> GetStatReportAsync(MoneyTransferRptQueryParam param)
@@ -555,6 +558,7 @@ namespace Yvtu.Infra.Data
                 obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
                 obj.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
                 obj.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
                 results.Add(obj);
             }
             return results;

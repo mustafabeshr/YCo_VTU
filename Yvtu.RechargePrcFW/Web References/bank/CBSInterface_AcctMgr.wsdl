@@ -1,0 +1,932 @@
+<?xml version="1.0" encoding="utf-8"?>
+<definitions xmlns:common="http://www.huawei.com/bme/cbsinterface/common" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:account="http://www.huawei.com/bme/cbsinterface/cbs/accountmgr" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:accountmgrmsg="http://www.huawei.com/bme/cbsinterface/cbs/accountmgrmsg" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" targetNamespace="http://www.huawei.com/bme/cbsinterface/cbs/accountmgr" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <types>
+    <xs:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.huawei.com/bme/cbsinterface/common">
+      <xs:include schemaLocation="CBSInterface_Common.xsd" />
+    </xs:schema>
+    <xs:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.huawei.com/bme/cbsinterface/cbs/accountmgr">
+      <xs:include schemaLocation="CBSInterface_AcctMgr.xsd" />
+    </xs:schema>
+    <xs:schema xmlns="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.huawei.com/bme/cbsinterface/cbs/accountmgrmsg">
+      <xs:import schemaLocation="CBSInterface_Common.xsd" namespace="http://www.huawei.com/bme/cbsinterface/common" />
+      <xs:import schemaLocation="CBSInterface_AcctMgr.xsd" namespace="http://www.huawei.com/bme/cbsinterface/cbs/accountmgr" />
+      <xs:element name="QueryBalanceRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="QueryBalanceRequest" type="account:QueryBalanceRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryBalanceResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="QueryBalanceResult" nillable="true" type="account:QueryBalanceResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="VoucherRechargeRequest" type="account:VoucherRechargeRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="VoucherRechargeResult" nillable="true" type="account:VoucherRechargeResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PaymentRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="PaymentRequest" type="account:PaymentRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PaymentResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="PaymentResult" type="account:PaymentResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ActiveFirstRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ActiveFirstRequest" type="account:ActiveFirstRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ActiveFirstResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ReversePaymentRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ReversePaymentRequest" type="account:ReversePaymentRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ReversePaymentResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="ReversePaymentResult" type="account:ReversePaymentResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AdjustAccountRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="AdjustAccountRequest" type="account:AdjustAccountRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AdjustAccountResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="AdjustAccountResult" nillable="true" type="account:AdjustAccountResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeEnquiryRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="VoucherRechargeEnquiryRequest" type="account:VoucherRechargeEnquiryRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeEnquiryResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="VoucherRechargeEnquiryResult" type="account:VoucherRechargeEnquiryResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TransferAccountRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="TransferAccountRequest" type="account:TransferAccountRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TransferAccountResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="TransferAccountResult" type="account:TransferAccountResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PaymentEnquiryRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="PaymentEnquiryRequest" type="account:PaymentEnquiryRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PaymentEnquiryResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="PaymentEnquiryResult" type="account:PaymentEnquiryResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CumulateEnquiryRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="CumulateEnquiryRequest" type="account:CumulateEnquiryRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="CumulateEnquiryResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="CumulateEnquiryResult" type="account:CumulateEnquiryResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherEnquiryBySeqRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="VoucherEnquiryBySeqRequest" type="account:VoucherEnquiryBySeqRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherEnquiryBySeqResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="VoucherEnquiryBySeqResult" type="account:VoucherEnquiryBySeqResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherEnquiryByPINRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="VoucherEnquiryByPINRequest" type="account:VoucherEnquiryByPINRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherEnquiryByPINResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="VoucherEnquiryByPINResult" nillable="true" type="account:VoucherEnquiryByPINResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="OneOffDeductionRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="OneOffDeductionRequest" type="account:OneOffDeductionRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="OneOffDeductionResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="OneOffDeductionResult" nillable="true" type="account:OneOffDeductionResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ServiceHandleFeeRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ServiceHandleFeeRequest" type="account:ServiceHandleFeeRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ServiceHandleFeeResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="ServiceHandleFeeResult" type="account:ServiceHandleFeeResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryTransferLogRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="QueryTransferLogRequest" type="account:QueryTransferLogRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryTransferLogResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="QueryTransferLogResult" type="account:QueryTransferLogResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryAdjustmentLogRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="QueryAdjustmentLogRequest" type="account:QueryAdjustmentLogRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryAdjustmentLogResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="QueryAdjustmentLogResult" type="account:QueryAdjustmentLogResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryBonusHistoryRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="QueryBonusHistoryRequest" type="account:QueryBonusHistoryRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryBonusHistoryResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="QueryBonusHistoryResult" type="account:QueryBonusHistoryResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModifyVoucherStateRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ModifyVoucherStateRequest" type="account:ModifyVoucherStateRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModifyVoucherStateResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BalanceToValidityRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="BalanceToValidityRequest" type="account:BalanceToValidityRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BalanceToValidityResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="BalanceToValidityResult" type="account:BalanceToValidityResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TransInPpsPosRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="TransInPpsPosRequest" type="account:TransInPpsPosRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="TransInPpsPosResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="TransInPpsPosResult" type="account:TransInPpsPosResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ExchangeAccountRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ExchangeAccountRequest" type="account:ExchangeAccountRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ExchangeAccountResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="ExchangeAccountResult" type="account:ExchangeAccountResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModSubBillCycleTypeRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="ModSubBillCycleTypeRequest" type="account:ModSubBillCycleTypeRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="ModSubBillCycleTypeResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AdjustSubAccountRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="AdjustSubAccountRequest" type="account:AdjustSubAccountRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="AdjustSubAccountResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="AdjustSubAccountResult" type="account:AdjustSubAccountResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SubAccountRechargeRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="SubAccountRechargeRequest" type="account:SubAccountRechargeRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="SubAccountRechargeResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="SubAccountRechargeResult" type="account:SubAccountRechargeResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeBySeqRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="VoucherRechargeBySeqRequest" type="account:VoucherRechargeBySeqRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="VoucherRechargeBySeqResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="VoucherRechargeBySeqResult" type="account:VoucherRechargeBySeqResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryCallHistoryRequestMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="RequestHeader" type="common:RequestHeader" />
+            <xs:element name="QueryCallHistoryRequest" type="account:QueryCallHistoryRequest" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="QueryCallHistoryResultMsg">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="ResultHeader" type="common:ResultHeader" />
+            <xs:element name="QueryCallHistoryResult" type="account:QueryCallHistoryResult" />
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </types>
+  <message name="QueryBalanceRequestMessage">
+    <part name="QueryBalanceRequestMsg" element="accountmgrmsg:QueryBalanceRequestMsg" />
+  </message>
+  <message name="QueryBalanceResultMessage">
+    <part name="QueryBalanceResultMsg" element="accountmgrmsg:QueryBalanceResultMsg" />
+  </message>
+  <message name="VoucherRechargeRequestMessage">
+    <part name="VoucherRechargeRequestMsg" element="accountmgrmsg:VoucherRechargeRequestMsg" />
+  </message>
+  <message name="VoucherRechargeResultMessage">
+    <part name="VoucherRechargeResultMsg" element="accountmgrmsg:VoucherRechargeResultMsg" />
+  </message>
+  <message name="PaymentRequestMessage">
+    <part name="PaymentRequestMsg" element="accountmgrmsg:PaymentRequestMsg" />
+  </message>
+  <message name="PaymentResultMessage">
+    <part name="PaymentResultMsg" element="accountmgrmsg:PaymentResultMsg" />
+  </message>
+  <message name="ActiveFirstRequestMessage">
+    <part name="ActiveFirstRequestMsg" element="accountmgrmsg:ActiveFirstRequestMsg" />
+  </message>
+  <message name="ActiveFirstResultMessage">
+    <part name="ActiveFirstResultMsg" element="accountmgrmsg:ActiveFirstResultMsg" />
+  </message>
+  <message name="ReversePaymentRequestMessage">
+    <part name="ReversePaymentRequestMsg" element="accountmgrmsg:ReversePaymentRequestMsg" />
+  </message>
+  <message name="ReversePaymentResultMessage">
+    <part name="ReversePaymentResultMsg" element="accountmgrmsg:ReversePaymentResultMsg" />
+  </message>
+  <message name="AdjustAccountRequestMessage">
+    <part name="AdjustAccountRequestMsg" element="accountmgrmsg:AdjustAccountRequestMsg" />
+  </message>
+  <message name="AdjustAccountResultMessage">
+    <part name="AdjustAccountResultMsg" element="accountmgrmsg:AdjustAccountResultMsg" />
+  </message>
+  <message name="VoucherRechargeEnquiryRequestMessage">
+    <part name="VoucherRechargeEnquiryRequestMsg" element="accountmgrmsg:VoucherRechargeEnquiryRequestMsg" />
+  </message>
+  <message name="VoucherRechargeEnquiryResultMessage">
+    <part name="VoucherRechargeEnquiryResultMsg" element="accountmgrmsg:VoucherRechargeEnquiryResultMsg" />
+  </message>
+  <message name="TransferAccountRequestMessage">
+    <part name="TransferAccountRequestMsg" element="accountmgrmsg:TransferAccountRequestMsg" />
+  </message>
+  <message name="TransferAccountResultMessage">
+    <part name="TransferAccountResultMsg" element="accountmgrmsg:TransferAccountResultMsg" />
+  </message>
+  <message name="PaymentEnquiryRequestMessage">
+    <part name="PaymentEnquiryRequestMsg" element="accountmgrmsg:PaymentEnquiryRequestMsg" />
+  </message>
+  <message name="PaymentEnquiryResultMessage">
+    <part name="PaymentEnquiryResultMsg" element="accountmgrmsg:PaymentEnquiryResultMsg" />
+  </message>
+  <message name="CumulateEnquiryRequestMessage">
+    <part name="CumulateEnquiryRequestMsg" element="accountmgrmsg:CumulateEnquiryRequestMsg" />
+  </message>
+  <message name="CumulateEnquiryResultMessage">
+    <part name="CumulateEnquiryResultMsg" element="accountmgrmsg:CumulateEnquiryResultMsg" />
+  </message>
+  <message name="VoucherEnquiryBySeqRequestMessage">
+    <part name="VoucherEnquiryBySeqRequestMsg" element="accountmgrmsg:VoucherEnquiryBySeqRequestMsg" />
+  </message>
+  <message name="VoucherEnquiryBySeqResultMessage">
+    <part name="VoucherEnquiryBySeqResultMsg" element="accountmgrmsg:VoucherEnquiryBySeqResultMsg" />
+  </message>
+  <message name="VoucherEnquiryByPINRequestMessage">
+    <part name="VoucherEnquiryByPINRequestMsg" element="accountmgrmsg:VoucherEnquiryByPINRequestMsg" />
+  </message>
+  <message name="VoucherEnquiryByPINResultMessage">
+    <part name="VoucherEnquiryByPINResultMsg" element="accountmgrmsg:VoucherEnquiryByPINResultMsg" />
+  </message>
+  <message name="OneOffDeductionRequestMessage">
+    <part name="OneOffDeductionRequestMsg" element="accountmgrmsg:OneOffDeductionRequestMsg" />
+  </message>
+  <message name="OneOffDeductionResultMessage">
+    <part name="OneOffDeductionResultMsg" element="accountmgrmsg:OneOffDeductionResultMsg" />
+  </message>
+  <message name="ServiceHandleFeeRequestMessage">
+    <part name="ServiceHandleFeeRequestMsg" element="accountmgrmsg:ServiceHandleFeeRequestMsg" />
+  </message>
+  <message name="ServiceHandleFeeResultMessage">
+    <part name="ServiceHandleFeeResultMsg" element="accountmgrmsg:ServiceHandleFeeResultMsg" />
+  </message>
+  <message name="QueryTransferLogRequestMessage">
+    <part name="QueryTransferLogRequestMsg" element="accountmgrmsg:QueryTransferLogRequestMsg" />
+  </message>
+  <message name="QueryTransferLogResultMessage">
+    <part name="QueryTransferLogResultMsg" element="accountmgrmsg:QueryTransferLogResultMsg" />
+  </message>
+  <message name="QueryAdjustmentLogRequestMessage">
+    <part name="QueryAdjustmentLogRequestMsg" element="accountmgrmsg:QueryAdjustmentLogRequestMsg" />
+  </message>
+  <message name="QueryAdjustmentLogResultMessage">
+    <part name="QueryAdjustmentLogResultMsg" element="accountmgrmsg:QueryAdjustmentLogResultMsg" />
+  </message>
+  <message name="QueryBonusHistoryRequestMessage">
+    <part name="QueryBonusHistoryRequestMsg" element="accountmgrmsg:QueryBonusHistoryRequestMsg" />
+  </message>
+  <message name="QueryBonusHistoryResultMessage">
+    <part name="QueryBonusHistoryResultMsg" element="accountmgrmsg:QueryBonusHistoryResultMsg" />
+  </message>
+  <message name="ModifyVoucherStateRequestMessage">
+    <part name="ModifyVoucherStateRequestMsg" element="accountmgrmsg:ModifyVoucherStateRequestMsg" />
+  </message>
+  <message name="ModifyVoucherStateResultMessage">
+    <part name="ModifyVoucherStateResultMsg" element="accountmgrmsg:ModifyVoucherStateResultMsg" />
+  </message>
+  <message name="BalanceToValidityRequestMessage">
+    <part name="BalanceToValidityRequestMsg" element="accountmgrmsg:BalanceToValidityRequestMsg" />
+  </message>
+  <message name="BalanceToValidityResultMessage">
+    <part name="BalanceToValidityResultMsg" element="accountmgrmsg:BalanceToValidityResultMsg" />
+  </message>
+  <message name="TransInPpsPosRequestMessage">
+    <part name="TransInPpsPosRequestMsg" element="accountmgrmsg:TransInPpsPosRequestMsg" />
+  </message>
+  <message name="TransInPpsPosResultMessage">
+    <part name="TransInPpsPosResultMsg" element="accountmgrmsg:TransInPpsPosResultMsg" />
+  </message>
+  <message name="ExchangeAccountRequestMessage">
+    <part name="ExchangeAccountRequestMsg" element="accountmgrmsg:ExchangeAccountRequestMsg" />
+  </message>
+  <message name="ExchangeAccountResultMessage">
+    <part name="ExchangeAccountResultMsg" element="accountmgrmsg:ExchangeAccountResultMsg" />
+  </message>
+  <message name="ModSubBillCycleTypeRequestMessage">
+    <part name="ModSubBillCycleTypeRequestMsg" element="accountmgrmsg:ModSubBillCycleTypeRequestMsg" />
+  </message>
+  <message name="ModSubBillCycleTypeResultMessage">
+    <part name="ModSubBillCycleTypeResultMsg" element="accountmgrmsg:ModSubBillCycleTypeResultMsg" />
+  </message>
+  <message name="AdjustSubAccountRequestMessage">
+    <part name="AdjustSubAccountRequestMsg" element="accountmgrmsg:AdjustSubAccountRequestMsg" />
+  </message>
+  <message name="AdjustSubAccountResultMessage">
+    <part name="AdjustSubAccountResultMsg" element="accountmgrmsg:AdjustSubAccountResultMsg" />
+  </message>
+  <message name="SubAccountRechargeRequestMessage">
+    <part name="SubAccountRechargeRequestMsg" element="accountmgrmsg:SubAccountRechargeRequestMsg" />
+  </message>
+  <message name="SubAccountRechargeResultMessage">
+    <part name="SubAccountRechargeResultMsg" element="accountmgrmsg:SubAccountRechargeResultMsg" />
+  </message>
+  <message name="VoucherRechargeBySeqRequestMessage">
+    <part name="VoucherRechargeBySeqRequestMsg" element="accountmgrmsg:VoucherRechargeBySeqRequestMsg" />
+  </message>
+  <message name="VoucherRechargeBySeqResultMessage">
+    <part name="VoucherRechargeBySeqResultMsg" element="accountmgrmsg:VoucherRechargeBySeqResultMsg" />
+  </message>
+  <message name="QueryCallHistoryRequestMessage">
+    <part name="QueryCallHistoryRequestMsg" element="accountmgrmsg:QueryCallHistoryRequestMsg" />
+  </message>
+  <message name="QueryCallHistoryResultMessage">
+    <part name="QueryCallHistoryResultMsg" element="accountmgrmsg:QueryCallHistoryResultMsg" />
+  </message>
+  <portType name="CBSInterfaceAccountMgr">
+    <operation name="QueryBalance">
+      <input message="account:QueryBalanceRequestMessage" />
+      <output message="account:QueryBalanceResultMessage" />
+    </operation>
+    <operation name="VoucherRecharge">
+      <input message="account:VoucherRechargeRequestMessage" />
+      <output message="account:VoucherRechargeResultMessage" />
+    </operation>
+    <operation name="Payment">
+      <input message="account:PaymentRequestMessage" />
+      <output message="account:PaymentResultMessage" />
+    </operation>
+    <operation name="ActiveFirst">
+      <input message="account:ActiveFirstRequestMessage" />
+      <output message="account:ActiveFirstResultMessage" />
+    </operation>
+    <operation name="ReversePayment">
+      <input message="account:ReversePaymentRequestMessage" />
+      <output message="account:ReversePaymentResultMessage" />
+    </operation>
+    <operation name="AdjustAccount">
+      <input message="account:AdjustAccountRequestMessage" />
+      <output message="account:AdjustAccountResultMessage" />
+    </operation>
+    <operation name="VoucherRechargeEnquiry">
+      <input message="account:VoucherRechargeEnquiryRequestMessage" />
+      <output message="account:VoucherRechargeEnquiryResultMessage" />
+    </operation>
+    <operation name="TransferAccount">
+      <input message="account:TransferAccountRequestMessage" />
+      <output message="account:TransferAccountResultMessage" />
+    </operation>
+    <operation name="PaymentEnquiry">
+      <input message="account:PaymentEnquiryRequestMessage" />
+      <output message="account:PaymentEnquiryResultMessage" />
+    </operation>
+    <operation name="CumulateEnquiry">
+      <input message="account:CumulateEnquiryRequestMessage" />
+      <output message="account:CumulateEnquiryResultMessage" />
+    </operation>
+    <operation name="VoucherEnquiryBySeq">
+      <input message="account:VoucherEnquiryBySeqRequestMessage" />
+      <output message="account:VoucherEnquiryBySeqResultMessage" />
+    </operation>
+    <operation name="VoucherEnquiryByPIN">
+      <input message="account:VoucherEnquiryByPINRequestMessage" />
+      <output message="account:VoucherEnquiryByPINResultMessage" />
+    </operation>
+    <operation name="OneOffDeduction">
+      <input message="account:OneOffDeductionRequestMessage" />
+      <output message="account:OneOffDeductionResultMessage" />
+    </operation>
+    <operation name="ServiceHandleFee">
+      <input message="account:ServiceHandleFeeRequestMessage" />
+      <output message="account:ServiceHandleFeeResultMessage" />
+    </operation>
+    <operation name="QueryTransferLog">
+      <input message="account:QueryTransferLogRequestMessage" />
+      <output message="account:QueryTransferLogResultMessage" />
+    </operation>
+    <operation name="QueryAdjustmentLog">
+      <input message="account:QueryAdjustmentLogRequestMessage" />
+      <output message="account:QueryAdjustmentLogResultMessage" />
+    </operation>
+    <operation name="QueryBonusHistory">
+      <input message="account:QueryBonusHistoryRequestMessage" />
+      <output message="account:QueryBonusHistoryResultMessage" />
+    </operation>
+    <operation name="ModifyVoucherState">
+      <input message="account:ModifyVoucherStateRequestMessage" />
+      <output message="account:ModifyVoucherStateResultMessage" />
+    </operation>
+    <operation name="BalanceToValidity">
+      <input message="account:BalanceToValidityRequestMessage" />
+      <output message="account:BalanceToValidityResultMessage" />
+    </operation>
+    <operation name="TransInPpsPos">
+      <input message="account:TransInPpsPosRequestMessage" />
+      <output message="account:TransInPpsPosResultMessage" />
+    </operation>
+    <operation name="ExchangeAccount">
+      <input message="account:ExchangeAccountRequestMessage" />
+      <output message="account:ExchangeAccountResultMessage" />
+    </operation>
+    <operation name="ModSubBillCycleType">
+      <input message="account:ModSubBillCycleTypeRequestMessage" />
+      <output message="account:ModSubBillCycleTypeResultMessage" />
+    </operation>
+    <operation name="AdjustSubAccount">
+      <input message="account:AdjustSubAccountRequestMessage" />
+      <output message="account:AdjustSubAccountResultMessage" />
+    </operation>
+    <operation name="SubAccountRecharge">
+      <input message="account:SubAccountRechargeRequestMessage" />
+      <output message="account:SubAccountRechargeResultMessage" />
+    </operation>
+    <operation name="VoucherRechargeBySeq">
+      <input message="account:VoucherRechargeBySeqRequestMessage" />
+      <output message="account:VoucherRechargeBySeqResultMessage" />
+    </operation>
+    <operation name="QueryCallHistory">
+      <input message="account:QueryCallHistoryRequestMessage" />
+      <output message="account:QueryCallHistoryResultMessage" />
+    </operation>
+  </portType>
+  <binding name="CBSInterfaceAccountMgrBinding" type="account:CBSInterfaceAccountMgr">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <operation name="QueryBalance">
+      <soap:operation soapAction="QueryBalance" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="VoucherRecharge">
+      <soap:operation soapAction="VoucherRecharge" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="Payment">
+      <soap:operation soapAction="Payment" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ActiveFirst">
+      <soap:operation soapAction="ActiveFirst" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ReversePayment">
+      <soap:operation soapAction="ReversePayment" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="AdjustAccount">
+      <soap:operation soapAction="AdjustAccount" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="VoucherRechargeEnquiry">
+      <soap:operation soapAction="VoucherRechargeEnquiry" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="TransferAccount">
+      <soap:operation soapAction="TransferAccount" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="PaymentEnquiry">
+      <soap:operation soapAction="PaymentEnquiry" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="CumulateEnquiry">
+      <soap:operation soapAction="CumulateEnquiry" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="VoucherEnquiryBySeq">
+      <soap:operation soapAction="VoucherEnquiryBySeq" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="VoucherEnquiryByPIN">
+      <soap:operation soapAction="VoucherEnquiryByPIN" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="OneOffDeduction">
+      <soap:operation soapAction="OneOffDeduction" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ServiceHandleFee">
+      <soap:operation soapAction="ServiceHandleFee" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="QueryTransferLog">
+      <soap:operation soapAction="QueryTransferLog" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="QueryAdjustmentLog">
+      <soap:operation soapAction="QueryAdjustmentLog" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="QueryBonusHistory">
+      <soap:operation soapAction="QueryBonusHistory" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ModifyVoucherState">
+      <soap:operation soapAction="ModifyVoucherState" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="BalanceToValidity">
+      <soap:operation soapAction="BalanceToValidity" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="TransInPpsPos">
+      <soap:operation soapAction="TransInPpsPos" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ExchangeAccount">
+      <soap:operation soapAction="ExchangeAccount" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="ModSubBillCycleType">
+      <soap:operation soapAction="ModSubBillCycleType" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="AdjustSubAccount">
+      <soap:operation soapAction="AdjustSubAccount" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="SubAccountRecharge">
+      <soap:operation soapAction="SubAccountRecharge" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="VoucherRechargeBySeq">
+      <soap:operation soapAction="VoucherRechargeBySeq" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+    <operation name="QueryCallHistory">
+      <soap:operation soapAction="QueryCallHistory" style="document" />
+      <input>
+        <soap:body use="literal" />
+      </input>
+      <output>
+        <soap:body use="literal" />
+      </output>
+    </operation>
+  </binding>
+  <service name="CBSInterfaceAccountMgrService">
+    <port name="CBSInterfaceAccountMgrServicePort" binding="account:CBSInterfaceAccountMgrBinding">
+      <soap:address location="http://www.huawei.com/bme/cbsinterface/accountmgr/wsdl/CBSInterface_AcctMgr.wsdl" />
+    </port>
+  </service>
+</definitions>

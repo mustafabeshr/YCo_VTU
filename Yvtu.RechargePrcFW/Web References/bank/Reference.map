@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DiscoveryClientResultsFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Results>
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.ContractReference" url="file:///D:/Development/Private/NT/OCS_wsdl/OCS_wsdl/CBSInterface_AcctMgr.wsdl" filename="CBSInterface_AcctMgr.wsdl" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="file:///D:/Development/Private/NT/OCS_wsdl/OCS_wsdl/CBSInterface_AcctMgr.xsd" filename="CBSInterface_AcctMgr.xsd" />
+    <DiscoveryClientResult referenceType="System.Web.Services.Discovery.SchemaReference" url="file:///D:/Development/Private/NT/OCS_wsdl/OCS_wsdl/CBSInterface_Common.xsd" filename="CBSInterface_Common.xsd" />
+  </Results>
+</DiscoveryClientResultsFile>

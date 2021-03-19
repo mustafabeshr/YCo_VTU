@@ -68,5 +68,6 @@ namespace Yvtu.Core.Queries
         public string Note { get; set; }
         public bool Adjusted { get; set; }
         public int AdjustmentNo { get; set; }
+        public int ApiTransaction { get; set; }
     }
 }

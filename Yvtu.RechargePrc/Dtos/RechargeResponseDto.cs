@@ -6,7 +6,7 @@ namespace Yvtu.RechargePrc.Dtos
 {
     public class RechargeResponseDto
     {
-        public int ResultCode { get; set; }
+        public string ResultCode { get; set; }
         public string ResultDesc { get; set; }
         public int Duration { get; set; }
         public string TransNo { get; set; }

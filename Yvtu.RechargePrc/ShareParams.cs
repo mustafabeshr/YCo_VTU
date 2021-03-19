@@ -13,6 +13,8 @@ namespace Yvtu.RechargePrc
         public static string OCSApiUser { get; set; }
         public static string OCSApiPassword { get; set; }
         public static string OCSEndpoint { get; set; }
+        public static string PaymentRemoteAddress { get; set; }
+        public static string SuccessPaymentCode { get; set; }
         public static string CommandsList { get; set; }
         public static string GrappedRequestsCount { get; set; }
         public static string MobileNumberPattern { get; set; }
@@ -42,6 +44,8 @@ namespace Yvtu.RechargePrc
                 OCSApiUser = Utility.GetKeyValueFromConfigFile("OCSApiUser");
                 OCSApiPassword = Utility.GetKeyValueFromConfigFile("OCSApiPassword");
                 OCSEndpoint = Utility.GetKeyValueFromConfigFile("OCSEndpoint");
+                SuccessPaymentCode = Utility.GetKeyValueFromConfigFile("SuccessPaymentCode");
+                PaymentRemoteAddress = Utility.GetKeyValueFromConfigFile("PaymentRemoteAddress");
                 CommandsList = Utility.GetKeyValueFromConfigFile("CommandsList");
                 GrappedRequestsCount = Utility.GetKeyValueFromConfigFile("GrappedRequestsCount");
                 MobileNumberPattern = Utility.GetKeyValueFromConfigFile("MobileNumberPattern");
