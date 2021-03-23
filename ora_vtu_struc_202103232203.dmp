@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 11/02/2021, 21:23:04 21:23:04  --
+-- Created by mbeshr on 23/03/2021, 22:04:09 22:04:09  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202102112122.log
+spool ora_vtu_struc_202103232203.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -22,6 +22,21 @@ create table ACTIVITIES
 ;
 alter table ACTIVITIES
   add constraint FK_ACTIVITIES primary key (ACT_ID);
+
+prompt
+prompt Creating table ACTIVITIES2
+prompt ==========================
+prompt
+create table ACTIVITIES2
+(
+  act_id       VARCHAR2(100) not null,
+  act_name     NVARCHAR2(200) not null,
+  act_type     VARCHAR2(100) not null,
+  act_order    NUMBER default 0 not null,
+  internal_use NUMBER(1) default 0 not null,
+  act_desc     NVARCHAR2(300)
+)
+;
 
 prompt
 prompt Creating table MESSAGE_TEMPLATE
@@ -237,6 +252,37 @@ alter table ADJUSTMENT
   references APPROLE (ROLEID);
 
 prompt
+prompt Creating table API_IP_BLACKLIST
+prompt ===============================
+prompt
+create table API_IP_BLACKLIST
+(
+  ip_address VARCHAR2(15) not null,
+  createdon  DATE default sysdate not null
+)
+;
+alter table API_IP_BLACKLIST
+  add constraint PK_API_IP_BLACKLIST primary key (IP_ADDRESS);
+
+prompt
+prompt Creating table API_LOG
+prompt ======================
+prompt
+create table API_LOG
+(
+  log_id     NUMBER not null,
+  createdon  DATE default sysdate,
+  log_data   VARCHAR2(500),
+  log_user   VARCHAR2(100),
+  log_ip     VARCHAR2(50),
+  log_level  NUMBER(1),
+  log_action VARCHAR2(100)
+)
+;
+alter table API_LOG
+  add constraint PK_API_LOG primary key (LOG_ID);
+
+prompt
 prompt Creating table BG_SERVICE
 prompt =========================
 prompt
@@ -289,7 +335,8 @@ create table COLLECTION
   ref_time       DATE,
   ref_trans_no   VARCHAR2(100),
   debug_info     NVARCHAR2(500),
-  pfr            NUMBER default 0 not null
+  pfr            NUMBER default 0 not null,
+  api_trans      NUMBER default 0 not null
 )
 ;
 alter table COLLECTION
@@ -480,7 +527,8 @@ create table MONEY_TRANSFER
   creator_role_id NUMBER not null,
   part_acc        NUMBER,
   creator_acc     NUMBER,
-  pfr             NUMBER default 0 not null
+  pfr             NUMBER default 0 not null,
+  api_trans       NUMBER default 0 not null
 )
 ;
 alter table MONEY_TRANSFER
@@ -912,6 +960,17 @@ increment by 1
 cache 20;
 
 prompt
+prompt Creating sequence SEQ_API_LOG
+prompt =============================
+prompt
+create sequence SEQ_API_LOG
+minvalue 1
+maxvalue 9999999999999999999999999999
+start with 21
+increment by 1
+cache 20;
+
+prompt
 prompt Creating sequence SEQ_BDSERVICE_ID
 prompt ==================================
 prompt
@@ -940,7 +999,7 @@ prompt
 create sequence SEQ_COLLECTION_DRAFT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 41
+start with 61
 increment by 1
 cache 20;
 
@@ -951,7 +1010,7 @@ prompt
 create sequence SEQ_COLLECTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 41
+start with 81
 increment by 1
 cache 20;
 
@@ -973,7 +1032,7 @@ prompt
 create sequence SEQ_DATA_AUDIT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 121
+start with 141
 increment by 1
 cache 20;
 
@@ -995,7 +1054,7 @@ prompt
 create sequence SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 161
+start with 181
 increment by 1
 cache 20;
 
@@ -1006,7 +1065,7 @@ prompt
 create sequence SEQ_MONEY_TRANSFER_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 181
+start with 241
 increment by 1
 cache 20;
 
@@ -1028,7 +1087,7 @@ prompt
 create sequence SEQ_PARTNER_ACC
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -1039,7 +1098,7 @@ prompt
 create sequence SEQ_PARTNER_ACIVITY_ROWID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 321
+start with 341
 increment by 1
 cache 20;
 
@@ -1050,7 +1109,7 @@ prompt
 create sequence SEQ_PARTNER_REQ_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 41
+start with 81
 increment by 1
 cache 20;
 
@@ -1072,7 +1131,7 @@ prompt
 create sequence SEQ_PFR_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 101
+start with 161
 increment by 1
 cache 20;
 
@@ -1105,7 +1164,7 @@ prompt
 create sequence SEQ_SMS_IN_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 121
+start with 161
 increment by 1
 cache 20;
 
@@ -1116,7 +1175,7 @@ prompt
 create sequence SEQ_SMS_OUT_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 281
+start with 381
 increment by 1
 cache 20;
 
@@ -1265,7 +1324,8 @@ c.ref_no,
 c.ref_message,
 c.ref_time,
 c.ref_trans_no,
-c.debug_info
+c.debug_info,
+c.api_trans
 from collection c, partner p
 where c.pos_acc = p.partner_acc;
 
@@ -1343,7 +1403,8 @@ tr.creator_bal,
 tr.creator_role_id,
 crole.rolename creator_role_name,
 tr.part_acc,
-tr.creator_acc
+tr.creator_acc,
+tr.api_trans
 from money_transfer tr, partner p, partner creator, approle prole, approle crole
 where tr.part_acc = p.partner_acc
 and tr.creator_acc = creator.partner_acc
@@ -1554,7 +1615,8 @@ create or replace package pk_financial is
     v_bill_no money_transfer.bill_no%type,
     v_request_no money_transfer.request_no%type,
     v_request_amt money_transfer.request_amt%type,
-    v_note money_transfer.note%type
+    v_note money_transfer.note%type,
+    v_api_trans money_transfer.api_trans%type
     ) return number;
 
 
@@ -1579,7 +1641,8 @@ v_ref_message      collection.ref_message%type,
 v_ref_time         collection.ref_time%type,  
 v_ref_trans_no     collection.ref_trans_no%type,  
 v_debug_info       collection.debug_info%type,
-v_status       collection.status%type
+v_status       collection.status%type,
+v_api_trans       collection.api_trans%type
 ) return number;
 
 function fn_Update_Collection (
@@ -1907,6 +1970,18 @@ function fn_UserInstructTo_Delete(
  v_to_id   users_instruct_to.to_id%type
 ) return number;
 
+function fn_create_api_ip_blacklist(
+  v_ip_address api_ip_blacklist.ip_address%type
+  ) return number;
+
+function fn_create_api_log(
+  v_log_data api_log.log_data%type,
+  v_log_user api_log.log_user%type,
+  v_log_ip api_log.log_ip%type,
+  v_log_level  api_log.log_level%type,
+    v_log_action  api_log.log_action%type
+  ) return number;
+
 end pk_infra;
 /
 
@@ -2050,6 +2125,357 @@ end pk_Utility;
 /
 
 prompt
+prompt Creating function FN_GEN_INSERTS
+prompt ================================
+prompt
+CREATE OR REPLACE FUNCTION fn_gen_inserts
+(
+  p_sql                        CLOB,
+  p_new_owner_name             VARCHAR2,
+  p_new_table_name             VARCHAR2
+)
+RETURN CLOB
+IS
+  l_cur                        NUMBER;
+  l_sql                        CLOB := p_sql;
+  l_ret                        NUMBER;
+  l_col_cnt                    NUMBER;
+  l_rec_tab                    dbms_sql.desc_tab;
+
+  l_separator                  CHAR(1) := '!';
+  l_clob                       CLOB;
+  l_clob_line                  CLOB;
+  l_clob_ins                   CLOB;
+  l_clob_all                   CLOB;
+  l_line                       CLOB := '-----------------------------------';
+
+  cons_date_frm                VARCHAR2(32) := 'DD.MM.YYYY HH24:MI:SS';
+  cons_timestamp_frm           VARCHAR2(32) := 'DD.MM.YYYY HH24:MI:SSXFF';
+  cons_timestamp_wtz_frm       VARCHAR2(32) := 'DD.MM.YYYY HH24:MI:SSXFF TZR';
+
+  cons_varchar2_code           NUMBER := 1;
+  cons_nvarchar2_code          NUMBER := 1;
+  cons_number_code             NUMBER := 2;
+  cons_float_code              NUMBER := 2;
+  cons_long_code               NUMBER := 8;
+  cons_date_code               NUMBER := 12;
+  cons_binary_float_code       NUMBER := 100;
+  cons_binary_double_code      NUMBER := 101;
+  cons_timestamp_code          NUMBER := 180;
+  cons_timestamp_wtz_code      NUMBER := 181;
+  cons_timestamp_lwtz_code     NUMBER := 231;
+  cons_interval_ytm_code       NUMBER := 182;
+  cons_interval_dts_code       NUMBER := 183;
+  cons_raw_code                NUMBER := 23;
+  cons_long_raw_code           NUMBER := 24;
+  cons_rowid_code              NUMBER := 11;
+  cons_urowid_code             NUMBER := 208;
+  cons_char_code               NUMBER := 96;
+  cons_nchar_code              NUMBER := 96;
+  cons_clob_code               NUMBER := 112;
+  cons_nclob_code              NUMBER := 112;
+  cons_blob_code               NUMBER := 113;
+  cons_bfile_code              NUMBER := 114;
+  cons_xmltype_code            NUMBER := 109;
+
+  -------------------------------------
+  -- Supported types
+  -------------------------------------
+  l_varchar2_col                VARCHAR2(32767); --1
+  l_number_col                  NUMBER;          --2
+  --l_long_col                    long;          --8 - not supported
+  l_date_col                    DATE;            --12
+  --l_raw_col                     raw(2000);     --23 - not supported
+  l_rowid_col                   ROWID;           --69
+  l_char_col                    CHAR(2000);      --96
+  l_binary_float_col            BINARY_FLOAT;    --100
+  l_binary_double_col           BINARY_DOUBLE;   --101
+  l_clob_col                    CLOB;            --112
+  l_timestamp_col               TIMESTAMP(9);    --180
+  l_timestamp_wtz_col           TIMESTAMP(9) WITH TIME ZONE;    --181
+  l_interval_ytm_col            INTERVAL YEAR(9) TO MONTH;      --182
+  l_interval_dts_col            INTERVAL DAY(9) TO SECOND(2);   --183
+  l_urowid_col                  UROWID;                         --208
+  l_timestamp_wltz_col          TIMESTAMP WITH LOCAL TIME ZONE; --231
+  l_xmltype_col                 XMLTYPE; --109
+  --l_nchar_col                   nchar(2000); --96 the same as char
+  --l_nclob_col                   nclob; --112 the same as clob
+  --l_blob_col - not supported
+  --l_bfile_col - not supported
+  --l_long_raw_col - not supported
+
+  PROCEDURE print_rec(rec IN dbms_sql.desc_rec) IS
+  BEGIN
+    l_clob_all := l_clob_all||chr(10)||
+      'col_type            =    ' || rec.col_type||chr(10)||
+      'col_maxlen          =    ' || rec.col_max_len||chr(10)||
+      'col_name            =    ' || rec.col_name||chr(10)||
+      'col_name_len        =    ' || rec.col_name_len||chr(10)||
+      'col_schema_name     =    ' || rec.col_schema_name||chr(10)||
+      'col_schema_name_len =    ' || rec.col_schema_name_len||chr(10)||
+      'col_precision       =    ' || rec.col_precision||chr(10)||
+      'col_scale           =    ' || rec.col_scale||chr(10)||
+      'col_null_ok         =    ';
+
+    IF (rec.col_null_ok) THEN
+      l_clob_all := l_clob_all||'true'||chr(10);
+    ELSE
+      l_clob_all := l_clob_all||'false'||chr(10);
+    END IF;
+  END;
+BEGIN
+  ---------------------------------------
+  -- INSERT - header generation
+  ---------------------------------------
+  l_clob_all :=
+  'declare'||chr(10)||
+  '  type   t_clob is table of clob index by binary_integer;'||chr(10)||
+  '  l_clob t_clob;'||chr(10)||
+  '  type   t_varchar2 is table of varchar2(64) index by binary_integer;'||chr(10)||
+  '  l_varchar2 t_varchar2;'||chr(10)||
+  'begin'||chr(10)||
+  '/*'||chr(10);
+
+  ---------------------------------------
+  -- Introduction
+  ---------------------------------------
+  l_clob_all := l_clob_all||l_line||chr(10)||'Parsing query:'||chr(10)||l_sql||chr(10);
+
+  ---------------------------------------
+  -- Open parse cursor
+  ---------------------------------------
+  l_cur := dbms_sql.open_cursor;
+  dbms_sql.parse(l_cur, l_sql, dbms_sql.NATIVE);
+
+  ---------------------------------------
+  -- Describe columns
+  ---------------------------------------
+  l_clob_all := l_clob_all||l_line||chr(10)||'Describe columns:'||chr(10);
+
+  dbms_sql.describe_columns(l_cur, l_col_cnt, l_rec_tab);
+
+  FOR i IN 1..l_rec_tab.count
+  loop
+    print_rec(l_rec_tab(i));
+  END loop;
+
+  l_clob_all := l_clob_all||chr(10)||
+            '*/'||chr(10)||
+            '  '||chr(10)||l_line||chr(10)||
+            '  -- start generation of records'||chr(10)||
+            '  '||l_line||chr(10);
+
+  ---------------------------------------
+  -- Define columns
+  ---------------------------------------
+  FOR i IN 1..l_rec_tab.count
+  loop
+    IF    l_rec_tab(i).col_type = cons_varchar2_code THEN --varchar2
+      dbms_sql.define_column(l_cur, i, l_varchar2_col, l_rec_tab(i).col_max_len);
+    elsif l_rec_tab(i).col_type = cons_number_code THEN --number
+      dbms_sql.define_column(l_cur, i, l_number_col);
+    --elsif l_rec_tab(i).col_type = cons_long_code then --long
+    --  dbms_sql.define_column_long(l_cur, i);
+    elsif l_rec_tab(i).col_type = cons_date_code THEN --date
+      dbms_sql.define_column(l_cur, i, l_date_col);
+    elsif l_rec_tab(i).col_type = cons_binary_float_code THEN --binary_float
+      dbms_sql.define_column(l_cur, i, l_binary_float_col);
+    elsif l_rec_tab(i).col_type = cons_binary_double_code THEN --binary_double
+      dbms_sql.define_column(l_cur, i, l_binary_double_col);
+--    elsif l_rec_tab(i).col_type = cons_raw_code then --raw
+--      dbms_sql.define_column_raw(l_cur, i, l_raw_col, l_rec_tab(i).col_max_len);
+    elsif l_rec_tab(i).col_type = cons_rowid_code THEN  --rowid
+      dbms_sql.define_column_rowid(l_cur, i, l_rowid_col);
+    elsif l_rec_tab(i).col_type = cons_char_code THEN  --char
+      dbms_sql.define_column_char(l_cur, i, l_char_col, l_rec_tab(i).col_max_len);
+    elsif l_rec_tab(i).col_type = cons_clob_code THEN --clob
+      dbms_sql.define_column(l_cur, i, l_clob_col);
+    elsif l_rec_tab(i).col_type = cons_timestamp_code THEN --timestamp
+      dbms_sql.define_column(l_cur, i, l_timestamp_col);
+    elsif l_rec_tab(i).col_type = cons_timestamp_wtz_code THEN --timestamp with time zone
+      dbms_sql.define_column(l_cur, i, l_timestamp_wtz_col);
+    elsif l_rec_tab(i).col_type = cons_rowid_code THEN --urowid
+      dbms_sql.define_column(l_cur, i, l_urowid_col);
+    elsif l_rec_tab(i).col_type = cons_timestamp_lwtz_code THEN --timestamp with local time zone
+      dbms_sql.define_column(l_cur, i, l_timestamp_wltz_col);
+    elsif l_rec_tab(i).col_type = cons_interval_ytm_code THEN --interval year to month
+      dbms_sql.define_column(l_cur, i, l_interval_ytm_col);
+    elsif l_rec_tab(i).col_type = cons_interval_dts_code THEN --interval day to second
+      dbms_sql.define_column(l_cur, i, l_interval_dts_col);
+    elsif l_rec_tab(i).col_type = cons_urowid_code THEN --urowid
+      dbms_sql.define_column(l_cur, i, l_urowid_col);
+    elsif l_rec_tab(i).col_type = cons_xmltype_code THEN --xmltype
+      dbms_sql.define_column(l_cur, i, l_xmltype_col);
+    ELSE
+      raise_application_error(-20001, 'Column: '||l_rec_tab(i).col_name||chr(10)||
+                                      'Type not supported: '||l_rec_tab(i).col_type);
+      --not supported
+    END IF;
+  END loop;
+
+  ---------------------------------------
+  -- Execute cursor
+  ---------------------------------------
+  l_ret := dbms_sql.EXECUTE(l_cur);
+
+  ---------------------------------------
+  -- Fetch rows
+  ---------------------------------------
+  loop
+    l_ret := dbms_sql.fetch_rows(l_cur);
+    exit WHEN l_ret = 0;
+
+    ---------------------------------------
+    -- Building INSERT - build column declarations
+    ---------------------------------------
+    l_clob_line := '';
+
+    FOR i IN 1..l_rec_tab.count
+    loop
+      IF    l_rec_tab(i).col_type = cons_varchar2_code THEN --varchar2
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_varchar2_col);
+        l_clob := l_varchar2_col;
+      elsif l_rec_tab(i).col_type = cons_number_code THEN --number
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_number_col);
+        l_clob := to_char(l_number_col);
+--      elsif l_rec_tab(i).col_type = cons_long_code then --long
+--        dbms_sql.column_value(l_cur, i, l_long_col);
+--        l_clob := l_long_col;
+      elsif l_rec_tab(i).col_type = cons_date_code THEN --date
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_date_col);
+        l_clob := to_char(l_date_col, cons_date_frm);
+      elsif l_rec_tab(i).col_type = cons_binary_float_code THEN --binary_float
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_binary_float_col);
+        l_clob := to_char(l_binary_float_col);
+      elsif l_rec_tab(i).col_type = cons_binary_double_code THEN --binary_double
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_binary_double_col);
+        l_clob := to_char(l_binary_double_col);
+--      elsif l_rec_tab(i).col_type = cons_raw_code then --raw
+--        dbms_sql.column_value(l_cur, i, l_raw_col);
+--        l_clob := to_char(l_raw_col);
+      elsif l_rec_tab(i).col_type = cons_rowid_code THEN --rowid
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_rowid_col);
+        l_clob := to_char(l_rowid_col);
+      elsif l_rec_tab(i).col_type = cons_char_code THEN --char
+        dbms_sql.column_value_char(l_cur, i, l_char_col);
+        l_clob := substr(l_char_col, 1, l_rec_tab(i).col_max_len - 1);
+      elsif l_rec_tab(i).col_type = cons_clob_code THEN --clob
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_clob_col);
+        l_clob := l_clob_col;
+      elsif l_rec_tab(i).col_type = cons_timestamp_code THEN --timestamp
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_timestamp_col);
+        l_clob := to_char(l_timestamp_col, cons_timestamp_frm);
+      elsif l_rec_tab(i).col_type = cons_timestamp_wtz_code THEN --timestamp with time zone
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_timestamp_wtz_col);
+        l_clob := to_char(l_timestamp_wtz_col, cons_timestamp_wtz_frm);
+      elsif l_rec_tab(i).col_type = cons_interval_ytm_code THEN --interval year to month
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_interval_ytm_col);
+        l_clob := to_char(l_interval_ytm_col);
+      elsif l_rec_tab(i).col_type = cons_interval_dts_code THEN --interval day to second
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_interval_dts_col);
+        l_clob := to_char(l_interval_dts_col);
+      elsif l_rec_tab(i).col_type = cons_urowid_code THEN --urowid
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_urowid_col);
+        l_clob := to_char(l_urowid_col);
+      elsif l_rec_tab(i).col_type = cons_timestamp_lwtz_code THEN --timestamp with local time zone
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_timestamp_wltz_col);
+        l_clob := to_char(l_timestamp_wltz_col, cons_timestamp_wtz_frm);
+      elsif l_rec_tab(i).col_type = cons_xmltype_code THEN --xmltype
+        dbms_sql.COLUMN_VALUE(l_cur, i, l_xmltype_col);
+        l_clob := l_xmltype_col.getclobval();
+      END IF;
+
+      IF l_rec_tab(i).col_type IN (cons_clob_code, cons_char_code, cons_varchar2_code) THEN
+        l_clob_line := l_clob_line||'  l_clob('||to_char(i)||') :=q'''||l_separator||l_clob||l_separator||''';'||chr(10);
+      ELSIF l_rec_tab(i).col_type IN (cons_xmltype_code) THEN
+        l_clob_line := l_clob_line||'  l_clob('||to_char(i)||') :=q'''||l_separator||l_clob||l_separator||''';'||chr(10);
+      ELSE
+        l_clob_line := l_clob_line||'  l_varchar2('||to_char(i)||') :=q'''||l_separator||l_clob||l_separator||''';'||chr(10);
+      END IF;
+    END loop;
+
+    l_clob_all := l_clob_all||chr(10)||l_clob_line;
+
+    ---------------------------------------
+    -- Building INSERT - build column list
+    ---------------------------------------
+    l_clob_all := l_clob_all||chr(10)||
+              '  insert into '||p_new_owner_name||'.'||p_new_table_name||chr(10)||
+              '  ('||chr(10);
+
+    FOR i IN 1..l_rec_tab.count
+    loop
+      IF i = 1 THEN
+        l_clob_all := l_clob_all||'     '||l_rec_tab(i).col_name||chr(10);
+      ELSE
+        l_clob_all := l_clob_all||'    ,'||l_rec_tab(i).col_name||chr(10);
+      END IF;
+    END loop;
+
+    l_clob_all := l_clob_all||
+              '  )'||chr(10)||
+              '  values'||chr(10)||
+              '  ('||chr(10);
+
+    ---------------------------------------
+    -- Building INSERT - build values
+    ---------------------------------------
+    FOR i IN 1..l_rec_tab.count
+    loop
+      IF i!=1 THEN
+        l_clob_all := l_clob_all||'    ,';
+      ELSE
+        l_clob_all := l_clob_all||'     ';
+      END IF;
+
+      IF l_rec_tab(i).col_type = cons_number_code THEN --number
+        l_clob_all := l_clob_all||'to_number(l_varchar2('||to_char(i)||'))'||chr(10);
+--      elsif l_rec_tab(i).col_type = cons_long_code then --long
+--        l_clob := l_long_col;
+      elsif l_rec_tab(i).col_type = cons_clob_code THEN --clob, xmltype
+        l_clob_all := l_clob_all||'l_clob('||to_char(i)||')'||chr(10);
+      ELSIF L_REC_TAB(I).COL_TYPE = CONS_XMLTYPE_CODE then --clob, xmltype
+        l_clob_all := l_clob_all||'xmltype(l_clob('||to_char(i)||'))'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_char_code THEN --timestamp with local time zone
+        l_clob_all := l_clob_all||'to_char(l_clob('||to_char(i)||'))'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_varchar2_code THEN --timestamp with local time zone
+        l_clob_all := l_clob_all||'to_char(l_clob('||to_char(i)||'))'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_date_code THEN --date
+        l_clob_all := l_clob_all||'to_date(l_varchar2('||to_char(i)||'),'''||cons_date_frm||''')'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_timestamp_code THEN --timestamp
+        l_clob_all := l_clob_all||'to_timestamp(l_varchar2('||to_char(i)||'),'''||cons_timestamp_frm||''')'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_timestamp_wtz_code THEN --timestamp with time zone
+        l_clob_all := l_clob_all||'to_timestamp_tz(l_varchar2('||to_char(i)||'),'''||cons_timestamp_wtz_frm||''')'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_interval_ytm_code THEN --interval year to month
+        l_clob_all := l_clob_all||'to_yminterval(l_varchar2('||to_char(i)||'))'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_interval_dts_code THEN --interval day to second
+        l_clob_all := l_clob_all||'to_dsinterval(l_varchar2('||to_char(i)||'))'||chr(10);
+      elsif l_rec_tab(i).col_type = cons_timestamp_lwtz_code THEN --timestamp with local time zone
+        l_clob_all := l_clob_all||'to_timestamp_tz(l_varchar2('||to_char(i)||'),'''||cons_timestamp_wtz_frm||''')'||chr(10);
+      ELSE
+        l_clob_all := l_clob_all||'l_varchar2('||to_char(i)||')'||chr(10);
+      END IF;
+    END loop;
+
+    l_clob_all := l_clob_all||'  );'||chr(10);
+  END loop;
+
+  ---------------------------------------
+  -- Building INSERT - end of code
+  ---------------------------------------
+  l_clob_all := l_clob_all||chr(10)||'end;';
+  l_clob_all := l_clob_all||chr(10)||'/';
+
+  ---------------------------------------
+  -- Close cursor
+  ---------------------------------------
+  dbms_sql.close_cursor(l_cur);
+
+  RETURN l_clob_all;
+END;
+/
+
+prompt
 prompt Creating procedure SP_ADD_EXCEPTION
 prompt ===================================
 prompt
@@ -2085,7 +2511,8 @@ function fn_MoneyTransfer (
   v_bill_no money_transfer.bill_no%type,
   v_request_no money_transfer.request_no%type,
   v_request_amt money_transfer.request_amt%type,
-  v_note money_transfer.note%type
+  v_note money_transfer.note%type,
+  v_api_trans money_transfer.api_trans%type
   
   ) return number is
   
@@ -2109,7 +2536,7 @@ function fn_MoneyTransfer (
     v_creator_acc partner.partner_acc%TYPE;
     v_partnerActivityFound number := 0;
     v_result number;
-   
+   v_tmp number;
 
   
   BEGIN
@@ -2161,6 +2588,20 @@ function fn_MoneyTransfer (
        end;
       end if;
      
+     if (v_access_channel = 'api') then
+       begin
+           select  nvl(count(*),0) into v_tmp from money_transfer where  creator_acc = v_creator_acc and api_trans = v_api_trans and access_channel = 'api';
+           if (v_tmp > 0) then
+             begin
+                return -508;
+             end;
+           end if;
+       end;
+     end if;
+         
+     
+     
+     
      select nvl(taxper,0) into v_tax_per from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
      select nvl(bonus_per,0) into v_bonus_per from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
      select nvl(bonus_tax,0) into v_bonus_tax from v_partner_activity_detail where act_id = 'MoneyTransfer.Create' and fromroleid = v_creator_role_id and toroleid = v_part_role_id;
@@ -2202,11 +2643,12 @@ function fn_MoneyTransfer (
     insert into money_transfer
       (trans_id, part_id, part_role_id, part_bal, pay_type, pay_no, pay_date, bank_name, createdby, createdon
       , access_channel, amount, tax_per, tax_amt, bonus_per, bonus_amt, bonus_tax, bonus_tax_amt, received_amt
-      , net_amount, bill_no, request_no, request_amt, note, adjusted, adjust_id, creator_bal, creator_role_id, part_acc, creator_acc)
+      , net_amount, bill_no, request_no, request_amt, note, adjusted, adjust_id, creator_bal, creator_role_id, part_acc, creator_acc, api_trans)
     values
       (v_trans_id, v_part_id, v_part_role_id, v_part_bal, v_pay_type, v_pay_no, v_pay_date, v_bank_name, v_createdby
       , sysdate, v_access_channel, v_amount, v_tax_per, v_tax_amt, v_bonus_per, v_bonus_amt, v_bonus_tax, v_bonus_tax_amt
-      , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal, v_creator_role_id, v_part_acc, v_creator_acc);
+      , v_received_amt, v_net_amount, v_bill_no, v_request_no, v_request_amt, v_note, 0, null, v_creator_bal, v_creator_role_id,
+       v_part_acc, v_creator_acc, v_api_trans);
     
      update partner set balance = balance + v_amount where partner_acc = v_part_acc;
        pk_infra.sp_create_pfr(v_act_time => sysdate,
@@ -2536,7 +2978,8 @@ v_ref_message      collection.ref_message%type,
 v_ref_time         collection.ref_time%type,  
 v_ref_trans_no     collection.ref_trans_no%type,  
 v_debug_info       collection.debug_info%type,
-v_status       collection.status%type
+v_status       collection.status%type,
+v_api_trans       collection.api_trans%type
 ) return number is
 v_cl_id            collection.cl_id%type;
 v_pos_bal  collection.pos_bal%type;
@@ -2545,6 +2988,10 @@ v_clDraft_id     collection_Draft.Row_Id%type;
 v_role number;
 v_PartnerStatus partner.status%type;
 v_HasPermission number := 0;
+v_tmp number := 0;
+v_Min_Value partner_activity_detail.min_value%TYPE;
+v_Max_Value partner_activity_detail.max_value%TYPE;
+ v_creator_role_id money_transfer.creator_role_id%TYPE;
 begin
  
   v_pos_acc := pk_utility.fn_GetActiveAccount(v_pos_id);
@@ -2585,13 +3032,40 @@ begin
         return -501;
     end;
   end if;
+  
+     if (v_access_channel = 'api') then
+       begin
+           select  nvl(count(*),0) into v_tmp from collection where collection.pos_acc = v_pos_acc and api_trans = v_api_trans and access_channel = 'api';
+           if (v_tmp > 0) then
+             begin
+                return -514;
+             end;
+           end if;
+       end;
+     end if;
+  
+     select nvl(Min_Value,0) into v_Min_Value from v_partner_activity_detail where act_id = 'Recharge.Create' and fromroleid = v_role and toroleid = 9;
+     select nvl(Max_Value,0) into v_Max_Value from v_partner_activity_detail where act_id = 'Recharge.Create' and fromroleid = v_role and toroleid = 9;
+    if (v_Min_Value > v_amount) then
+       begin
+           --message := 'Amount less than minimum';
+           return -502;
+       end;
+        end if;  
+      
+      if (v_Max_Value < v_amount) then
+       begin
+           --message := 'Amount more than maximum';
+           return -503;
+       end;
+        end if;  
   v_cl_id := seq_collection_id.nextval();
   insert into collection
   (cl_id, createdon, subs_no, amount, pos_id, pos_acc, pos_bal, access_channel, status, status_time, queue_no, ref_no, 
-  ref_message, ref_time, ref_trans_no, debug_info)
+  ref_message, ref_time, ref_trans_no, debug_info, api_trans)
 values
   (v_cl_id, sysdate, v_subs_no, v_amount, v_pos_id, v_pos_acc, v_pos_bal, v_access_channel, v_status, sysdate,
-   v_queue_no, v_ref_no, v_ref_message, v_ref_time, v_ref_trans_no, v_debug_info);
+   v_queue_no, v_ref_no, v_ref_message, v_ref_time, v_ref_trans_no, v_debug_info, v_api_trans);
    
    update partner set reserved = reserved + v_amount where partner_acc = v_pos_acc;
    
@@ -2629,6 +3103,8 @@ v_update_bal  number
 ) return number is
 v_CollectionRow Collection%ROWTYPE;
 v_pos_bal  collection.pos_bal%type;
+v_tmp number;
+v_currentBalance number;
 begin
  
    BEGIN
@@ -2677,20 +3153,53 @@ begin
    where cl_id = v_cl_id;
 
    delete from collection_draft where ref_no = v_cl_id;
+
    
    if (v_update_bal = 1 and v_status = 1) then
      begin
+       select nvl(balance,0) into v_currentBalance from partner where partner_acc= v_CollectionRow.Pos_Acc;
         update partner set balance = balance - v_CollectionRow.Amount, reserved = reserved - v_CollectionRow.Amount where partner_acc= v_CollectionRow.Pos_Acc;
+        
           pk_infra.sp_create_pfr(v_act_time => sysdate,
                          v_partner_acc => v_CollectionRow.Pos_Acc,
                          v_amount => -1 * v_CollectionRow.Amount,
                          v_act_id => 'Recharge.Create',
                          v_act_no => v_cl_id,
                          v_createdbyacc => v_CollectionRow.Subs_No);
+                         
+          v_tmp := pk_infra.fn_createoutsms(v_message => 'Êã ÇÖÇÝÉ ãÈáÛ ' 
+          ||  rtrim(ltrim(to_char(v_CollectionRow.Amount,'999,999,999,999')))
+          || ' ÚÈÑ ÇÍÏì äÞÇØ ÇáÔÇÍä ÇáÝæÑí',
+          v_receiver => v_CollectionRow.Subs_No);
+          
+          if (v_CollectionRow.Access_Channel = 'sms') then
+            begin
+                   v_tmp := pk_infra.fn_createoutsms(v_message => 'Êã ÔÍä ÇáÑÞã ' 
+                   || v_CollectionRow.Subs_No 
+                   || ' ÈãÈáÛ ' 
+                   ||   rtrim(ltrim(to_char(v_CollectionRow.Amount,'999,999,999,999')))
+                   || ' ÑÕíÏß ÇáÍÇáí '
+                   ||  rtrim(ltrim(to_char(v_pos_bal,'999,999,999,999'))),
+                   v_receiver => v_CollectionRow.Pos_Id);              
+            end;
+          end if;
+           
+           
      end;
    else if (v_update_bal = 1 and v_status = 2) then
      begin
         update partner set reserved = reserved - v_CollectionRow.Amount where partner_acc= v_CollectionRow.Pos_Acc;
+          if (v_CollectionRow.Access_Channel = 'sms') then
+            begin
+                   v_tmp := pk_infra.fn_createoutsms(v_message => 'ÝÔáÊ ÚãáíÉ ÔÍä ÇáÑÞã '
+                     || v_CollectionRow.Subs_No 
+                     || ' ÈãÈáÛ ' 
+                     ||   rtrim(ltrim(to_char(v_CollectionRow.Amount,'999,999,999,999'))) 
+                     || ' ÑÕíÏß ÇáÍÇáí '
+                     ||  rtrim(ltrim(to_char(v_pos_bal,'999,999,999,999'))),
+                     v_receiver => v_CollectionRow.Pos_Id);              
+            end;
+          end if;
      end;
    end if;
    end if;
@@ -3775,6 +4284,59 @@ begin
   delete from users_instruct_to where to_id = v_to_id;
   return 1;
 end;
+
+function fn_create_api_ip_blacklist(
+  v_ip_address api_ip_blacklist.ip_address%type
+  ) return number is
+  v_tmp number := 0;
+ begin
+     select nvl(count(*),0) into v_tmp from api_ip_blacklist where ip_address = v_ip_address;
+     
+     if (v_tmp > 0) then
+       begin
+           return 2;
+       end;
+       end if;
+       
+       insert into api_ip_blacklist
+       (ip_address, createdon)
+      values
+      (v_ip_address, sysdate);
+
+    return 1;
+       EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'ip_blacklist');
+         return SQLCODE;   
+ end;
+
+function fn_create_api_log(
+  v_log_data api_log.log_data%type,
+  v_log_user api_log.log_user%type,
+  v_log_ip api_log.log_ip%type,
+  v_log_level  api_log.log_level%type,
+  v_log_action  api_log.log_action%type
+  ) return number is
+   v_log_id number;
+  begin
+     v_log_id := seq_api_log.nextval();
+     insert into api_log
+         (log_id, createdon, log_data, log_user, log_ip, log_level,log_action)
+     values
+        (v_log_id, sysdate, v_log_data, v_log_user, v_log_ip, v_log_level,v_log_action);
+     return v_log_id;
+  EXCEPTION
+      WHEN OTHERS THEN
+         sp_add_exception(v_exp_code => SQLCODE,
+                 v_exp_message => SUBSTR(SQLERRM, 1 , 500),
+                 v_exp_operation => 'Create',
+                 v_exp_object => 'api_log');
+         return SQLCODE;     
+  end;
+
 end pk_infra;
 /
 

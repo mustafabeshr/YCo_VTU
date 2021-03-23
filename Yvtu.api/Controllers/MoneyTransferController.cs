@@ -29,11 +29,10 @@ namespace Yvtu.api.Controllers
         [HttpPost("/api/mt/transfer")]
         public IActionResult Transfer(MoneyTransferDto mt)
         {
-
             if (!Utility.ValidYMobileNo(mt.pid)) return BadRequest(new ApiResponse(-3000, "Sorry, the target mobile was wrong"));
             if (mt.amt <= 0) return BadRequest(new ApiResponse(-3001, "Sorry, the amount was wrong"));
             var partnerResult = this._partnerManager.Validate(mt.pid);
-            if (!partnerResult.Success) return BadRequest(new ApiResponse(-3002, "Sorry, the target was wrong"));
+            if (!partnerResult.Success) return BadRequest(new ApiResponse(-3002, "Sorry, the target pos was wrong"));
 
             var currentUser = _partnerManager.GetPartnerById(this.HttpContext.User.Identity.Name);
 
@@ -67,7 +66,9 @@ namespace Yvtu.api.Controllers
             moneyTransfer = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetSingleOrDefault(result.AffectedCount);
 
             return Ok(new { 
-                transId = moneyTransfer.Id,
+                resultCode = 0,
+                resultDesc = "OK",
+                transferId = moneyTransfer.Id,
                 seq = moneyTransfer.ApiTransaction,
                 from = moneyTransfer.CreatedBy.Id +" | "+ moneyTransfer.CreatedBy.Account,
                 to = moneyTransfer.Partner.Id + " | " + moneyTransfer.Partner.Account,
@@ -81,6 +82,40 @@ namespace Yvtu.api.Controllers
                 bonusTaxPer = moneyTransfer.BounsTaxPercent,
                 bonusTaxAmt = moneyTransfer.BounsTaxAmount,
                 yourBal = (moneyTransfer.CreatedBy.Balance - moneyTransfer.CreatedBy.Reserved)
+            });
+        }
+
+        [HttpGet("/api/mt/query/{id}")]
+        public IActionResult TransferQuery(int id)
+        {
+            var currentUser = _partnerManager.GetPartnerById(this.HttpContext.User.Identity.Name);
+            var moneyTransfer = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetByApiTransaction(id, currentUser.Account);
+            
+            if (moneyTransfer == null) return Ok(new { resultCode = 0, resultDesc = "OK", success = "no", queryTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") });
+
+            return Ok(new
+            {
+                resultCode = 0,
+                resultDesc = "OK",
+                success = "yes",
+                data = new
+                {
+                    transferTime = moneyTransfer.CreatedOn.ToString("yyyy/MM/dd HH:mm:ss"),
+                    transferId = moneyTransfer.Id,
+                    seq = moneyTransfer.ApiTransaction,
+                    from = moneyTransfer.CreatedBy.Id + " | " + moneyTransfer.CreatedBy.Account,
+                    to = moneyTransfer.Partner.Id + " | " + moneyTransfer.Partner.Account,
+                    amt = moneyTransfer.Amount,
+                    netAmt = moneyTransfer.NetAmount,
+                    recAmt = moneyTransfer.ReceivedAmount,
+                    taxPer = moneyTransfer.TaxPercent,
+                    taxAmt = moneyTransfer.TaxAmount,
+                    bonusPer = moneyTransfer.BonusPercent,
+                    bonusAmt = moneyTransfer.BounsAmount,
+                    bonusTaxPer = moneyTransfer.BounsTaxPercent,
+                    bonusTaxAmt = moneyTransfer.BounsTaxAmount
+                },
+                queryTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")
             });
         }
     }

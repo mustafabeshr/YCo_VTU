@@ -36,7 +36,7 @@ namespace Yvtu.Infra.Data
             }
             return false;
         }
-        public bool ChangePwd(int PartnerAcc, string PartnerId,string newPwd)
+        public bool ChangePwd(int PartnerAcc, string PartnerId,string newPwd, bool notify = true)
         {
             //var pass = Utility.GenerateNewCode(4);
             byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
@@ -57,12 +57,15 @@ namespace Yvtu.Infra.Data
 
                 if (result > 0)
                 {
-                    var msg = "تم تغيير كلمة المرور الخاصبة بك الى " + newPwd;
-                    new OutSMSRepo(db).Create(new SMSOut
+                    if (notify)
                     {
-                        Receiver = PartnerId,
-                        Message = msg
-                    });
+                        var msg = "تم تغيير كلمة المرور الخاصبة بك الى " + newPwd;
+                        new OutSMSRepo(db).Create(new SMSOut
+                        {
+                            Receiver = PartnerId,
+                            Message = msg
+                        });
+                    }
                     return true;
                 }
                 else

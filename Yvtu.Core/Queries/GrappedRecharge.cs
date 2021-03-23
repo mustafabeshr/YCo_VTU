@@ -21,5 +21,6 @@ namespace Yvtu.Core.Queries
         public string RefTransNo { get; set; }
         public DateTime RefTime { get; set; }
         public string DebugInfo { get; set; }
+        public int ApiTransaction { get; set; }
     }
 }

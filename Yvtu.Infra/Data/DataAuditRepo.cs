@@ -91,13 +91,13 @@ namespace Yvtu.Infra.Data.Interfaces
                 {
                     var param1 = new OracleParameter() { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
                     parameters.Add(param1);
-                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate ";
+                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE trunc(createdon)>=:StartDate " : " AND trunc(createdon)>=:StartDate ";
                 }
                 if (param.EndDate != null && param.EndDate != DateTime.MinValue)
                 {
                     var param1 = new OracleParameter() { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
                     parameters.Add(param1);
-                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate ";
+                    whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE trunc(createdon)<=:EndDate " : " AND trunc(createdon)<=:EndDate ";
                 }
             }
 

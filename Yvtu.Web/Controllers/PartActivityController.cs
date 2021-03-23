@@ -67,6 +67,10 @@ namespace Yvtu.Web.Controllers
                 {
                     var result = _partActRepo.GetListByActivity(model.ActivityId);
                     model.PartnerActivities = result;
+                } else if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId > 0)
+                {
+                    var result = _partActRepo.GetListByFrom(model.FromRoleId);
+                    model.PartnerActivities = result;
                 } else
                 {
                     var result = _partActRepo.GetListByActivityWithFromRole(model.ActivityId, model.FromRoleId);

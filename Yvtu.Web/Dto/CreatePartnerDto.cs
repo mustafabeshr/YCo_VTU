@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
+using Yvtu.Web.Helpers;
 
 namespace Yvtu.Web.Dto
 {
@@ -35,6 +36,7 @@ namespace Yvtu.Web.Dto
         [Required(ErrorMessage = "يجب تحديد رقم موبايل احتياطي")]
         [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
+        [PartnerCustomValidation]
         public string PairMobile { get; set; }
         [Required(ErrorMessage = "يجب تحديد المدينة")]
         public int? CityId { get; set; }

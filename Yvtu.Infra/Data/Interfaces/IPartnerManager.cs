@@ -38,7 +38,7 @@ namespace Yvtu.Infra.Data.Interfaces
         OpertionResult Create(Partner partner);
         Task<OpertionResult> CreateAsync(Partner partner);
         List<Partner> GetPartnersWithPaging(PartnerQuery param);
-        bool ChangePwd(int PartnerAcc, string PartnerId, string newPwd);
+        bool ChangePwd(int PartnerAcc, string PartnerId, string newPwd, bool notify);
         Task<OpertionResult> ChangePwdAsync(string PartnerId, string newPwd);
         IEnumerable<Claim> GetUserClaims(Partner user);
         string GetCurrentUserId(HttpContext httpContext);

@@ -75,54 +75,8 @@ namespace Yvtu.Infra.Data
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
 
-            var moneyTransfer = new MoneyTransfer();
             DataRow row = masterDataTable.Rows[0];
-            moneyTransfer.Id = row["trans_id"] == DBNull.Value ? -1 : int.Parse(row["trans_id"].ToString());
-            var partAccount = row["part_acc"] == DBNull.Value ? -1 : int.Parse(row["part_acc"].ToString());
-            var creatorAccount = row["creator_acc"] == DBNull.Value ? -1 : int.Parse(row["creator_acc"].ToString());
-            var partRoleId = row["part_role_id"] == DBNull.Value ? -1 : int.Parse(row["part_role_id"].ToString());
-            var creatorRoleId = row["creator_role_id"] == DBNull.Value ? -1 : int.Parse(row["creator_role_id"].ToString());
-            var partBalance = row["part_bal"] == DBNull.Value ? -1 : long.Parse(row["part_bal"].ToString());
-            var creatorBalance = row["creator_bal"] == DBNull.Value ? 0 : long.Parse(row["creator_bal"].ToString());
-            
-            var payType = row["pay_type"] == DBNull.Value ? string.Empty : row["pay_type"].ToString();
-            moneyTransfer.PayType = new CommonCodeRepo(db).GetCodesById(payType, "pay.type");
-            moneyTransfer.PayNo = row["pay_no"] == DBNull.Value ? string.Empty : row["pay_no"].ToString();
-            moneyTransfer.PayBank = row["bank_name"] == DBNull.Value ? string.Empty : row["bank_name"].ToString();
-            moneyTransfer.PayDate = row["pay_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["pay_date"].ToString());
-            moneyTransfer.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
-            var accessChannel = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
-            moneyTransfer.AccessChannel = new CommonCodeRepo(db).GetCodesById(accessChannel, "access.channel");
-            moneyTransfer.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
-            moneyTransfer.TaxPercent = row["tax_per"] == DBNull.Value ? 0 : double.Parse(row["tax_per"].ToString());
-            moneyTransfer.TaxAmount = row["tax_amt"] == DBNull.Value ? 0 : double.Parse(row["tax_amt"].ToString());
-            moneyTransfer.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
-            moneyTransfer.BounsAmount = row["bonus_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_amt"].ToString());
-            moneyTransfer.BounsTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
-            moneyTransfer.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
-            moneyTransfer.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
-            moneyTransfer.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
-            moneyTransfer.BillNo = row["bill_no"] == DBNull.Value ? string.Empty : row["bill_no"].ToString();
-            moneyTransfer.RequestNo = row["request_no"] == DBNull.Value ? string.Empty : row["request_no"].ToString();
-            moneyTransfer.RequestAmount = row["request_amt"] == DBNull.Value ? 0 :double.Parse(row["request_amt"].ToString());
-            moneyTransfer.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
-            moneyTransfer.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
-            moneyTransfer.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
-            moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
-            moneyTransfer.Partner = partnerManager.GetPartnerByAccount(partAccount);
-            if (moneyTransfer.Partner != null)
-            {
-                moneyTransfer.Partner.Role = new RoleRepo(db, partnerActivityRepo).GetRole(partRoleId);
-                moneyTransfer.Partner.Balance = partBalance;
-                moneyTransfer.Partner.Id = row["part_id"] == DBNull.Value ? string.Empty : row["part_id"].ToString();
-            }
-            moneyTransfer.CreatedBy = partnerManager.GetPartnerByAccount(creatorAccount);
-            if (moneyTransfer.CreatedBy != null)
-            {
-                moneyTransfer.CreatedBy.Role = new RoleRepo(db, partnerActivityRepo).GetRole(creatorRoleId);
-                moneyTransfer.CreatedBy.Balance = creatorBalance;
-                moneyTransfer.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
-            }
+            var moneyTransfer = ConvertDataRowToMoneyTransfer(row);
             return moneyTransfer;
         }
 
@@ -214,7 +168,7 @@ namespace Yvtu.Infra.Data
             }
             if(param.QFromDate > DateTime.MinValue && param.QFromDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)>=:StartDate " : " AND trunc(createdon)>=:StartDate   ");
                 var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.QFromDate };
                 parameters.Add(parm);
             }
@@ -365,13 +319,13 @@ namespace Yvtu.Infra.Data
             }
             if (param.QFromDate > DateTime.MinValue && param.QFromDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)>=:StartDate " : " AND trunc(createdon)>=:StartDate   ");
                 var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.QFromDate };
                 parameters.Add(parm);
             }
             if (param.QToDate > DateTime.MinValue && param.QToDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)<=:EndDate " : " AND trunc(createdon)<=:EndDate   ");
                 var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.QToDate };
                 parameters.Add(parm);
             }
@@ -389,6 +343,74 @@ namespace Yvtu.Infra.Data
             return count;
         }
 
+        public MoneyTransfer GetByApiTransaction(int apiTransId, int account)
+        {
+            string WhereClause = string.Empty;
+            var parameters = new List<OracleParameter> {
+                 new OracleParameter{ ParameterName = "apiTransId", OracleDbType = OracleDbType.Int32,  Value = apiTransId },
+                 new OracleParameter{ ParameterName = "account", OracleDbType = OracleDbType.Int32,  Value = account }
+            };
+            var masterDataTable = this.db.GetData("Select * from MONEY_TRANSFER  where api_trans=:apiTransId and creator_acc = :account and access_channel = 'api'", parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+            DataRow row = masterDataTable.Rows[0];
+            var moneyTransfer = ConvertDataRowToMoneyTransfer(row);
+            return moneyTransfer;
+        }
+        private MoneyTransfer ConvertDataRowToMoneyTransfer(DataRow row)
+        {
+            var moneyTransfer = new MoneyTransfer();
+            moneyTransfer.Id = row["trans_id"] == DBNull.Value ? -1 : int.Parse(row["trans_id"].ToString());
+            var partAccount = row["part_acc"] == DBNull.Value ? -1 : int.Parse(row["part_acc"].ToString());
+            var creatorAccount = row["creator_acc"] == DBNull.Value ? -1 : int.Parse(row["creator_acc"].ToString());
+            var partRoleId = row["part_role_id"] == DBNull.Value ? -1 : int.Parse(row["part_role_id"].ToString());
+            var creatorRoleId = row["creator_role_id"] == DBNull.Value ? -1 : int.Parse(row["creator_role_id"].ToString());
+            var partBalance = row["part_bal"] == DBNull.Value ? -1 : long.Parse(row["part_bal"].ToString());
+            var creatorBalance = row["creator_bal"] == DBNull.Value ? 0 : long.Parse(row["creator_bal"].ToString());
+
+            var payType = row["pay_type"] == DBNull.Value ? string.Empty : row["pay_type"].ToString();
+            moneyTransfer.PayType = new CommonCodeRepo(db).GetCodesById(payType, "pay.type");
+            moneyTransfer.PayNo = row["pay_no"] == DBNull.Value ? string.Empty : row["pay_no"].ToString();
+            moneyTransfer.PayBank = row["bank_name"] == DBNull.Value ? string.Empty : row["bank_name"].ToString();
+            moneyTransfer.PayDate = row["pay_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["pay_date"].ToString());
+            moneyTransfer.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
+            var accessChannel = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
+            moneyTransfer.AccessChannel = new CommonCodeRepo(db).GetCodesById(accessChannel, "access.channel");
+            moneyTransfer.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+            moneyTransfer.TaxPercent = row["tax_per"] == DBNull.Value ? 0 : double.Parse(row["tax_per"].ToString());
+            moneyTransfer.TaxAmount = row["tax_amt"] == DBNull.Value ? 0 : double.Parse(row["tax_amt"].ToString());
+            moneyTransfer.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
+            moneyTransfer.BounsAmount = row["bonus_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_amt"].ToString());
+            moneyTransfer.BounsTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
+            moneyTransfer.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
+            moneyTransfer.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
+            moneyTransfer.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
+            moneyTransfer.BillNo = row["bill_no"] == DBNull.Value ? string.Empty : row["bill_no"].ToString();
+            moneyTransfer.RequestNo = row["request_no"] == DBNull.Value ? string.Empty : row["request_no"].ToString();
+            moneyTransfer.RequestAmount = row["request_amt"] == DBNull.Value ? 0 : double.Parse(row["request_amt"].ToString());
+            moneyTransfer.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
+            moneyTransfer.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
+            moneyTransfer.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
+            moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+
+            moneyTransfer.Partner = partnerManager.GetPartnerByAccount(partAccount);
+
+            if (moneyTransfer.Partner != null)
+            {
+                moneyTransfer.Partner.Role = new RoleRepo(db, partnerActivityRepo).GetRole(partRoleId);
+                moneyTransfer.Partner.Balance = partBalance;
+                moneyTransfer.Partner.Id = row["part_id"] == DBNull.Value ? string.Empty : row["part_id"].ToString();
+            }
+            moneyTransfer.CreatedBy = partnerManager.GetPartnerByAccount(creatorAccount);
+            if (moneyTransfer.CreatedBy != null)
+            {
+                moneyTransfer.CreatedBy.Role = new RoleRepo(db, partnerActivityRepo).GetRole(creatorRoleId);
+                moneyTransfer.CreatedBy.Balance = creatorBalance;
+                moneyTransfer.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
+            }
+            return moneyTransfer;
+        }
         private MoneyTransferDetailQueryDto ConvertDataRowToDataModel(DataRow row , bool includeSeq = false)
         {
             var dataModel = new MoneyTransferDetailQueryDto();

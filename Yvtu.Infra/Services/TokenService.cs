@@ -37,7 +37,7 @@ namespace Yvtu.Infra.Services
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddHours(4),
                 SigningCredentials = creds,
                 Issuer = _config["Token:Issuer"]
             };

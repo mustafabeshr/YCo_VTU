@@ -34,6 +34,7 @@ namespace Yvtu.api
             services.AddScoped<IPartnerManager, PartnerManager>();
             services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
             services.AddSingleton<IAppDbContext, AppDbContext>();
+            services.AddSingleton<IApiDbLog, ApiLogFileRepo>();
             services.AddSingleton<ITokenService, TokenService>();
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

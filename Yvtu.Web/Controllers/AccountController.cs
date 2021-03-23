@@ -386,7 +386,7 @@ namespace Yvtu.Web.Controllers
                     model.Error = "عذرا ، حسابك متوقف مؤقتا لمدة  " + Utility.HowMuchLeftTime(currentPartner.LockTime);
                     await SignOut();
                 }
-                if (!System.Text.RegularExpressions.Regex.IsMatch( model.NewPass.ToString(), "^[0-9]{4,6}$"))
+                if (!System.Text.RegularExpressions.Regex.IsMatch(model.NewPass.ToString(), "^[0-9]{4,6}$"))
                 {
                     model.Error = "كلمة المرور الجديدة غير مستوفية للشروط";
                     return View(model);
@@ -403,7 +403,7 @@ namespace Yvtu.Web.Controllers
                     return View(model);
                 }
 
-                partnerManager.ChangePwd(currentPartner.Account, currentPartner.Id, model.NewPass.ToString());
+                partnerManager.ChangePwd(currentPartner.Account, currentPartner.Id, model.NewPass.ToString(),true);
                 toastNotification.AddSuccessToastMessage("تم تغيير كلمة المرور بنجاح");
             }
 

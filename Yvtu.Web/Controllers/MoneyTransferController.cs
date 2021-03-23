@@ -305,7 +305,7 @@ namespace Yvtu.Web.Controllers
             var currAccountId = _partnerManager.GetCurrentUserAccount(this.HttpContext);
 
             var permission = _partnerActivity.GetPartAct("MoneyTransfer.Query", currRoleId);
-            if (permission == null || permission.Details == null)
+            if (permission == null)
             {
                 model.Error = "ليس لديك الصلاحيات الكافية";
                 return View(model);

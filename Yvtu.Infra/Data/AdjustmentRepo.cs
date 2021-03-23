@@ -138,13 +138,13 @@ namespace Yvtu.Infra.Data
             }
             if (startDate > DateTime.MinValue && startDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE t.createon>=:StartDate " : " AND t.createon>=:StartDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(t.createon)>=:StartDate " : " AND trunc(t.createon)>=:StartDate   ");
                 var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = startDate };
                 parameters.Add(parm);
             }
             if (endDate > DateTime.MinValue && endDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE t.createon<=:EndDate " : " AND t.createon<=:EndDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(t.createon)<=:EndDate " : " AND trunc(t.createon)<=:EndDate   ");
                 var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = endDate };
                 parameters.Add(parm);
             }

@@ -114,13 +114,13 @@ namespace Yvtu.Infra.Data
             }
             if (param.QFromDate > DateTime.MinValue && param.QFromDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon>=:StartDate " : " AND createdon>=:StartDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)>=:StartDate " : " AND trunc(createdon)>=:StartDate   ");
                 var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.QFromDate };
                 parameters.Add(parm);
             }
             if (param.QToDate > DateTime.MinValue && param.QToDate != null)
             {
-                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate   ");
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)<=:EndDate " : " AND trunc(createdon)<=:EndDate   ");
                 var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.QToDate };
                 parameters.Add(parm);
             }
@@ -158,6 +158,22 @@ namespace Yvtu.Infra.Data
             return ConvertDataRowToRechargeQueryResult(masterDataTable.Rows[0]);
 
         }
+
+        public RechargeQueryResult GetRechargeByApiTransaction(int id, int account)
+        {
+            var parameters = new List<OracleParameter>();
+            var parm1 = new OracleParameter { ParameterName = "apiTransaction", OracleDbType = OracleDbType.Int32, Value = id };
+            var parm2 = new OracleParameter { ParameterName = "account", OracleDbType = OracleDbType.Int32, Value = account };
+            parameters.Add(parm1);
+            parameters.Add(parm2);
+            var masterDataTable = this.db.GetData("Select * from v_collection t WHERE api_trans=:apiTransaction and access_channel = 'api' and pos_acc =:account", parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            return ConvertDataRowToRechargeQueryResult(masterDataTable.Rows[0]);
+
+        }
         private RechargeQueryResult ConvertDataRowToRechargeQueryResult(DataRow row)
         {
             var obj = new RechargeQueryResult();
@@ -183,6 +199,7 @@ namespace Yvtu.Infra.Data
             obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
             obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
             obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+            obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
             return obj;
         }
         public OpertionResult Create(RechargeCollection rechargeCollection)
@@ -203,7 +220,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_ref_time",OracleDbType = OracleDbType.Date,  Value = rechargeCollection.RefTime },
                  new OracleParameter{ ParameterName = "v_ref_trans_no",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.RefTransNo },
                  new OracleParameter{ ParameterName = "v_debug_info",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.DebugInfo },
-                 new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Status.Id }
+                 new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Status.Id },
+                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.ApiTransaction }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_financial.fn_create_collection", parameters);
@@ -284,6 +302,7 @@ namespace Yvtu.Infra.Data
                 obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
                 obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue :DateTime.Parse(row["ref_time"].ToString());
                 obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
                 results.Enqueue(obj);
             }
             return results;
@@ -322,10 +341,12 @@ namespace Yvtu.Infra.Data
                 obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
                 obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
                 obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
                 results.Add(obj);
             }
             return results;
         }
+
 
         public async Task<List<ToExcelSchema.RechargeCollection>> GetCollectionsForExcelAsync(string whereClause, List<OracleParameter> parameters)
         {
@@ -358,6 +379,7 @@ namespace Yvtu.Infra.Data
                 obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
                 obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
                 obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
                 results.Add(obj);
             }
             return results;
