@@ -1,10 +1,10 @@
 ---------------------------------------------------------
 -- Export file for user VTU@ORCL                       --
--- Created by mbeshr on 23/03/2021, 22:04:09 22:04:09  --
+-- Created by mbeshr on 25/03/2021, 20:04:27 20:04:27  --
 ---------------------------------------------------------
 
 set define off
-spool ora_vtu_struc_202103232203.log
+spool ora_vtu_struc_202103252004.log
 
 prompt
 prompt Creating table ACTIVITIES
@@ -272,7 +272,7 @@ create table API_LOG
 (
   log_id     NUMBER not null,
   createdon  DATE default sysdate,
-  log_data   VARCHAR2(500),
+  log_data   VARCHAR2(4000),
   log_user   VARCHAR2(100),
   log_ip     VARCHAR2(50),
   log_level  NUMBER(1),
@@ -1054,7 +1054,7 @@ prompt
 create sequence SEQ_EXCEPTION_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 181
+start with 201
 increment by 1
 cache 20;
 
@@ -1153,7 +1153,7 @@ prompt
 create sequence SEQ_SMSONE_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 21
+start with 41
 increment by 1
 cache 20;
 
@@ -1197,7 +1197,7 @@ prompt
 create sequence SEQ_USERS_INSTRUCT_HIS_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 61
+start with 81
 increment by 1
 cache 20;
 
@@ -1208,7 +1208,7 @@ prompt
 create sequence SEQ_USER_INST_ID
 minvalue 1
 maxvalue 9999999999999999999999999999
-start with 81
+start with 101
 increment by 1
 cache 20;
 

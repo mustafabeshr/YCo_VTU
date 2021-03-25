@@ -41,7 +41,8 @@ namespace Yvtu.api.Controllers
             var partnerResult = this._partnerManager.Validate(loginDto.UserId);
             if (!partnerResult.Success) {
                 var response = Unauthorized(new ApiResponse(401));
-                _apiDbLog.Create(new ApiLogFile { Data = JsonSerializer.Serialize(response), Action = "login", Ip = remoteIpAddress.ToString(), Level = 0, User = loginDto.UserId });
+                _apiDbLog.Create(new ApiLogFile { Data = JsonSerializer.Serialize(response), Action = "login", Ip = remoteIpAddress.ToString(), 
+                    Level = 0, User = loginDto.UserId });
                 return response;
             };
 
