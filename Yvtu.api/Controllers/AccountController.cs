@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Yvtu.api.Dtos;
@@ -18,19 +15,16 @@ namespace Yvtu.api.Controllers
     {
         private readonly IAppDbContext _db;
         private readonly IPartnerManager _partnerManager;
-        private readonly IPartnerActivityRepo _partnerActivity;
         private readonly ITokenService _tokenService;
         private readonly IApiDbLog _apiDbLog;
 
         public AccountController(IAppDbContext db,
               IPartnerManager partnerManager,
-             IPartnerActivityRepo partnerActivity,
              ITokenService tokenService,
              IApiDbLog apiDbLog)
         {
             this._db = db;
             this._partnerManager = partnerManager;
-            this._partnerActivity = partnerActivity;
             this._tokenService = tokenService;
             this._apiDbLog = apiDbLog;
         }
@@ -44,7 +38,7 @@ namespace Yvtu.api.Controllers
                 _apiDbLog.Create(new ApiLogFile { Data = JsonSerializer.Serialize(response), Action = "login", Ip = remoteIpAddress.ToString(), 
                     Level = 0, User = loginDto.UserId });
                 return response;
-            };
+            }
 
             if (new ApiIPBlacklistRepo(_db).isBlacklisted(remoteIpAddress.ToString()))
             {
@@ -68,8 +62,7 @@ namespace Yvtu.api.Controllers
 
             if (partnerResult.Partner.Pwd != hash)
             {
-                bool lockAccount = false;
-                if (partnerResult.Partner.WrongPwdAttempts >= 2) lockAccount = true;
+                bool lockAccount = partnerResult.Partner.WrongPwdAttempts >= 2;
                 _partnerManager.IncreaseWrongPwdAttempts(partnerResult.Partner.Id, lockAccount);
                 return BadRequest(new ApiResponse(400, "Sorry, incorrect credentials"));
             }

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using Oracle.ManagedDataAccess.Client;
 using Yvtu.api.Dtos;
 using Yvtu.api.Errors;
 using Yvtu.Core.Entities;
@@ -18,28 +15,17 @@ namespace Yvtu.api.Controllers
     [Authorize]
     public class TopupController : BaseApiController
     {
-        public class RechargeResponse
-        {
-            public string ResultCode { get; set; }
-            public string ResultDesc { get; set; }
-            public int Duration { get; set; }
-            public string TransNo { get; set; }
-        }
-
         private readonly IAppDbContext _db;
         private readonly IPartnerManager _partnerManager;
-        private readonly IPartnerActivityRepo _partnerActivity;
         private readonly IConfiguration _config;
 
         public TopupController(IAppDbContext db,
               IPartnerManager partnerManager,
-              IPartnerActivityRepo partnerActivity,
               IConfiguration config
              )
         {
             this._db = db;
             this._partnerManager = partnerManager;
-            this._partnerActivity = partnerActivity;
             this._config = config;
         }
 

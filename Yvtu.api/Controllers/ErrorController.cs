@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Yvtu.api.Errors;
 using Yvtu.Core.Entities;
@@ -25,8 +19,7 @@ namespace Yvtu.api.Controllers
         public IActionResult Error()
         {
             var exceptionDetails = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-
-            var err = _apiDbLog.Create(new ApiLogFile
+            _ = _apiDbLog.Create(new ApiLogFile
             {
                 Data = $"{exceptionDetails.Error.GetType().Name} Path={exceptionDetails.Path} Message={exceptionDetails.Error.Message} StackTrace={exceptionDetails.Error.StackTrace}",
                 Action = "Error",
