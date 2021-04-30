@@ -34,7 +34,7 @@ namespace Yvtu.Web.Controllers
         public IActionResult Index()
         {
           
-             var  model = new ListPartnerActivityDto();
+            var  model = new ListPartnerActivityDto();
 
             model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
             model.FromRoles =  new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");

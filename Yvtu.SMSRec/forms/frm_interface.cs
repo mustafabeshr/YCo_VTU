@@ -4,6 +4,7 @@ using SMPPSocket;
 using System.Drawing;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Infra.Data;
@@ -104,6 +105,7 @@ namespace Yvtu.SMSRec
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IPartnerActivityRepo partnerActivityRepo;
+        private readonly ILogger<frm_Parent> _logger;
 
         //-----------------------------------------------------------
 
@@ -121,13 +123,15 @@ namespace Yvtu.SMSRec
                 return 1;
             }
         }
-        public frm_interface(byte Interface_No, IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public frm_interface(byte Interface_No, IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo
+            , ILogger<frm_Parent> logger)
         {
             InitializeComponent();
             _interface_no = Interface_No;
             this.db = db;
             this.partnerManager = partnerManager;
             this.partnerActivityRepo = partnerActivityRepo;
+            _logger = logger;
             //bw_Delivery.WorkerReportsProgress = true;
             //bw_Delivery.WorkerSupportsCancellation = true;
             //bw_Delivery.DoWork += new DoWorkEventHandler(bw_Delivery_DoWork);
@@ -190,7 +194,7 @@ namespace Yvtu.SMSRec
                 DeliverMessage.Delivered_Message delmsg = (DeliverMessage.Delivered_Message)e.Argument;
                 if (delmsg.Short_code == SharedParams.Short_Code.ToString())
                 {
-                    DeliverMessage DeliverMsg = new DeliverMessage(db, partnerManager, partnerActivityRepo);
+                    DeliverMessage DeliverMsg = new DeliverMessage(db, partnerManager, partnerActivityRepo, _logger);
                     DeliverMessage.RequestReturnValue RQretuenvalue = new DeliverMessage.RequestReturnValue();
                     var RQpack = new PartnerRequest();
                     var queueNo = getCurrentChannelNo();

@@ -1,0 +1,29 @@
+﻿@model Yvtu.Web.Dto.PaymentValuesDto
+
+@{
+    ViewData["Title"] = "Payment Values";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">إضافة مبلغ الى قائمة الدفع</p>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <div class="form-row">
+        <div class="form-group col-12">
+            <label asp-for="PayValue" class="FormLabel">المبلغ :</label>
+            <input asp-for="PayValue" class="form-control RequiredInput" />
+            <span asp-validation-for="PayValue" class="text-danger"></span>
+        </div>
+    </div>
+    <button type="submit" class="btn btn-outline-success"
+            style="width:100%;border-radius:10px;">
+        <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+    </button>
+</form>

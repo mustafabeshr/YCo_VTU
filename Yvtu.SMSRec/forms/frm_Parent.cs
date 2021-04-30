@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using Microsoft.Extensions.Logging;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.SMSRec
@@ -11,15 +12,17 @@ namespace Yvtu.SMSRec
         private bool collapseSharedParamPanel = false;
         private readonly IPartnerManager partnerManager;
         private readonly IPartnerActivityRepo partnerActivityRepo;
+        private readonly ILogger<frm_Parent> _logger;
 
         public IAppDbContext Db { get; }
 
-        public frm_Parent(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public frm_Parent(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo, ILogger<frm_Parent> logger)
         {
             InitializeComponent();
             Db = db;
             this.partnerManager = partnerManager;
             this.partnerActivityRepo = partnerActivityRepo;
+            _logger = logger;
         }
         public void RefreshInterfacesCount()
         {
@@ -41,7 +44,7 @@ namespace Yvtu.SMSRec
                 {
                     //if (SharedParams.InterfaceDictionary[inter.Interface_No].Status == "closed")
                     //{
-                        frm_interface childForm = new frm_interface(inter.Interface_No, Db, partnerManager, partnerActivityRepo);
+                        frm_interface childForm = new frm_interface(inter.Interface_No, Db, partnerManager, partnerActivityRepo, _logger);
                         childForm.MdiParent = this;
                         childForm.Tag = inter.Interface_No.ToString();
                         childForm.Text = "Interface " + childFormNumber++;
@@ -187,6 +190,7 @@ namespace Yvtu.SMSRec
 
         private void ReloadSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            _logger.LogError("sdsdsdsdsd");
             LoadSettings();
         }
     }

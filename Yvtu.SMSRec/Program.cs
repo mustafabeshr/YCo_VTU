@@ -6,8 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Extensions.Logging;
+using NLog.Extensions.Logging;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
+using Yvtu.SMSRec.logger;
 
 namespace Yvtu.SMSRec
 {
@@ -36,8 +39,7 @@ namespace Yvtu.SMSRec
              .ConfigureLogging(logging =>
              {
                  // Add other loggers...
-             })
-             .Build();
+             }).Build();
 
             var services = host.Services;
             var mainForm = services.GetRequiredService<frm_Parent>();
@@ -50,7 +52,13 @@ namespace Yvtu.SMSRec
             services.AddSingleton<IAppDbContext, AppDbContext>();
             services.AddScoped<IPartnerManager, PartnerManager>();
             services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
+            services.AddLogging(option =>
+            {
+                option.SetMinimumLevel(LogLevel.Information);
+                option.AddNLog("nlog.config");
+            });
             services.AddSingleton<frm_Parent>();
+            services.AddScoped<frm_interface>();
         }
         
     }

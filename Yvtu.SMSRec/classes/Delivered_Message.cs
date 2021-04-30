@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -12,12 +13,15 @@ namespace Yvtu.SMSRec
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IPartnerActivityRepo partnerActivityRepo;
+        private readonly ILogger<frm_Parent> _logger;
 
-        public DeliverMessage(IAppDbContext db, IPartnerManager partnerManager, IPartnerActivityRepo partnerActivityRepo)
+        public DeliverMessage(IAppDbContext db, IPartnerManager partnerManager, 
+            IPartnerActivityRepo partnerActivityRepo, ILogger<frm_Parent> logger)
         {
             this.db = db;
             this.partnerManager = partnerManager;
             this.partnerActivityRepo = partnerActivityRepo;
+            _logger = logger;
         }
         // Write your code in this class to process the request ...
         public RequestReturnValue Parse_Request(Delivered_Message ClientMessage, byte queueNo, out PartnerRequest parsedRequest)
@@ -132,15 +136,15 @@ namespace Yvtu.SMSRec
                             return ret;
                         }
                         var partner = partnerResult.Partner;
-                        if (partner.Balance < double.Parse(Tokens[1]))
-                        {
-                            ret.Ret_ID = -1;
-                            ret.Ret_Message = "NotEnoughBalance";
-                            ret.Ret_Message_to_Client = "رصيدك غير كافي لاجراء عملية نقل رصيد";
-                            ret.Ret_Status = false;
-                            parsedRequest.RequestId = 2;
-                            return ret;
-                        }
+                        //if (partner.Balance < double.Parse(Tokens[1]))
+                        //{
+                        //    ret.Ret_ID = -1;
+                        //    ret.Ret_Message = "NotEnoughBalance";
+                        //    ret.Ret_Message_to_Client = "رصيدك غير كافي لاجراء عملية نقل رصيد";
+                        //    ret.Ret_Status = false;
+                        //    parsedRequest.RequestId = 2;
+                        //    return ret;
+                        //}
                         var targetPartnerResult = partnerManager.Validate(Tokens[2]);
                         if (!targetPartnerResult.Success)
                         {
@@ -276,9 +280,10 @@ namespace Yvtu.SMSRec
                                 }
                                 else if (result.AffectedCount < 0)
                                 {
+                                    _logger.LogError($"mobile={parsedRequest.MobileNo},id={parsedRequest.Id},result={result.AffectedCount},result error={result.Error}");
                                     ret.Ret_ID = -1;
                                     ret.Ret_Message = "UnExpectedError";
-                                    ret.Ret_Message_to_Client = "عذرا لم تتم عملية نقل الرصيد لحدوث خطأ في السيرفر ";
+                                    ret.Ret_Message_to_Client = "عذرا لم تتم عملية نقل الرصيد لحدوث خطأ في السيرفر " + result.AffectedCount;
                                     ret.Ret_Status = false;
                                     return ret;
                                 }

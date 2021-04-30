@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NToastNotify;
 using System;
+using Microsoft.AspNetCore.Mvc;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 
@@ -53,7 +54,10 @@ namespace Yvtu.Web
                 PositionClass = ToastPositions.TopCenter
             })
             .AddRazorRuntimeCompilation();
-            services.AddControllersWithViews();
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

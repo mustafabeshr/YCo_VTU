@@ -1,0 +1,53 @@
+﻿@model IEnumerable<Yvtu.Core.Entities.PaymentValues>
+
+@{
+    ViewData["Title"] = "Payment Values";
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">قائمة مبالغ الدفع</p>
+        </div>
+    </div>
+    <a class="btn btn-outline-info float-left" asp-action="CreatePVs" asp-controller="Settings" style="font-size:11px;">
+        <i class="fas fa-plus"></i>
+        &nbsp;&nbsp;  اضافة مبلغ
+    </a>
+</div>
+
+
+
+@if (Model != null && Model.Any())
+{
+    @foreach (var item in Model)
+    {
+        <div class="row shadow-sm bg-white p-2" style="font-size: 12px; margin-top: 1px;">
+            <div class="row container-fluid">
+                <div class="col-md-1 text-center">
+                    @item.Seq
+                </div>
+                <div class="col-md-3 text-center">
+                    @item.PayValue.ToString("N2")
+                </div>
+                <div class="col-md-3 text-center">
+                    @item.CreatedOn.ToString("dd/MM/yyyy HH:mm:ss")
+                </div>
+                <div class="col-md-1 text-center">
+                    @item.CreatedBy.Id
+                </div>
+                <div class="col-md-1 text-center">
+                    @item.CreatedBy.Account
+                </div>
+                <div class="col-md-2 text-center">
+                    @item.CreatedBy.Name
+                </div>
+                <div class="col-md-1 text-center">
+                   <a class="far fa-times-circle" style="color: red;"  asp-action="RemovePV" asp-controller="Settings" asp-route-pvalue="@item.PayValue"></a>
+                </div>
+            </div>
+        </div>
+     }
+ }
