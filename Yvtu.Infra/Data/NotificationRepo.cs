@@ -25,7 +25,7 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.Varchar2,  Value = sms.Message },
+                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.NVarchar2,  Value = sms.Message },
                  new OracleParameter{ ParameterName = "v_receiver",OracleDbType = OracleDbType.Varchar2,  Value = sms.Receiver },
                 };
                 #endregion

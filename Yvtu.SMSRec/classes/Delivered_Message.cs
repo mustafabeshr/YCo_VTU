@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using Yvtu.Core.Entities;
@@ -475,6 +476,26 @@ namespace Yvtu.SMSRec
                             parsedRequest.RequestId = 1;
                             return ret;
                         }
+
+                        var paymentAmounts = new AppGlobalSettingsRepo(db).GetSingle("PaymentAmount");
+                        if (paymentAmounts != null && paymentAmounts.SettingValue == "list")
+                        {
+                            var amt = double.Parse(Tokens[0]);
+                            var amtValues = new PaymentValuesRepo(db, partnerManager).GetAll();
+                            if (amtValues != null)
+                            {
+                                if (!amtValues.Any(x => x.PayValue == amt))
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "AmountNotInList";
+                                    ret.Ret_Message_to_Client = "عذرا المبلغ المراد دفعه غير صحيح ، لمعرفة فئات المبالغ يرجى ارسال ف";
+                                    ret.Ret_Status = false;
+                                    parsedRequest.RequestId = 1;
+                                    return ret;
+                                }
+                            }
+                        }
+
                         if (permission.Details[0].MinValue > 0 && int.Parse(Tokens[0]) < permission.Details[0].MinValue)
                         {
                             ret.Ret_ID = -1;
@@ -551,6 +572,14 @@ namespace Yvtu.SMSRec
                                     ret.Ret_Status = false;
                                     return ret;
                                 }
+                                else if (result.AffectedCount == -515)
+                                {
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "AmountNotInList";
+                                    ret.Ret_Message_to_Client = "عذرا المبلغ المراد دفعه غير صحيح ، لمعرفة فئات المبالغ يرجى ارسال ف";
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
                                 #endregion
                             }
                             else
@@ -566,7 +595,32 @@ namespace Yvtu.SMSRec
                         
                         #endregion
                         #endregion
-                    } else
+                    } else if (ClientMessage.Message == "ف")
+                    {
+                        #region Query about payment values
+                            var amountValues = new PaymentValuesRepo(db, partnerManager).GetAllPaymentValues();
+                            if (amountValues != null)
+                            {
+                                var amountValuesString = String.Join(",", amountValues);
+                                var msg = "فئات المبالغ المسموح بها" + Environment.NewLine + amountValuesString;
+                                var result = new OutSMSRepo(db).Create(new SMSOut
+                                {
+                                    Receiver = parsedRequest.MobileNo,
+                                    Message = msg
+                                });
+                                parsedRequest.RequestName = "Payment Values";
+                                parsedRequest.Status = 1;
+                                parsedRequest.MobileNo = ClientMessage.Mobile_No;
+                                parsedRequest.ReplayDesc = msg;
+                                ret.Ret_ID = 1;
+                                ret.Ret_Status = true;
+                                ret.Ret_Message = "OK";
+                                ret.Ret_Message_to_Client = msg;
+                                return ret;
+                            }
+                        #endregion
+                    }
+                    else
                     {
                         #region Unkown Request
                         ret.Ret_ID = -1;

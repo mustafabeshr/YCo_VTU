@@ -83,6 +83,26 @@ namespace Yvtu.Infra.Data
 
         }
 
+        public List<double> GetAllPaymentValues()
+        {
+            //var parameters = new List<OracleParameter> {
+            //    new OracleParameter{ ParameterName = "pValue", OracleDbType = OracleDbType.Decimal,  Value = pValue }
+            //};
+            var masterDataTable = this._db.GetData("Select * from pay_values  order by pvalue ", null);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+            var paymentVlaues = new List<double>();
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToPaymentValues(row);
+                paymentVlaues.Add(obj.PayValue);
+            }
+
+            return paymentVlaues;
+
+        }
+
         public OpertionResult Remove(double pValue)
         {
             try

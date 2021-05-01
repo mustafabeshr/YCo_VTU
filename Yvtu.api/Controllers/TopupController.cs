@@ -51,6 +51,7 @@ namespace Yvtu.api.Controllers
                 if (result.AffectedCount == -511) return BadRequest(new ApiResponse(-3007, "Sorry, your account was invalid"));
                 if (result.AffectedCount == -512) return BadRequest(new ApiResponse(-3008, "Sorry, inconsistent data"));
                 if (result.AffectedCount == -514) return BadRequest(new ApiResponse(-3009, $"Sorry, duplicated sequence {topup.seq}"));
+                if (result.AffectedCount == -515) return BadRequest(new ApiResponse(-3010, $"Sorry, amount not allowed"));
             }
             recharge.Id = result.AffectedCount;
             // call web service 

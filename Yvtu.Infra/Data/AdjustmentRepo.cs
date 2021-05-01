@@ -32,7 +32,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_moneytranferid",OracleDbType = OracleDbType.Int32,  Value = adjust.MoneyTransferId },
                  new OracleParameter{ ParameterName = "v_amount",OracleDbType = OracleDbType.Decimal,  Value = adjust.Amount },
                  new OracleParameter{ ParameterName = "v_access_channel",OracleDbType = OracleDbType.Varchar2,  Value = adjust.AccessChannel.Id },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = adjust.Note },
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = adjust.Note },
                  new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Varchar2,  Value = adjust.CreatedBy.Account }
                 };
 

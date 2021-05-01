@@ -39,7 +39,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = created.CreatedBy.Account },
                  new OracleParameter{ ParameterName = "v_partner_id",OracleDbType = OracleDbType.Varchar2,  Value = created.Partner.Id },
                  new OracleParameter{ ParameterName = "v_partner_acc",OracleDbType = OracleDbType.Int32,  Value = created.Partner.Account },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = created.Note }
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = created.Note }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_financial.fn_create_confiscation", parameters);

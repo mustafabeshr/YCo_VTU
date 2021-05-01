@@ -42,7 +42,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_partner_acc",OracleDbType = OracleDbType.Int32,  Value = log.Partner.Account },
                  new OracleParameter{ ParameterName = "v_old_status",OracleDbType = OracleDbType.Int32,  Value = log.OldStatus.Id },
                  new OracleParameter{ ParameterName = "v_new_status",OracleDbType = OracleDbType.Int32,  Value = log.NewStatus.Id },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = log.Note },
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = log.Note },
                  new OracleParameter{ ParameterName = "v_newstatus_expireon",OracleDbType = OracleDbType.Date,  Value = log.NewStatusExpireOn }
                 };
                 #endregion

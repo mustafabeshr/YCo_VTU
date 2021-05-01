@@ -24,8 +24,8 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_subject",OracleDbType = OracleDbType.Varchar2,  Value = obj.Subject },
-                 new OracleParameter{ ParameterName = "v_content",OracleDbType = OracleDbType.Varchar2,  Value = obj.Content },
+                 new OracleParameter{ ParameterName = "v_subject",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Subject },
+                 new OracleParameter{ ParameterName = "v_content",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Content },
                  new OracleParameter{ ParameterName = "v_priority",OracleDbType = OracleDbType.Varchar2,  Value = obj.Priority.Id },
                  new OracleParameter{ ParameterName = "v_createdbyid",OracleDbType = OracleDbType.Varchar2,  Value = obj.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_expire_time",OracleDbType = OracleDbType.Date,  Value =  obj.ExpireOn },

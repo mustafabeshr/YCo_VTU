@@ -28,7 +28,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_reciever",OracleDbType = OracleDbType.Varchar2,  Value = sms.Receiver },
                  new OracleParameter{ ParameterName = "v_sender",OracleDbType = OracleDbType.Varchar2,  Value = sms.Sender },
-                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.Varchar2,  Value = sms.Message },
+                 new OracleParameter{ ParameterName = "v_message",OracleDbType = OracleDbType.NVarchar2,  Value = sms.Message },
                  new OracleParameter{ ParameterName = "v_ref_no",OracleDbType = OracleDbType.Int32,  Value = sms.RefNo },
                  new OracleParameter{ ParameterName = "v_lang",OracleDbType = OracleDbType.Varchar2,  Value = sms.Lang }
                 };

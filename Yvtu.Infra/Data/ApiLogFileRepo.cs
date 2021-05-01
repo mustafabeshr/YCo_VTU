@@ -33,7 +33,7 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_log_data",OracleDbType = OracleDbType.Varchar2,  Value = obj.Data },
+                 new OracleParameter{ ParameterName = "v_log_data",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Data },
                  new OracleParameter{ ParameterName = "v_log_user",OracleDbType = OracleDbType.Varchar2,  Value = obj.User },
                  new OracleParameter{ ParameterName = "v_log_ip",OracleDbType = OracleDbType.Varchar2,  Value = obj.Ip },
                  new OracleParameter{ ParameterName = "v_log_level",OracleDbType = OracleDbType.Int32,  Value = obj.Level },

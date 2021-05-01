@@ -26,8 +26,8 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_msg_name",OracleDbType = OracleDbType.Varchar2,  Value = template.Title },
-                 new OracleParameter{ ParameterName = "v_msg_text",OracleDbType = OracleDbType.Varchar2,  Value = template.Message },
+                 new OracleParameter{ ParameterName = "v_msg_name",OracleDbType = OracleDbType.NVarchar2,  Value = template.Title },
+                 new OracleParameter{ ParameterName = "v_msg_text",OracleDbType = OracleDbType.NVarchar2,  Value = template.Message },
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = template.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = template.CreatedBy.Account },
                  new OracleParameter{ ParameterName = "v_towho",OracleDbType = OracleDbType.Int32,  Value = template.ToWho }

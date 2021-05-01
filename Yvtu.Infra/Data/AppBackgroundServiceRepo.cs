@@ -46,9 +46,9 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_partner_acc",OracleDbType = OracleDbType.Int32,  Value = obj.Partner.Account },
                  new OracleParameter{ ParameterName = "v_start_date",OracleDbType = OracleDbType.Date,  Value = obj.StartDate },
                  new OracleParameter{ ParameterName = "v_end_date",OracleDbType = OracleDbType.Date,  Value = obj.EndDate },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = obj.Note },
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Note },
                  new OracleParameter{ ParameterName = "v_active_time",OracleDbType = OracleDbType.Date,  Value = obj.ActiveTime },
-                 new OracleParameter{ ParameterName = "v_service_name",OracleDbType = OracleDbType.Varchar2,  Value = obj.Name }
+                 new OracleParameter{ ParameterName = "v_service_name",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Name }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_infra.fn_create_bgservice", parameters);

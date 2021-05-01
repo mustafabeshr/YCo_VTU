@@ -38,8 +38,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = created.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = created.CreatedBy.Account },
                  new OracleParameter{ ParameterName = "v_receiver",OracleDbType = OracleDbType.Varchar2,  Value = created.Receiver },
-                 new OracleParameter{ ParameterName = "v_msg",OracleDbType = OracleDbType.Varchar2,  Value = created.Message },
-                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.Varchar2,  Value = created.Note }
+                 new OracleParameter{ ParameterName = "v_msg",OracleDbType = OracleDbType.NVarchar2,  Value = created.Message },
+                 new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = created.Note }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_infra.fn_create_smsone", parameters);
