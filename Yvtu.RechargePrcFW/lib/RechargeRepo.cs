@@ -90,7 +90,15 @@ namespace Yvtu.RechargePrcFW.lib
             }
         }
 
-
+        public bool RemoveRechargeDraft(int id)
+        {
+            var parameters = new List<OracleParameter>
+            {
+                new OracleParameter {ParameterName = "id", OracleDbType = OracleDbType.Int32, Value = id},
+            };
+            var result =DB.ExecuteQuery("delete from collection_draft where ref_no=:id", parameters, 0);
+            return result > 0;
+        }
 
     }
 }

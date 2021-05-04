@@ -108,6 +108,11 @@ namespace Yvtu.Web.Reports
      <td style='width:30%;text-align:center;'>" + result.Amount.ToString("N2") + @"</td>
      <td style='width:55%;text-align:right;font-size:18px;'>" + new MonyToString().NumToStr(result.Amount) + @"</td>
 </tr>
+ <tr>
+     <td style='width:15%;text-align:right;'>نسبة ثابتة</td>
+     <td style='width:30%;text-align:center;'>" + result.FixedFactor.ToString("N6") + @"</td>
+     <td style='width:55%;text-align:right;font-size:18px;'></td>
+</tr>
 <tr>
      <td style='width:15%;text-align:right;'>الصافي</td>
      <td style='width:30%;text-align:center;'>" + result.NetAmount.ToString("N2") + @"</td>
@@ -134,12 +139,12 @@ namespace Yvtu.Web.Reports
      <td style='width:55%;text-align:right;font-size:18px;'>" + new MonyToString().NumToStr(result.BounsAmount) + @"</td>
 </tr>
 <tr>
-<td style='width:15%;text-align:right;'>نسبة ضريبة العمولة</td>
+<td style='width:15%;text-align:right;'>نسبة ضريبة المنبع</td>
      <td style='width:30%;text-align:center;'>" + result.BounsTaxPercent.ToString("N2") + @" %</td>
      <td style='width:55%;text-align:right;'></td>
 </tr>
 <tr>
-<td style='width:10%;text-align:right;'>مبلغ ضريبة العمولة</td>
+<td style='width:10%;text-align:right;'>مبلغ ضريبة المنبع</td>
      <td style='width:30%;text-align:center;'>" + result.BounsTaxAmount.ToString("N2") + @"</td>
      <td style='width:60%;text-align:right;font-size:18px;'>" + new MonyToString().NumToStr(result.BounsTaxAmount) + @"</td>
 </tr>

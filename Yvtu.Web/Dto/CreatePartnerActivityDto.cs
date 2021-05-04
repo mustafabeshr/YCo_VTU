@@ -130,6 +130,8 @@ namespace Yvtu.Web.Dto
         [Required(ErrorMessage = "يجب تحديد نسبة الضريبة")]
         [Range(0, 100, ErrorMessage = "نسبة الضريبة غير صحيحة")]
         public double TaxPercent { get; set; }
+        [Required(ErrorMessage = "يجب تحديد النسبة الثابتة")]
+        public double FixedFactor { get; set; }
         public AppUser CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastEditOn { get; set; }

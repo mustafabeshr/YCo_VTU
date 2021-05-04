@@ -84,10 +84,6 @@ namespace Yvtu.Web.Controllers
 
             return File(file, "application/pdf");
         }
-        public IActionResult Index()
-        {
-            return View();
-        }
 
         [HttpGet]
         public IActionResult Create()
@@ -219,6 +215,7 @@ namespace Yvtu.Web.Controllers
                     TaxPercent = moneyTransferSettings.TaxPercent,
                     BonusPercent = moneyTransferSettings.BonusPercent,
                     BounsTaxPercent = moneyTransferSettings.BonusTaxPercent,
+                    FixedFactor = moneyTransferSettings.FixedFactor,
                     Error = "N/A"
                 };
                 if (amount <= 0) return model;
@@ -251,11 +248,11 @@ namespace Yvtu.Web.Controllers
                     }
                 }
 
-                var netAmount = amount / ((moneyTransferSettings.TaxPercent / 100) + 1) ;
+                var netAmount = amount * (moneyTransferSettings.FixedFactor <= 0 ? 1 : moneyTransferSettings.FixedFactor) ;
                 var taxAmount = netAmount * (moneyTransferSettings.TaxPercent / 100);
                 var bounsAmount = netAmount * (moneyTransferSettings.BonusPercent / 100);
                 var bounsTaxAmount = bounsAmount * (moneyTransferSettings.BonusTaxPercent / 100);
-                var recievedAmount = (amount - bounsAmount + bounsTaxAmount);
+                var recievedAmount = netAmount;
 
                 model.Amount = amount;
                 model.NetAmount = netAmount;

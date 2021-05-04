@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
@@ -347,7 +348,14 @@ namespace Yvtu.Infra.Data
             return results;
         }
 
-
+        public async Task RemoveRechargeDraft(int id)
+        {
+            var parameters = new List<OracleParameter>
+            {
+                new OracleParameter {ParameterName = "id", OracleDbType = OracleDbType.Int32, Value = id},
+            };
+            await db.ExecuteSqlCommandAsync("delete from collection_draft where ref_no=:id", parameters);
+        }
         public async Task<List<ToExcelSchema.RechargeCollection>> GetCollectionsForExcelAsync(string whereClause, List<OracleParameter> parameters)
         {
             string strSql = $"select * from V_COLLECTION {whereClause} order by cl_id";

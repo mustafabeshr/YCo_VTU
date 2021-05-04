@@ -20,6 +20,7 @@ namespace Yvtu.Core.Entities
         public double BonusPercent { get; set; }
         public double BonusTaxPercent { get; set; }
         public double TaxPercent { get; set; }
+        public double FixedFactor { get; set; }
         public AppUser CreatedBy { get; set; }
         public DateTime CreatedOn { get; set; }
         public DateTime LastEditOn { get; set; }
@@ -38,6 +39,7 @@ namespace Yvtu.Core.Entities
                 "Tax Per =" + TaxPercent.ToString("N2") + Environment.NewLine +
                 "Bonus Per =" + BonusPercent.ToString("N2") + Environment.NewLine +
                 "Bonus Tax Per =" + BonusTaxPercent.ToString("N2") + Environment.NewLine +
+                "Fixed Factor =" + FixedFactor.ToString("N6") + Environment.NewLine +
                 "Created On=" + CreatedOn.ToString("yyyy/MM/dd H:mm:ss") + Environment.NewLine +
                 "Created By=" + CreatedBy.Id + Environment.NewLine +
                 "Created By Account=" + CreatedBy.Account + Environment.NewLine +

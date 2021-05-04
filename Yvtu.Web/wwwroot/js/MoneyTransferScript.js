@@ -1,6 +1,6 @@
 ﻿
 $(document).ready(function () {
-    $("#txtPartnerId").keyup(function (data) {
+    $("#txtPartnerId").blur(function () {
         if ($("#txtPartnerId").val().length == 9) {
             if (matchString($("#txtPartnerId").val()) === 1) {
                 callBasicInfo($("#txtPartnerId").val());
@@ -8,9 +8,9 @@ $(document).ready(function () {
         }
     });
 
-    if ($("#txtPartnerId").val().length == 9) {
-        callBasicInfo($("#txtPartnerId").val());
-    }
+    //if ($("#txtPartnerId").val().length == 9) {
+    //    callBasicInfo($("#txtPartnerId").val());
+    //}
 
     function callBasicInfo(id) {
         $.ajax({
@@ -19,7 +19,7 @@ $(document).ready(function () {
             data: { pId:  id}, 
             traditional: true,
             success: function (result) {
-                //console.log(result);
+                console.log(result);
                 if (result.error == "N/A") {
                     document.getElementById('lblPartnerName').innerHTML = result.partnerName;
                     document.getElementById('lblPartnerRoleName').innerHTML = result.partnerRoleName;
@@ -27,6 +27,7 @@ $(document).ready(function () {
                     document.getElementById('lblTaxPercent').innerHTML = result.taxPercent;
                     document.getElementById('lblBonusPercent').innerHTML = result.bonusPercent;
                     document.getElementById('lblBounsTaxPercent').innerHTML = result.bounsTaxPercent;
+                    document.getElementById('lblFixedFactor').innerHTML = result.fixedFactor;
                     //FreeUpAmountControls();
                 }
                 else {
@@ -83,6 +84,7 @@ $(document).ready(function () {
         document.getElementById('lblTaxPercent').innerHTML = '';
         document.getElementById('lblBonusPercent').innerHTML = '';
         document.getElementById('lblBounsTaxPercent').innerHTML = '';
+        document.getElementById('lblFixedFactor').innerHTML = '';
         //document.getElementById('lblNetAmount').innerHTML = '';
         //document.getElementById('lblTaxAmount').innerHTML = '';
         //document.getElementById('lblBounsAmount').innerHTML = '';
@@ -104,13 +106,15 @@ $(document).ready(function () {
 
     function CalculateAmounts(amount) {
         var taxPer = document.getElementById('lblTaxPercent').innerHTML;
+        var fixedFactor = document.getElementById('lblFixedFactor').innerHTML;
         var bonusPer = document.getElementById('lblBonusPercent').innerHTML;
         var bonustaxPer = document.getElementById('lblBounsTaxPercent').innerHTML;
-        var netAmount = (amount / ((taxPer / 100) + 1));
+        if (fixedFactor <= 0) fixedFactor = 1;
+        var netAmount = (amount * fixedFactor);
         var taxAmount = netAmount * (taxPer / 100);
         var bounsAmount = netAmount * (bonusPer / 100);
         var bounsTaxAmount = bounsAmount * (bonustaxPer / 100);
-        var recAmount = (amount - bounsAmount + bounsTaxAmount);
+        var recAmount = netAmount;
 
         document.getElementById('lblNetAmount').innerHTML = numberWithCommas(netAmount.toFixed(2));
         document.getElementById('lblTaxAmount').innerHTML = numberWithCommas(taxAmount.toFixed(2));

@@ -12,6 +12,7 @@ namespace Yvtu.Infra.Data.Interfaces
         PartnerActivity GetPartAct(string actId, int fromRoleId, int toRoleId);
         PartnerActivity GetPartAct(string actId, int fromRoleId);
         PartnerActivity GetPartAct(int id);
+        PartnerActivity GetPartActOnly(int id);
         List<PartnerActivity> GetListByActivity(string activityId);
         List<PartnerActivity> GetListByFrom(int fromId);
         List<PartnerActivity> GetListByActivityWithFromRole(string activityId, int fromRoleId);

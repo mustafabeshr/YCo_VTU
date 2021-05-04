@@ -393,6 +393,7 @@ namespace Yvtu.Infra.Data
             moneyTransfer.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             moneyTransfer.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
             moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+            moneyTransfer.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
 
             moneyTransfer.Partner = partnerManager.GetPartnerByAccount(partAccount);
 
@@ -452,6 +453,7 @@ namespace Yvtu.Infra.Data
             dataModel.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             dataModel.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
             dataModel.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+            dataModel.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
             return dataModel;
         }
         public async Task<List<MoneyTransferRpt>> GetStatReportAsync(MoneyTransferRptQueryParam param)
@@ -581,6 +583,7 @@ namespace Yvtu.Infra.Data
                 obj.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
                 obj.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
                 obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+                obj.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
                 results.Add(obj);
             }
             return results;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using NToastNotify;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
@@ -18,17 +19,21 @@ namespace Yvtu.Web.Controllers
         private readonly IPartnerActivityRepo _partActRepo;
         private readonly IDataAuditRepo _auditing;
         private readonly IToastNotification toastNotification;
+        private readonly ILogger<PartActivityController> _logger;
 
         public IPartnerManager _PartnerManager { get; }
 
         public PartActivityController(IAppDbContext db, IPartnerActivityRepo partActRepo
-            , IPartnerManager partnerManager, IDataAuditRepo auditing  ,IToastNotification toastNotification)
+            , IPartnerManager partnerManager, IDataAuditRepo auditing  
+            ,IToastNotification toastNotification, 
+            ILogger<PartActivityController> logger)
         {
             this.db = db;
             _partActRepo = partActRepo;
             _PartnerManager = partnerManager;
             _auditing = auditing;
             this.toastNotification = toastNotification;
+            _logger = logger;
         }
         [HttpGet]
         public IActionResult Index()
@@ -301,6 +306,7 @@ namespace Yvtu.Web.Controllers
                 originObject.TaxPercent = model.TaxPercent;
                 originObject.BonusPercent = model.BonusPercent;
                 originObject.BonusTaxPercent = model.BonusTaxPercent;
+                originObject.FixedFactor = model.FixedFactor;
                 originObject.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
                 var result = _partActRepo.CreateDetail(originObject);
                 if (result.Success)
@@ -333,9 +339,9 @@ namespace Yvtu.Web.Controllers
                 TaxPercent = model.TaxPercent,
                 BonusPercent = model.BonusPercent,
                 BonusTaxPercent = model.BonusTaxPercent,
+                FixedFactor = model.FixedFactor,
                 ToRoles = toRoles
             };
-
             return View(viewModel);
         }
         [HttpPost]
@@ -357,18 +363,23 @@ namespace Yvtu.Web.Controllers
                 originObject.TaxPercent = model.TaxPercent;
                 originObject.BonusPercent = model.BonusPercent;
                 originObject.BonusTaxPercent = model.BonusTaxPercent;
+                originObject.FixedFactor = model.FixedFactor;
                 originObject.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
                 var result = _partActRepo.UpdateDetail(originObject);
                 if (result.Success)
                 {
                     var audit = new DataAudit();
-                    audit.Activity.Id = "PartnerActivity.Detail";
+                    audit.Activity.Id = "PartnerActivity.Detail.Edit";
                     audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
                     audit.Action.Id = "Update";
                     audit.Success = true;
                     audit.OldValue = old.ToString();
                     audit.NewValue = originObject.ToString();
-                    _auditing.Create(audit);
+                    var auditResult =_auditing.Create(audit);
+                    if (!auditResult.Success)
+                    {
+                        _logger.LogError($"Edit Partner Activity Detail no[{originObject.Id}] , Error was {auditResult.Error}");
+                    }
                 }
                 return RedirectToAction("Detail", new { id = model.ParentId });
             }

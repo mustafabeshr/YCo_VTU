@@ -38,6 +38,7 @@ namespace Yvtu.Core.Entities
         public bool Adjusted { get; set; }
         public int AdjustmentNo { get; set; }
         public int ApiTransaction { get; set; }
+        public double FixedFactor { get; set; }
 
     }
 
@@ -77,6 +78,7 @@ namespace Yvtu.Core.Entities
             public bool Adjusted { get; set; }
             public int AdjustmentNo { get; set; }
             public int ApiTransaction { get; set; }
+            public double FixedFactor { get; set; }
 
         }
     }

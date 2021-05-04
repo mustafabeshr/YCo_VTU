@@ -237,6 +237,22 @@ namespace Yvtu.Infra.Data
             return partAct;
         }
 
+        public PartnerActivity GetPartActOnly(int id)
+        {
+            var parameters = new List<OracleParameter> {
+                new OracleParameter{ ParameterName = "pactrowid", OracleDbType = OracleDbType.Int32,  Value = id }
+            };
+
+            var actDataTable = this.db.GetData("Select * from v_partner_activity where row_id=:pactrowid ", parameters);
+            var partAct = new PartnerActivity();
+            if (actDataTable != null)
+            {
+                DataRow row = actDataTable.Rows[0];
+                partAct = ConvertDataRowToDataModel(row);
+            }
+            return partAct;
+        }
+
         public List<PartnerActivityDetail> GetDetails(int id, bool withMaster = false)
         {
             var parameters = new List<OracleParameter> {
@@ -313,7 +329,7 @@ namespace Yvtu.Infra.Data
             {
                 DataRow row = masterDataTable.Rows[0];
                 partAct = ConvertDataRowToDetailDataModel(row);
-                if (withMaster) partAct.Parent = GetPartAct(partAct.ParentId);
+                if (withMaster) partAct.Parent = GetPartActOnly(partAct.ParentId);
 
             }
             return partAct;
@@ -334,7 +350,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = model.TaxPercent },
                  new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = model.BonusTaxPercent },
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id },
-                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = model.CreatedBy.Account }
+                 new OracleParameter{ ParameterName = "v_createdbyacc",OracleDbType = OracleDbType.Int32,  Value = model.CreatedBy.Account },
+                 new OracleParameter{ ParameterName = "v_fixed_factor",OracleDbType = OracleDbType.Decimal,  Value = model.FixedFactor }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_settings.fn_createpartneractivitydetail", parameters);
@@ -371,7 +388,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_bonus_per",OracleDbType = OracleDbType.Decimal,  Value = model.BonusPercent },
                  new OracleParameter{ ParameterName = "v_taxper",OracleDbType = OracleDbType.Decimal,  Value = model.TaxPercent },
                  new OracleParameter{ ParameterName = "v_bonus_tax",OracleDbType = OracleDbType.Decimal,  Value = model.BonusTaxPercent },
-                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id }
+                 new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = model.CreatedBy.Id },
+                 new OracleParameter{ ParameterName = "v_fixed_factor",OracleDbType = OracleDbType.Decimal,  Value = model.FixedFactor }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_settings.fn_updatepartneractivitydetail", parameters);
@@ -453,6 +471,7 @@ namespace Yvtu.Infra.Data
             partAct.BonusPercent = row["bonus_per"] == DBNull.Value ? 0 : double.Parse(row["bonus_per"].ToString());
             partAct.BonusTaxPercent = row["bonus_tax"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax"].ToString());
             partAct.TaxPercent = row["taxper"] == DBNull.Value ? 0 : double.Parse(row["taxper"].ToString());
+            partAct.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
             partAct.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
             partAct.LastEditOn = row["lastediton"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["lastediton"].ToString());
             partAct.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();

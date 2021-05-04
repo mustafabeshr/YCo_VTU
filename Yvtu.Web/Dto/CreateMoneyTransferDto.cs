@@ -41,6 +41,7 @@ namespace Yvtu.Web.Dto
         public double BounsTaxAmount { get; set; }
         public double ReceivedAmount { get; set; }
         public double NetAmount { get; set; }
+        public double FixedFactor { get; set; }
         public double RequestAmount { get; set; }
         public string BillNo { get; set; }
         public string RequestNo { get; set; }

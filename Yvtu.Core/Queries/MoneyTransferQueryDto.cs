@@ -63,6 +63,7 @@ namespace Yvtu.Core.Queries
         public double ReceivedAmount { get; set; }
         public double NetAmount { get; set; }
         public double RequestAmount { get; set; }
+        public double FixedFactor { get; set; }
         public string BillNo { get; set; }
         public string RequestNo { get; set; }
         public string Note { get; set; }
