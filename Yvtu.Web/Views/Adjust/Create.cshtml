@@ -54,6 +54,7 @@
             @Html.HiddenFor(x => x.OriginTrans.TaxPercent)
             @Html.HiddenFor(x => x.TaxPercent)
             @Html.HiddenFor(x => x.BonusPercent)
+            @Html.HiddenFor(x => x.FixedFactor)
             @Html.HiddenFor(x => x.BounsTaxPercent)
             @Html.HiddenFor(x => x.TaxAmount)
             @Html.HiddenFor(x => x.SettingsPeriodDays)
@@ -111,9 +112,17 @@
                         <td class="DetailLabel">الرصيد :</td>
                         <td style="color:blue;">@Model.OriginTrans.Partner.Balance.ToString("N2")</td>
                     </tr>
-                    <tr>
-                        <td colspan="4" class="text-center" style="background-color:#fdee9f">المالية</td>
-                    </tr>
+                <tr>
+                    <td colspan="4" class="text-center" style="background-color:#fdee9f">المالية</td>
+                </tr>
+                <tr>
+                    <td class="DetailLabel">نسبة ثابتة :</td>
+                    <td>
+                        @Model.OriginTrans.FixedFactor.ToString("N6")
+                        <input id="txtOFixedFactor" hidden asp-for="OriginTrans.FixedFactor" />
+                    </td>
+                    
+                </tr>
                     <tr>
                         <td class="DetailLabel">صافي الايراد :</td>
                         <td>
@@ -257,14 +266,16 @@
                         <td colspan="4">
                             <table style="width:100%;">
                                 <tbody>
-                                    <tr>
-                                        <td class="FormLabel" style="width:10%;">نسبة الضريبة</td>
-                                        <td style="width:20%;">@Model.TaxPercent</td>
-                                        <td class="FormLabel" style="width:10%;">نسبة العمولة</td>
-                                        <td style="width:20%;">@Model.BonusPercent</td>
-                                        <td class="FormLabel" style="width:20%;">نسبة ضريبة العمولة</td>
-                                        <td style="width:10%;">@Model.BounsTaxPercent</td>
-                                    </tr>
+                                <tr>
+                                    <td class="FormLabel" style="width:10%;">نسبة ثابتة</td>
+                                    <td style="width:20%;">@Model.FixedFactor</td>
+                                    <td class="FormLabel" style="width: 10%;">نسبة الضريبة</td>
+                                    <td style="width: 20%;">@Model.TaxPercent</td>
+                                    <td class="FormLabel" style="width: 10%;">نسبة العمولة</td>
+                                    <td style="width: 20%;">@Model.BonusPercent</td>
+                                    <td class="FormLabel" style="width: 20%;">نسبة ضريبة العمولة</td>
+                                    <td style="width: 10%;">@Model.BounsTaxPercent</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </td>

@@ -160,10 +160,10 @@ namespace Yvtu.Infra.Data
 
         }
 
-        public RechargeQueryResult GetRechargeByApiTransaction(int id, int account)
+        public RechargeQueryResult GetRechargeByApiTransaction(long id, int account)
         {
             var parameters = new List<OracleParameter>();
-            var parm1 = new OracleParameter { ParameterName = "apiTransaction", OracleDbType = OracleDbType.Int32, Value = id };
+            var parm1 = new OracleParameter { ParameterName = "apiTransaction", OracleDbType = OracleDbType.Int64, Value = id };
             var parm2 = new OracleParameter { ParameterName = "account", OracleDbType = OracleDbType.Int32, Value = account };
             parameters.Add(parm1);
             parameters.Add(parm2);
@@ -200,7 +200,7 @@ namespace Yvtu.Infra.Data
             obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
             obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
             obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
-            obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+            obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : long.Parse(row["api_trans"].ToString());
             return obj;
         }
         public OpertionResult Create(RechargeCollection rechargeCollection)
@@ -222,7 +222,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_ref_trans_no",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.RefTransNo },
                  new OracleParameter{ ParameterName = "v_debug_info",OracleDbType = OracleDbType.Varchar2,  Value = rechargeCollection.DebugInfo },
                  new OracleParameter{ ParameterName = "v_status",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.Status.Id },
-                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int32,  Value = rechargeCollection.ApiTransaction }
+                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int64,  Value = rechargeCollection.ApiTransaction }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_financial.fn_create_collection", parameters);

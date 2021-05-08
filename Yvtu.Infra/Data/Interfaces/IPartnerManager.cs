@@ -59,5 +59,6 @@ namespace Yvtu.Infra.Data.Interfaces
         int GetCount(PartnerQuery param);
         Task<int> GetUnreadUserNotifyCountAsync(string id);
         Task<List<UserNotifyHistory>> GetUnreadUserNotifyListAsync(string id);
+        double GetBalance(int acc);
     }
 }

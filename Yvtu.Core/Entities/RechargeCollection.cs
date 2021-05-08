@@ -26,7 +26,7 @@ namespace Yvtu.Core.Entities
         public string RefTransNo { get; set; }
         public DateTime RefTime { get; set; }
         public string DebugInfo { get; set; }
-        public int ApiTransaction { get; set; }
+        public long ApiTransaction { get; set; }
     }
 
     public partial class ToExcelSchema
@@ -51,7 +51,7 @@ namespace Yvtu.Core.Entities
             public string RefTransNo { get; set; }
             public DateTime RefTime { get; set; }
             public string DebugInfo { get; set; }
-            public int ApiTransaction { get; set; }
+            public long ApiTransaction { get; set; }
         }
     }
 }

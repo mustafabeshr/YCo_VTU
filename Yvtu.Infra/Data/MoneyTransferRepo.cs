@@ -44,7 +44,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_request_no",OracleDbType = OracleDbType.Varchar2,  Value = transfer.RequestNo },
                  new OracleParameter{ ParameterName = "v_request_amt",OracleDbType = OracleDbType.Decimal,  Value = transfer.RequestAmount },
                  new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = transfer.Note },
-                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int32,  Value = transfer.ApiTransaction }
+                 new OracleParameter{ ParameterName = "v_api_trans",OracleDbType = OracleDbType.Int64,  Value = transfer.ApiTransaction }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_financial.fn_MoneyTransfer", parameters);
@@ -392,7 +392,7 @@ namespace Yvtu.Infra.Data
             moneyTransfer.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
             moneyTransfer.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             moneyTransfer.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
-            moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+            moneyTransfer.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : long.Parse(row["api_trans"].ToString());
             moneyTransfer.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
 
             moneyTransfer.Partner = partnerManager.GetPartnerByAccount(partAccount);
@@ -452,7 +452,7 @@ namespace Yvtu.Infra.Data
             dataModel.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
             dataModel.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
             dataModel.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
-            dataModel.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+            dataModel.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : long.Parse(row["api_trans"].ToString());
             dataModel.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
             return dataModel;
         }
@@ -582,7 +582,7 @@ namespace Yvtu.Infra.Data
                 obj.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
                 obj.Adjusted = row["adjusted"] == DBNull.Value ? false : row["adjusted"].ToString() == "1" ? true : false;
                 obj.AdjustmentNo = row["adjust_id"] == DBNull.Value ? 0 : int.Parse(row["adjust_id"].ToString());
-                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : int.Parse(row["api_trans"].ToString());
+                obj.ApiTransaction = row["api_trans"] == DBNull.Value ? 0 : long.Parse(row["api_trans"].ToString());
                 obj.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
                 results.Add(obj);
             }

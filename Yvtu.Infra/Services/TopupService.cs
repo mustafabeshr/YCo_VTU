@@ -13,27 +13,32 @@ namespace Yvtu.Infra.Services
     public class TopupService
     {
         private readonly IAppDbContext _db;
-        public TopupService(IAppDbContext db)
+        private readonly IPartnerManager _partnerManager;
+
+        public TopupService(IAppDbContext db, IPartnerManager partnerManager)
         {
             this._db = db;
+            _partnerManager = partnerManager;
         }
         public async Task<string> DoRecharge(RechargeCollection recharge, string endpoint, string apiUser, 
             string apiPassword, string remoteAddress, string successCode)
         {
             //Thread.Sleep(2000);
-            #region Local test
-
-            #endregion Local test
             var watch = System.Diagnostics.Stopwatch.StartNew();
+            int resultCode;
+            string transNo = "0";
+            string resultDesc;
+            #region Local test
+            //resultCode = int.Parse(successCode);
+            //resultDesc = "success";
+            //System.Threading.Thread.Sleep(2000);
+            #endregion Local test
+            
             BasicHttpBinding httpBinding = new BasicHttpBinding();
             EndpointAddress p = new EndpointAddress(endpoint);
 
             //Start Send Request------------------------------ -
             var payService = new OCSService.CBSInterfaceAccountMgrClient(httpBinding, p);
-            int resultCode;
-            string transNo;
-            string resultDesc;
-            {
                 /// payService = SharedParams.OCSEndpoint;
                 OCSService.PaymentRequestMsg msg = new OCSService.PaymentRequestMsg();
                 OCSService.RequestHeader reqheader = new OCSService.RequestHeader();
@@ -41,11 +46,11 @@ namespace Yvtu.Infra.Services
                 reqheader.SessionEntity = new OCSService.SessionEntityType();
                 reqheader.SessionEntity.Name = apiUser;
                 reqheader.SessionEntity.Password = apiPassword;
-                reqheader.TransactionId = "";
+                reqheader.TransactionId = $"VTU{recharge.Id}";
                 reqheader.SequenceId = "1";
                 reqheader.CommandId = "Payment";
                 reqheader.Version = "1";
-                reqheader.SerialNo = "";
+                reqheader.SerialNo = $"VTU{recharge.Id}";
                 reqheader.RequestType = OCSService.RequestHeaderRequestType.Event;
                 reqheader.SessionEntity.RemoteAddress = remoteAddress;
                 msg.RequestHeader = reqheader;
@@ -78,10 +83,8 @@ namespace Yvtu.Infra.Services
                     resultDesc = ex.GetType().Name + "-" + ex.Message;
                     transNo = "0";
                 }
-            }
-            //}
-            // End Send Request -------------------------------
-            watch.Stop();
+        // End Send Request -------------------------------
+             watch.Stop();
             double elapsedMs = watch.ElapsedMilliseconds;
             var collection = new RechargeCollection();
             collection.Id = recharge.Id;
@@ -91,16 +94,21 @@ namespace Yvtu.Infra.Services
             collection.RefTransNo = transNo;
             collection.RefTime = DateTime.Now;
             collection.DebugInfo = resultDesc + " OCS(" + elapsedMs + ")";
-            elapsedMs = 0;
             //watch = System.Diagnostics.Stopwatch.StartNew();
             var dbResult = new RechargeRepo(_db, null).UpdateWithBalance(collection);
+            if (collection.Status.Id == 1)
+            {
+                new NotificationRepo(_db, _partnerManager).SendNotification("Recharge.Create", recharge.Id, recharge, 1);
+            }
+            
             //watch.Stop();
             //elapsedMs = watch.ElapsedMilliseconds;
             return JsonSerializer.Serialize( new  {
                                resultCode = resultCode == int.Parse(successCode) ? 0 : resultCode,
                                resultDesc = resultDesc,
-                               Sequence = transNo,
-                               Duration =  elapsedMs });
+                               sequence = transNo,
+                               payId = recharge.Id,
+                               duration =  elapsedMs });
         }
     }
 }

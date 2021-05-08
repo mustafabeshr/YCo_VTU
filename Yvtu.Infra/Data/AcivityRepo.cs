@@ -43,7 +43,7 @@ namespace Yvtu.Infra.Data
         public List<Activity> GetActivities(string actName, bool relatedMessages = false)
         {
             var parameters = new List<OracleParameter> {
-                 new OracleParameter{ ParameterName = "actName", OracleDbType = OracleDbType.Varchar2,  Value = actName },
+                 new OracleParameter{ ParameterName = "actName", OracleDbType = OracleDbType.NVarchar2,  Value = actName },
             };
 
             var actDataTable = this.db.GetData("Select * from activities WHERE act_name LIKE  '%' ||  :actName || '%' AND internal_use = 0 order by  act_order", parameters);

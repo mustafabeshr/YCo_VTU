@@ -4,6 +4,7 @@
     ViewData["Title"] = "تفاصيل";
 }
 
+@await Component.InvokeAsync("NToastNotify")
 
 <div class="row bg-white">
     <div class="col-12 shadow-sm LoginBox py-1" style="background-color:#EDF0F2;">
@@ -47,7 +48,7 @@
                 </fieldset>
             </div>
             <div class="col-md-6 mt-3">
-                <fieldset class="box-border"  style="background-color:#ffffc9;">
+                <fieldset class="box-border" style="background-color:#ffffc9;">
                     <legend class="box-border">من</legend>
                     <div class="row">
                         <div class="col-md-4" style="font-size:12px;color:gray;">الرقم :</div>
@@ -72,7 +73,7 @@
                 </fieldset>
             </div>
             <div class="col-md-6 mt-3">
-                <fieldset class="box-border"  style="background-color:#e1ffd1;">
+                <fieldset class="box-border" style="background-color:#e1ffd1;">
                     <legend class="box-border">الى</legend>
                     <div class="row">
                         <div class="col-md-4" style="font-size:12px;color:gray;">الرقم :</div>
@@ -99,6 +100,10 @@
             <div class="col-md-12 mt-3">
                 <fieldset class="box-border">
                     <legend class="box-border">البيانات المالية</legend>
+                    <div class="row">
+                        <div class="col-md-2" style="font-size:12px;color:gray;">نسبة ثابتة :</div>
+                        <div class="col-md-4">@Model.FixedFactor.ToString("N6")</div>
+                    </div>
                     <div class="row">
                         <div class="col-md-2" style="font-size:12px;color:gray;">صافي الايراد :</div>
                         <div class="col-md-4">@Model.NetAmount.ToString("N2")</div>

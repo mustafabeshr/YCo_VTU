@@ -177,7 +177,7 @@ namespace Yvtu.RechargePrcFW
                                     msg = operation.resultDisplayMsg + "  within " + Math.Round(elapsedMs / 1000, 2) + " sec " ;
                                     logmessage += msg;
                                     worker.ReportProgress(40, msg);
-                                    if (!chwithoutlog.Checked) WritingLOGToFILE(logmessage);
+                                    if (!chwithoutlog.Checked) WritingLOGToFILE(logmessage + " charge result = "+ result.ResultCode + "|"+ result.ResultDesc);
                                     #endregion
                             }
                         } //(GrabbedRequest != null)

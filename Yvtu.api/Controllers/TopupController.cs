@@ -60,12 +60,12 @@ namespace Yvtu.api.Controllers
             var apiPassword = _config["OCS:Password"];
             var remoteAddress = _config["OCS:RemoteAddress"];
             var successCode = _config["OCS:SuccessCode"];
-            var payResult = await new TopupService(_db).DoRecharge(recharge, endpoint, apiUser, apiPassword, remoteAddress, successCode);
+            var payResult = await new TopupService(_db, _partnerManager).DoRecharge(recharge, endpoint, apiUser, apiPassword, remoteAddress, successCode);
             return Ok(payResult);
         }
 
         [HttpGet("/api/topup/query/{id}")]
-        public IActionResult TopupQuery(int id)
+        public IActionResult TopupQuery(long id)
         {
             var currentUser = _partnerManager.GetPartnerById(this.HttpContext.User.Identity.Name);
             var collection = new RechargeRepo(_db, _partnerManager).GetRechargeByApiTransaction(id, currentUser.Account);

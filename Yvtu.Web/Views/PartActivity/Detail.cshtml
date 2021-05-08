@@ -128,7 +128,7 @@
                     <td style="font-family:Amiri-Regular">@item.BonusPercent.ToString("N2")</td>
                     <td style="font-family:Amiri-Regular">@item.BonusTaxPercent.ToString("N2")</td>
                     <td style="font-family:Amiri-Regular">@item.FixedFactor.ToString("N6")</td>
-                    <td style="font-family:Amiri-Regular">@item.CreatedOn</td>
+                    <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>
 
                     <td><a asp-action="MoreDetail" asp-controller="PartActivity" asp-route-id="@item.Id" asp-route-parentId="@Model.Id"><i class="far fa-list-alt"></i></a></td>
                 </tr>

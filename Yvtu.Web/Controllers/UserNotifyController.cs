@@ -75,7 +75,7 @@ namespace Yvtu.Web.Controllers
             model.Results = result;
             return View(model);
         }
-
+        [HttpGet]
         public IActionResult Create()
         {
             var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);

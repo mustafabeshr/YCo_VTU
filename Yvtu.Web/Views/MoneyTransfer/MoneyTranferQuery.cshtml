@@ -126,6 +126,7 @@
                             <td style="font-weight:normal;border-left:1px solid white;border-right:1px solid white;" colspan="2">الى</td>
                             <td style="font-weight:normal;border-left:1px solid white;border-right:1px solid white;" colspan="6">المبـــــالـــــغ</td>
                             <td style="font-weight:normal"></td>
+                            <td style="font-weight:normal"></td>
                         </tr>
                         <tr class="text-center" style="font-size:11px;font-weight:normal;background-color:rebeccapurple;color:white;">
                             <td style="font-weight:normal">#</td>
@@ -140,6 +141,7 @@
                             <td style="font-weight:normal">العمولة</td>
                             <td style="font-weight:normal">ض العمولة</td>
                             <td style="font-weight:normal">المستلم</td>
+                            <td style="font-weight:normal">القناة</td>
                             <td style="font-weight:normal">التفاصيل</td>
                         </tr>
                     </thead>
@@ -160,6 +162,7 @@
                                 <td>@item.BounsAmount.ToString("N2")</td>
                                 <td>@item.BounsTaxAmount.ToString("N2")</td>
                                 <td>@item.ReceivedAmount.ToString("N2")</td>
+                                <td style="font-size: 10px; text-align: center;">@item.AccessChannelName</td>
                                 <td><a asp-action="Detail" asp-controller="MoneyTransfer" asp-route-id="@item.Id"><i class="far fa-list-alt"></i></a></td>
                             </tr>
                         }

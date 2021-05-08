@@ -61,10 +61,14 @@
     </Compile>
     <Compile Include="frmMain.designer.cs" />
     <Compile Include="lib\DB.cs" />
+    <Compile Include="lib\Entities.cs" />
     <Compile Include="lib\GrappedRecharge.cs" />
+    <Compile Include="lib\MessageTemplateRepo.cs" />
+    <Compile Include="lib\Notifications.cs" />
     <Compile Include="lib\Operations.DoRecharge.cs" />
     <Compile Include="lib\RechargeCollection.cs" />
     <Compile Include="lib\RechargeRepo.cs" />
+    <Compile Include="lib\SMSOutRepo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShareParams.cs" />

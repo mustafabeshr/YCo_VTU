@@ -111,6 +111,7 @@ namespace Yvtu.Web.Controllers
             }
             if (!permission.Details.Any(x => x.ToRole.Id == moneyTransfer.CreatedBy.Role.Id))
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreateAdjustmentDto();

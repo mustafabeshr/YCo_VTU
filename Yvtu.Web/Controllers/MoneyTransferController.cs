@@ -161,6 +161,14 @@ namespace Yvtu.Web.Controllers
             moneyTransfer.RequestNo = model.RequestNo;
             moneyTransfer.RequestAmount = model.RequestAmount;
             moneyTransfer.Note = model.Note;
+            moneyTransfer.NetAmount = model.NetAmount;
+            moneyTransfer.TaxPercent = model.TaxPercent;
+            moneyTransfer.TaxAmount =  model.TaxAmount;
+            moneyTransfer.BonusPercent = model.BonusPercent;
+            moneyTransfer.BounsAmount = model.BounsAmount;
+            moneyTransfer.BounsTaxPercent = model.BounsTaxPercent;
+            moneyTransfer.BounsTaxAmount = model.BounsTaxAmount;
+            moneyTransfer.ReceivedAmount = model.ReceivedAmount;
 
             var result = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).Create(moneyTransfer);
             if (result.Success)
@@ -168,8 +176,9 @@ namespace Yvtu.Web.Controllers
                 model.Id = result.AffectedCount;
                 ModelState.SetModelValue("Id", new ValueProviderResult("" + result.AffectedCount + "", CultureInfo.InvariantCulture));
                 //CreatePDF(model.Id);
-                moneyTransfer.Partner.Balance += moneyTransfer.Amount;
-                moneyTransfer.CreatedBy.Balance -= moneyTransfer.Amount;
+                moneyTransfer.NetAmount = Math.Round(moneyTransfer.NetAmount, 2);
+                moneyTransfer.Partner.Balance = _partnerManager.GetBalance(moneyTransfer.Partner.Account);
+                moneyTransfer.CreatedBy.Balance = _partnerManager.GetBalance(moneyTransfer.CreatedBy.Account);
                 new NotificationRepo(_db, _partnerManager).SendNotification<MoneyTransfer>("MoneyTransfer.Create", result.AffectedCount, moneyTransfer);
                 return View(model);
             }

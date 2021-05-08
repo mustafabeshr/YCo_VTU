@@ -15,7 +15,7 @@ namespace Yvtu.Web.Dto
         public int Account { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال الاسم")]
-        [StringLength(100, ErrorMessage ="يجب ان يكون طول الاسم بين 10 و 100 حرف", MinimumLength = 10)]
+        [StringLength(100, ErrorMessage ="يجب ان يكون طول الاسم بين 3 و 100 حرف", MinimumLength = 3)]
         public string Name { get; set; }
         [StringLength(100, ErrorMessage = "يجب ان يكون طول الاسم التجاري بين 1 و 100 حرف", MinimumLength = 1)]
         public string BrandName { get; set; }
@@ -35,7 +35,7 @@ namespace Yvtu.Web.Dto
         [Required(ErrorMessage = "يجب تحديد رقم موبايل احتياطي")]
         [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
-        [PartnerCustomValidation]
+        [PartnerEditCustomValidation]
         public string PairMobile { get; set; }
         public string CityName { get; set; }
         [Required(ErrorMessage = "يجب تحديد المدينة")]
@@ -55,7 +55,7 @@ namespace Yvtu.Web.Dto
         public string Fixed { get; set; }
         [StringLength(25, ErrorMessage = "يجب ان يكون طول رقم الفاكس بين 8 و 25 رقما", MinimumLength = 8)]
         public string Fax { get; set; }
-        [StringLength(100, ErrorMessage = "يجب ان يكون طول الايميل بين 10 و 100 حرف", MinimumLength = 10)]
+        [StringLength(100, ErrorMessage = "يجب ان يكون طول الايميل بين 5 و 100 حرف", MinimumLength = 5)]
         public string Email { get; set; }
         [StringLength(150, ErrorMessage = "يجب ان لا يزيد طول المعلومات الاضافية عن 150 حرف")]
         public string ExtraAddressInfo { get; set; }

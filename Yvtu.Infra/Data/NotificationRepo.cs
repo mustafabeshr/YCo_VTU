@@ -93,13 +93,13 @@ namespace Yvtu.Infra.Data
             }
             return list;
         }
-        public void SendNotification<T>(string activityId, int refNo, T data)
+        public void SendNotification<T>(string activityId, int refNo, T data, int suppress = 0)
         {
             var activity = new ActivityRepo(db, partnerManager).GetActivity(activityId);
             var messages = new ActivityMessageRepo(db, partnerManager).GetList(activity.Id, -1);
             var toNumber = string.Empty;
             foreach (var m in messages)
-            {
+            {   if (suppress > 0 && suppress == m.Message.ToWho) continue;
                 if (m.Message.ToWho == 1) {
                     toNumber = new MessageTemplateRepo(db, partnerManager).TranslateMessage<T>("{mobile.1}", data);
                 }else

@@ -96,9 +96,59 @@ namespace Yvtu.RechargePrcFW.lib
             {
                 new OracleParameter {ParameterName = "id", OracleDbType = OracleDbType.Int32, Value = id},
             };
-            var result =DB.ExecuteQuery("delete from collection_draft where ref_no=:id", parameters, 0);
+            var result =DB.ExecuteQuery("delete from collection_draft where row_id=:id", parameters, 0);
             return result > 0;
         }
 
+        public GrappedRecharge GetSingle(int id)
+        {
+            var masterDataTable = DB.GetDataTable("Select * from COLLECTION t WHERE cl_id=" + id, null);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            DataRow row = masterDataTable.Rows[0];
+            var obj = new GrappedRecharge();
+            obj.Id = row["row_id"] == DBNull.Value ? -1 : int.Parse(row["row_id"].ToString());
+            obj.SubscriberNo = row["subs_no"] == DBNull.Value ? string.Empty : row["subs_no"].ToString();
+            obj.MasterId = row["cl_id"] == DBNull.Value ? int.MinValue : int.Parse(row["cl_id"].ToString());
+            obj.Amount = row["amount"] == DBNull.Value ? 0 : double.Parse(row["amount"].ToString());
+            obj.PointOfSaleId = row["pos_id"] == DBNull.Value ? string.Empty : row["pos_id"].ToString();
+            obj.PointOfSaleAccount = row["pos_acc"] == DBNull.Value ? 0 : int.Parse(row["pos_acc"].ToString());
+            obj.AccessChannelId = row["access_channel"] == DBNull.Value ? string.Empty : row["access_channel"].ToString();
+            obj.Status = row["status"] == DBNull.Value ? 0 : int.Parse(row["status"].ToString());
+            obj.StatusTime = row["status_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["status_time"].ToString());
+            obj.QueueNo = row["queue_no"] == DBNull.Value ? 0 : int.Parse(row["queue_no"].ToString());
+            obj.RefNo = row["ref_no"] == DBNull.Value ? string.Empty : row["ref_no"].ToString();
+            obj.RefMessage = row["ref_message"] == DBNull.Value ? string.Empty : row["ref_message"].ToString();
+            obj.RefTransNo = row["ref_trans_no"] == DBNull.Value ? string.Empty : row["ref_trans_no"].ToString();
+            obj.RefTime = row["ref_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["ref_time"].ToString());
+            obj.DebugInfo = row["debug_info"] == DBNull.Value ? string.Empty : row["debug_info"].ToString();
+            
+            return obj;
+        }
+
+        public double GetBalance(int acc)
+        {
+
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                    new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                    new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32,  Value = acc }
+                };
+
+                #endregion
+                DB.ExecuteStoredProc("pk_utility.fn_getpartnerbalance", parameters);
+                var result = double.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return -2;
+            }
+        }
     }
 }

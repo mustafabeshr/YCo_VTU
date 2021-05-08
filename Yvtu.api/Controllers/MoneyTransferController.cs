@@ -62,8 +62,10 @@ namespace Yvtu.api.Controllers
                 if (result.AffectedCount == -507) return BadRequest(new ApiResponse(-3008, "Sorry, inconsistent data"));
                 if (result.AffectedCount == -508) return BadRequest(new ApiResponse(-3009, $"Sorry, duplicated sequence {moneyTransfer.ApiTransaction}"));
             }
-
             moneyTransfer = new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetSingleOrDefault(result.AffectedCount);
+            moneyTransfer.Partner.Balance = _partnerManager.GetBalance(moneyTransfer.Partner.Account);
+            moneyTransfer.CreatedBy.Balance = _partnerManager.GetBalance(moneyTransfer.CreatedBy.Account);
+            new NotificationRepo(_db, _partnerManager).SendNotification<MoneyTransfer>("MoneyTransfer.Create", result.AffectedCount, moneyTransfer);
 
             return Ok(new { 
                 resultCode = 0,

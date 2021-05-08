@@ -95,19 +95,19 @@ namespace Yvtu.Infra.Data
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_partner_id", OracleDbType = OracleDbType.Varchar2,  Value = partner.Id },
-                 new OracleParameter{ ParameterName = "v_partner_name",OracleDbType = OracleDbType.Varchar2,  Value = partner.Name },
-                 new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.Varchar2,  Value = partner.BrandName },
+                 new OracleParameter{ ParameterName = "v_partner_name",OracleDbType = OracleDbType.NVarchar2,  Value = partner.Name },
+                 new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.NVarchar2,  Value = partner.BrandName },
                  new OracleParameter{ ParameterName = "v_roleid", OracleDbType = OracleDbType.Int32, Value = partner.Role.Id },
                  new OracleParameter{ ParameterName = "v_id_no", OracleDbType = OracleDbType.Int32, Value = partner.PersonalId.Id },
                  new OracleParameter{ ParameterName = "v_id_type", OracleDbType = OracleDbType.Int32, Value = partner.PersonalId.IdType.Id },
-                 new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.Varchar2, Value = partner.PersonalId.Place },
+                 new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.NVarchar2, Value = partner.PersonalId.Place },
                  new OracleParameter{ ParameterName = "v_id_issued", OracleDbType = OracleDbType.Date, Value = partner.PersonalId.Issued },
                  new OracleParameter{ ParameterName = "v_createdby", OracleDbType = OracleDbType.Varchar2, Value = partner.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_cityid", OracleDbType = OracleDbType.Int32, Value = partner.Address.City.Id},
                  new OracleParameter{ ParameterName = "v_districtid", OracleDbType = OracleDbType.Int32, Value = partner.Address.District.Id },
-                 new OracleParameter{ ParameterName = "v_street", OracleDbType = OracleDbType.Varchar2, Value = partner.Address.Street },
-                 new OracleParameter{ ParameterName = "v_zone", OracleDbType = OracleDbType.Varchar2, Value = partner.Address.Zone },
-                 new OracleParameter{ ParameterName = "v_extra_address", OracleDbType = OracleDbType.Varchar2, Value = partner.Address.ExtraInfo },
+                 new OracleParameter{ ParameterName = "v_street", OracleDbType = OracleDbType.NVarchar2, Value = partner.Address.Street },
+                 new OracleParameter{ ParameterName = "v_zone", OracleDbType = OracleDbType.NVarchar2, Value = partner.Address.Zone },
+                 new OracleParameter{ ParameterName = "v_extra_address", OracleDbType = OracleDbType.NVarchar2, Value = partner.Address.ExtraInfo },
                  new OracleParameter{ ParameterName = "v_pair_mobile", OracleDbType = OracleDbType.Varchar2, Value = partner.PairMobile },
                  new OracleParameter{ ParameterName = "v_mobile", OracleDbType = OracleDbType.Varchar2, Value = partner.ContactInfo.Mobile },
                  new OracleParameter{ ParameterName = "v_fixed", OracleDbType = OracleDbType.Varchar2, Value = partner.ContactInfo.Fixed },
@@ -588,19 +588,19 @@ namespace Yvtu.Infra.Data
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_partner_name", OracleDbType = OracleDbType.Varchar2,  Value = newPartner.Name },
-                 new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.Varchar2,  Value = newPartner.BrandName },
+                 new OracleParameter{ ParameterName = "v_partner_name", OracleDbType = OracleDbType.NVarchar2,  Value = newPartner.Name },
+                 new OracleParameter{ ParameterName = "v_brandname",OracleDbType = OracleDbType.NVarchar2,  Value = newPartner.BrandName },
                  new OracleParameter{ ParameterName = "v_roleid",OracleDbType = OracleDbType.Int32,  Value = newPartner.Role.Id },
                  new OracleParameter{ ParameterName = "v_id_no", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PersonalId.Id },
                  new OracleParameter{ ParameterName = "v_id_type", OracleDbType = OracleDbType.Int32, Value = newPartner.PersonalId.IdType.Id },
-                 new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PersonalId.Place },
+                 new OracleParameter{ ParameterName = "v_id_place", OracleDbType = OracleDbType.NVarchar2, Value = newPartner.PersonalId.Place },
                  new OracleParameter{ ParameterName = "v_id_issued", OracleDbType = OracleDbType.Date, Value = newPartner.PersonalId.Issued },
                  new OracleParameter{ ParameterName = "v_createdby", OracleDbType = OracleDbType.Varchar2, Value = newPartner.CreatedBy.Id },
                  new OracleParameter{ ParameterName = "v_cityid", OracleDbType = OracleDbType.Int32, Value = newPartner.Address.City.Id},
                  new OracleParameter{ ParameterName = "v_districtid", OracleDbType = OracleDbType.Int32, Value = newPartner.Address.District.Id },
-                 new OracleParameter{ ParameterName = "v_street", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.Street },
-                 new OracleParameter{ ParameterName = "v_zone", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.Zone },
-                 new OracleParameter{ ParameterName = "v_extra_address", OracleDbType = OracleDbType.Varchar2, Value = newPartner.Address.ExtraInfo },
+                 new OracleParameter{ ParameterName = "v_street", OracleDbType = OracleDbType.NVarchar2, Value = newPartner.Address.Street },
+                 new OracleParameter{ ParameterName = "v_zone", OracleDbType = OracleDbType.NVarchar2, Value = newPartner.Address.Zone },
+                 new OracleParameter{ ParameterName = "v_extra_address", OracleDbType = OracleDbType.NVarchar2, Value = newPartner.Address.ExtraInfo },
                  new OracleParameter{ ParameterName = "v_pair_mobile", OracleDbType = OracleDbType.Varchar2, Value = newPartner.PairMobile },
                  new OracleParameter{ ParameterName = "v_mobile", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Mobile },
                  new OracleParameter{ ParameterName = "v_fixed", OracleDbType = OracleDbType.Varchar2, Value = newPartner.ContactInfo.Fixed },
@@ -625,7 +625,7 @@ namespace Yvtu.Infra.Data
                     audit.Success = true;
                     audit.OldValue = oldPartner.ToString();
                     audit.NewValue = newPartner.ToString();
-                    new DataAuditRepo(db).Create(audit);
+                    var auditResult = new DataAuditRepo(db).Create(audit);
                     return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
                 }
                 else
@@ -677,6 +677,29 @@ namespace Yvtu.Infra.Data
                 return new UserNotifyHistoryRepo(db).GetUnreadListForPartner(id);
             });
             ;
+        }
+
+        public double GetBalance(int acc)
+        {
+
+            try
+            {
+                #region Parameters
+                var parameters = new List<OracleParameter> {
+                    new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
+                    new OracleParameter{ ParameterName = "v_partner_acc", OracleDbType = OracleDbType.Int32,  Value = acc }
+                };
+
+                #endregion
+                db.ExecuteStoredProc("pk_utility.fn_getpartnerbalance", parameters);
+                var result = double.Parse(parameters.Find(x => x.ParameterName == "retVal").Value.ToString());
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return -2;
+            }
         }
     }
 }

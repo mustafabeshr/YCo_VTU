@@ -28,6 +28,7 @@ namespace Yvtu.Core.Entities
         public double BounsAmount { get; set; }
         public double BounsTaxPercent { get; set; }
         public double BounsTaxAmount { get; set; }
+        public double FixedFactor { get; set; }
         public double ReceivedAmount { get; set; }
         public double NetAmount { get; set; }
         public CommonCode AccessChannel { get; set; }
