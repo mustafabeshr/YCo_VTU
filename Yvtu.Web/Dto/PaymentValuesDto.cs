@@ -10,5 +10,7 @@ namespace Yvtu.Web.Dto
     {
         [Required(ErrorMessage = "يجب ادخال المبلغ")]
         public double PayValue { get; set; }
+        [Required(ErrorMessage = "يجب ادخال رقم معرف")]
+        public double ProfileId { get; set; }
     }
 }

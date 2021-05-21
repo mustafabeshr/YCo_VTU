@@ -1,0 +1,47 @@
+﻿@using System.Diagnostics.Tracing
+@model IEnumerable<Yvtu.Core.Entities.ApiIPBlacklist>
+
+@{
+    ViewData["Title"] = "API IPs Blacklist";
+    int counter = 0;
+}
+
+@await Component.InvokeAsync("NToastNotify")
+
+<div class="row">
+    <div class="col-md-12 shadow-sm bg-white pb-3">
+        <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">القائمة السوداء الخاصة بالربط البيني
+            
+                @*<a class="btn btn-light float-right mt-3 mr-3"  asp-action="CreatePVs" asp-controller="Settings" style="font-size:11px;">
+                    <i class="fas fa-plus"></i>
+                </a>*@
+            </p>
+        </div>
+    </div>
+   
+</div>
+
+
+
+@if (Model != null && Model.Any())
+{
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row  justify-content-center">
+                
+                @foreach (var item in Model)
+                {
+                <div class="col-md-3 p-3 shadow-sm m-1" style="border:solid 1px darkgrey; border-radius: 15px;">
+                    <p style="font-family: arial; font-size: 16px; font-weight: bold; text-align: center;"> @item.IPAddress </p>
+                    <p style="font-family: arial; font-size: 13px;  text-align: center; color: gray;">  @item.CreatedOn.ToString("dd/MM/yyyy HH:mm:ss") </p>
+                    <a class="far fa-times-circle float-left" style="color: red;" asp-action="ApiBlackListRemove" asp-controller="Settings" asp-route-ipAddress="@item.IPAddress"></a>
+                </div>
+                }
+                
+            </div>
+        </div>
+    </div>
+
+
+ }

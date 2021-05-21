@@ -1,7 +1,9 @@
-﻿@model IEnumerable<Yvtu.Core.Entities.PaymentValues>
+﻿@using System.Diagnostics.Tracing
+@model IEnumerable<Yvtu.Core.Entities.PaymentValues>
 
 @{
     ViewData["Title"] = "Payment Values";
+    int counter = 0;
 }
 
 @await Component.InvokeAsync("NToastNotify")
@@ -9,45 +11,45 @@
 <div class="row">
     <div class="col-md-12 shadow-sm bg-white pb-3">
         <div class="text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
-            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">قائمة مبالغ الدفع</p>
+            <p style="font-family:'ArefRuqaa-Bold';font-size:28px;">قائمة مبالغ الدفع
+            
+                <a class="btn btn-light float-right mt-3 mr-3"  asp-action="CreatePVs" asp-controller="Settings" style="font-size:11px;">
+                    <i class="fas fa-plus"></i>
+                </a>
+            
+                </p>
+            
         </div>
     </div>
-    <a class="btn btn-outline-info float-left" asp-action="CreatePVs" asp-controller="Settings" style="font-size:11px;">
+    @*<a class="btn btn-outline-info float-left" asp-action="CreatePVs" asp-controller="Settings" style="font-size:11px;">
         <i class="fas fa-plus"></i>
         &nbsp;&nbsp;  اضافة مبلغ
-    </a>
+    </a>*@
 </div>
 
 
 
 @if (Model != null && Model.Any())
 {
-    @foreach (var item in Model)
-    {
-        <div class="row shadow-sm bg-white p-2" style="font-size: 12px; margin-top: 1px;">
-            <div class="row container-fluid">
-                <div class="col-md-1 text-center">
-                    @item.Seq
+    <div class="row">
+        <div class="col-md-12">
+            <div class="row  justify-content-center">
+                
+                @foreach (var item in Model)
+                {
+                <div class="col-md-3 p-3 shadow-sm m-1" style="border:solid 1px darkgrey; border-radius: 15px;">
+                    <p style="font-family: arial; font-size: 28px; font-weight: bold; text-align: center;"> @item.PayValue.ToString("N2") </p>
+                    <p style="font-family: arial; font-size: 24px; text-align: center; color: gray;"> @item.ProfileId </p>
+                    <p style="font-family: arial; font-size: 16px;  text-align: center; color: gray;">  @item.CreatedOn.ToString("dd/MM/yyyy HH:mm:ss") </p>
+                    <p style=" font-size: 16px;  text-align: center; color: gray;"> @item.CreatedBy.Name </p>
+                    <p style="font-family: arial; font-size: 16px; text-align: center; color: gray; position: absolute;"> @item.Seq </p>
+                    <a class="far fa-times-circle float-left" style="color: red;" asp-action="RemovePV" asp-controller="Settings" asp-route-pvalue="@item.PayValue"></a>
                 </div>
-                <div class="col-md-3 text-center">
-                    @item.PayValue.ToString("N2")
-                </div>
-                <div class="col-md-3 text-center">
-                    @item.CreatedOn.ToString("dd/MM/yyyy HH:mm:ss")
-                </div>
-                <div class="col-md-1 text-center">
-                    @item.CreatedBy.Id
-                </div>
-                <div class="col-md-1 text-center">
-                    @item.CreatedBy.Account
-                </div>
-                <div class="col-md-2 text-center">
-                    @item.CreatedBy.Name
-                </div>
-                <div class="col-md-1 text-center">
-                   <a class="far fa-times-circle" style="color: red;"  asp-action="RemovePV" asp-controller="Settings" asp-route-pvalue="@item.PayValue"></a>
-                </div>
+                }
+                
             </div>
         </div>
-     }
+    </div>
+
+
  }

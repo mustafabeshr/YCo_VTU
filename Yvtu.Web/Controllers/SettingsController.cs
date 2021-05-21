@@ -67,8 +67,14 @@ namespace Yvtu.Web.Controllers
                     _toastNotification.AddErrorToastMessage("المبلغ غير صحيح");
                     return View();
                 }
+                if (model.ProfileId <= 0)
+                {
+                    _toastNotification.AddErrorToastMessage("رقم المعرف غير صحيح");
+                    return View();
+                }
                 var created = new PaymentValues();
                 created.PayValue = model.PayValue;
+                created.ProfileId = model.ProfileId;
                 created.CreatedBy.Id = _partnerManager.GetCurrentUserId(httpContext: this.HttpContext);
                 created.CreatedBy.Account = _partnerManager.GetCurrentUserAccount(httpContext: this.HttpContext);
                 var result = new PaymentValuesRepo(_db, _partnerManager).Create(created);
@@ -123,6 +129,58 @@ namespace Yvtu.Web.Controllers
                 }
                 PValues();
                 return View("PValues");
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ApiIPsBlacklist()
+        {
+            var currentRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("API.IpBlacklist.View", currentRoleId);
+            if (permission == null)
+            {
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var model = new ApiIPBlacklistRepo(_db).GetList(string.Empty);
+
+            return View(model);
+        }
+
+        public IActionResult ApiBlackListRemove(string ipAddress)
+        {
+            var currentRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("API.IpBlacklist.Remove", currentRoleId);
+            if (permission == null)
+            {
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var removedObj = new ApiIPBlacklistRepo(_db).GetSingleOrDefault(ipAddress);
+            if (removedObj == null)
+            {
+                _toastNotification.AddErrorToastMessage($"العوان {ipAddress} غير موجود");
+                return View("ApiIPsBlacklist");
+            }
+            else
+            {
+                var result = new ApiIPBlacklistRepo(_db).Remove(ipAddress);
+                if (result.Success)
+                {
+                    _toastNotification.AddSuccessToastMessage($"العنوان {ipAddress} تم حذفه");
+                    var audit = new DataAudit();
+                    audit.Activity.Id = "API.IpBlacklist.Remove";
+                    audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.Action.Id = "Delete";
+                    audit.Success = true;
+                    audit.OldValue = removedObj.ToString();
+                    audit.NewValue = string.Empty;
+                    _auditing.Create(audit);
+                }
+                var model = new ApiIPBlacklistRepo(_db).GetList(string.Empty);
+                return View("ApiIPsBlacklist", model);
             }
         }
     }

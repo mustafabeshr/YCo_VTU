@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Yvtu.api.Dtos;
 using Yvtu.api.Errors;
 using Yvtu.Core.Entities;
+using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 
@@ -119,6 +122,61 @@ namespace Yvtu.api.Controllers
                 },
                 queryTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")
             });
+        }
+
+        [HttpPost("/api/mt/myreport")]
+        public async Task<IActionResult> MyReport(MoneyTransferMyReportDto param)
+        {
+            if (!Utility.IsValidDate(param.StartDate)) return BadRequest(new ApiResponse(-3011, $"Sorry, start date is invalid {param.StartDate}"));
+            if (!Utility.IsValidDate(param.EndDate)) return BadRequest(new ApiResponse(-3012, $"Sorry, end date is invalid {param.EndDate}"));
+            var startDate = DateTime.Parse(param.StartDate);
+            var endDate = DateTime.Parse(param.EndDate);
+            var maxDaysSettings = new AppGlobalSettingsRepo(_db).GetSingle("API.MoneyTransfer.Report.MaxDays");
+            if (maxDaysSettings != null)
+            {
+                if ((endDate - startDate).TotalDays > int.Parse(maxDaysSettings.SettingValue) &&
+                    int.Parse(maxDaysSettings.SettingValue) > 0)
+                {
+                    return BadRequest(new ApiResponse(-3013, $"Sorry, The report period is greater than the limit {int.Parse(maxDaysSettings.SettingValue)} day(s)"));
+                }
+            }
+
+            var currentUser = _partnerManager.GetPartnerById(this.HttpContext.User.Identity.Name);
+            if (currentUser == null)  return Unauthorized(new ApiResponse(-3003, "Sorry, re-login required"));
+            var permission = _partnerActivity.GetPartAct("MoneyTransfer.API.MyReport", currentUser.Role.Id);
+            if (permission == null) return Unauthorized(new ApiResponse(401));
+            var maxRecordsSettings = new AppGlobalSettingsRepo(_db).GetSingle("API.MoneyTransfer.Report.MaxResults");
+            int maxRecords = maxRecordsSettings == null ? 200 : int.Parse(maxRecordsSettings.SettingValue);
+
+            var results = await new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetMoneyTransfers(
+                currentUser.Account, startDate, endDate, maxRecords);
+            if (results == null || results.Count <= 0) return Ok("No Data");
+            var retResults = new List<object>();
+            foreach (var obj in results)
+            {
+                retResults.Add(new
+                {
+                    transDate = obj.CreatedOn,
+                    fromAccount = obj.CreatedBy.Account,
+                    fromMobile = obj.CreatedBy.Id,
+                    fromName = obj.CreatedBy.Name,
+                    fromBalance = obj.CreatedBy.Balance,
+                    toAccount = obj.Partner.Account,
+                    toMobile = obj.Partner.Id,
+                    toName = obj.Partner.Name,
+                    toBalance = obj.Partner.Balance,
+                    amount = obj.Amount,
+                    netAmount = obj.NetAmount,
+                    taxPercent = obj.TaxPercent,
+                    taxAmount = obj.TaxAmount,
+                    bonusPercent = obj.BonusPercent,
+                    bounsAmount = obj.BounsAmount,
+                    bounsTaxPercent = obj.BounsTaxPercent,
+                    bounsTaxAmount = obj.BounsTaxAmount,
+                    note = obj.Note
+                });
+            }
+            return Ok(retResults);
         }
     }
 }

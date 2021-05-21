@@ -66,6 +66,7 @@
     <Compile Include="lib\MessageTemplateRepo.cs" />
     <Compile Include="lib\Notifications.cs" />
     <Compile Include="lib\Operations.DoRecharge.cs" />
+    <Compile Include="lib\PaymentValuesRepo.cs" />
     <Compile Include="lib\RechargeCollection.cs" />
     <Compile Include="lib\RechargeRepo.cs" />
     <Compile Include="lib\SMSOutRepo.cs" />

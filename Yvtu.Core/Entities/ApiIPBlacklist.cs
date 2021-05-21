@@ -8,5 +8,11 @@ namespace Yvtu.Core.Entities
     {
         public string IPAddress { get; set; }
         public DateTime CreatedOn { get; set; }
+
+        public override string ToString()
+        {
+            return
+                $"IPAddress={IPAddress}\n CreatedOn={CreatedOn.ToString("dd/MM/yyyy HH:mm:ss")}";
+        }
     }
 }

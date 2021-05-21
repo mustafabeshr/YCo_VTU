@@ -33,7 +33,12 @@ namespace Yvtu.Infra.Services
             //resultDesc = "success";
             //System.Threading.Thread.Sleep(2000);
             #endregion Local test
-            
+            var paymentValue = new PaymentValuesRepo(_db, _partnerManager).GetSingleOrDefault(recharge.Amount);
+            double profileId = 0;
+            if (paymentValue != null)
+            {
+                profileId = paymentValue.ProfileId;
+            }
             BasicHttpBinding httpBinding = new BasicHttpBinding();
             EndpointAddress p = new EndpointAddress(endpoint);
 
@@ -59,7 +64,7 @@ namespace Yvtu.Infra.Services
                 msg.PaymentRequest.PaymentAmt = Convert.ToInt64(recharge.Amount) * 100;
                 msg.PaymentRequest.PaymentMode = "1000";
                 msg.PaymentRequest.TransactionCode = $"VTU{recharge.Id}";
-                msg.PaymentRequest.RefillProfileID = recharge.Amount.ToString();
+                msg.PaymentRequest.RefillProfileID = profileId.ToString();
                 try
                 {
                     var requestResult = await payService.PaymentAsync(msg);

@@ -80,7 +80,7 @@ namespace Yvtu.Infra.Data
             return moneyTransfer;
         }
 
-        public MoneyTransferQueryDto MTQuery(MoneyTransferQueryDto param, int count = 200)
+        public async Task<MoneyTransferQueryDto> MTQuery(MoneyTransferQueryDto param, int count = 200)
         {
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
@@ -181,7 +181,7 @@ namespace Yvtu.Infra.Data
 
             WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ROWNUM <= " + count : " AND ROWNUM <= " + count);
 
-            var masterDataTable = this.db.GetData("Select * from v_money_transfer  " + WhereClause + " order by createdon desc", parameters);
+            var masterDataTable = await this.db.GetDataAsync("Select * from v_money_transfer  " + WhereClause + " order by createdon desc", parameters);
 
             if (masterDataTable == null) return null;
             if (masterDataTable.Rows.Count == 0) return null;
@@ -221,6 +221,46 @@ namespace Yvtu.Infra.Data
             param.Results = moneyTransfer;
             
             return param;
+        }
+
+        public async Task<List<MoneyTransfer>> GetMoneyTransfers(int account, DateTime startDate, DateTime endDate, int count)
+        {
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            if (account <= 0) return null;
+            var accountParameter1 = new OracleParameter { ParameterName = "Account1", OracleDbType = OracleDbType.Int32, Value = account };
+            var accountParameter2 = new OracleParameter { ParameterName = "Account2", OracleDbType = OracleDbType.Int32, Value = account };
+            WhereClause.Append(" WHERE (part_acc=:Account1 OR creator_acc=:Account2) ");
+            parameters.Add(accountParameter1);
+            parameters.Add(accountParameter2);
+
+            if (startDate > DateTime.MinValue)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(createdon)>=:StartDate " : " AND trunc(createdon)>=:StartDate   ");
+                var parm = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = startDate };
+                parameters.Add(parm);
+            }
+            if (endDate > DateTime.MinValue)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE createdon<=:EndDate " : " AND createdon<=:EndDate   ");
+                var parm = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = endDate };
+                parameters.Add(parm);
+            }
+            WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE ROWNUM <= " + count : " AND ROWNUM <= " + count);
+
+            var masterDataTable = await this.db.GetDataAsync("Select * from v_money_transfer  " + WhereClause + " order by createdon", parameters);
+
+            if (masterDataTable == null) return null;
+            if (masterDataTable.Rows.Count == 0) return null;
+
+            var moneyTransfers = new List<MoneyTransfer>();
+           
+            foreach (DataRow row in masterDataTable.Rows)
+            {
+                var obj = ConvertDataRowToMoneyTransfer(row);
+                moneyTransfers.Add(obj);
+            }
+            return moneyTransfers;
         }
 
         private List<OracleParameter> BuildCriteria(MoneyTransferQueryDto param, ref string criteria)

@@ -22,5 +22,15 @@ namespace Yvtu.RechargePrcFW.lib
             public string Receiver { get; set; }
             public string Message { get; set; }
         }
+
+        public class PaymentValues
+        {
+            
+            public int Seq { get; set; }
+            public double PayValue { get; set; }
+            public double ProfileId { get; set; }
+
+            
+        }
     }
 }

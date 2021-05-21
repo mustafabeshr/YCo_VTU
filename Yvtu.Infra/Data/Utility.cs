@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -167,7 +168,14 @@ namespace Yvtu.Infra.Data
             return NewValue;
         }
 
-        
+        public static bool IsValidDate(string dateValue)
+        {
+            DateTime Temp;
+
+            if (DateTime.TryParseExact(dateValue, "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out Temp)) return true;
+
+            return false;
+        }
     }
 
    public class MonyToString

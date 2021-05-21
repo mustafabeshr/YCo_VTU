@@ -29,7 +29,8 @@ namespace Yvtu.Web
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                                          .AddCookie(options =>
                                          {
-                                             options.ExpireTimeSpan = TimeSpan.FromHours(2);
+                                             options.ExpireTimeSpan = TimeSpan.FromMinutes(15);
+                                             options.SlidingExpiration = true;
                                              options.LoginPath = "/Account/LogIn";
                                              options.AccessDeniedPath = "/Account/AccessDenied";
                                          });
@@ -57,6 +58,10 @@ namespace Yvtu.Web
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(15);
             });
         }
 

@@ -23,6 +23,13 @@ namespace Yvtu.RechargePrcFW.lib
             var removeResult = new RechargeRepo().RemoveRechargeDraft(recharge.Id);
             if (removeResult)
             {
+                var paymentValue = new PaymentValuesRepo().GetSingleOrDefault(recharge.Amount);
+                double profileId = 0;
+                if (paymentValue != null)
+                {
+                    profileId = paymentValue.ProfileId;
+                }
+                
                 //result.ResultCode = SharedParams.SuccessPaymentCode;
                 //result.ResultDesc = "success";
                 //System.Threading.Thread.Sleep(1000);
@@ -52,7 +59,7 @@ namespace Yvtu.RechargePrcFW.lib
                     msg.PaymentRequest.PaymentAmt = Convert.ToInt64(recharge.Amount) * 100;
                     msg.PaymentRequest.PaymentMode = "1000";
                     msg.PaymentRequest.TransactionCode = $"VTU{recharge.MasterId}";
-                    msg.PaymentRequest.RefillProfileID = recharge.Amount.ToString();
+                    msg.PaymentRequest.RefillProfileID = profileId.ToString();
 
                     try
                     {

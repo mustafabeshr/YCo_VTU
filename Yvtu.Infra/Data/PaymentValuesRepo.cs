@@ -27,7 +27,8 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
                  new OracleParameter{ ParameterName = "v_pvalue", OracleDbType = OracleDbType.Double,  Value = pValue.PayValue },
                  new OracleParameter{ ParameterName = "v_createdby",OracleDbType = OracleDbType.Varchar2,  Value = pValue.CreatedBy.Id },
-                 new OracleParameter{ ParameterName = "v_created_acc",OracleDbType = OracleDbType.Int32,  Value = pValue.CreatedBy.Account }
+                 new OracleParameter{ ParameterName = "v_created_acc",OracleDbType = OracleDbType.Int32,  Value = pValue.CreatedBy.Account },
+                 new OracleParameter{ ParameterName = "v_profile_id",OracleDbType = OracleDbType.Int32,  Value = pValue.ProfileId }
                 };
                 #endregion
                 _db.ExecuteStoredProc("pk_infra.fn_create_pay_values", parameters);
@@ -135,6 +136,7 @@ namespace Yvtu.Infra.Data
             var appObj = new PaymentValues();
             appObj.Seq = row["seq"] == DBNull.Value ? -1 : int.Parse(row["seq"].ToString());
             appObj.PayValue = row["pvalue"] == DBNull.Value ? -1 : double.Parse(row["pvalue"].ToString());
+            appObj.ProfileId = row["profile_id"] == DBNull.Value ? -1 : double.Parse(row["profile_id"].ToString());
             appObj.CreatedOn = row["createdon"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["createdon"].ToString());
             var creatorAccount = row["created_acc"] == DBNull.Value ? -1 : int.Parse(row["created_acc"].ToString());
 
