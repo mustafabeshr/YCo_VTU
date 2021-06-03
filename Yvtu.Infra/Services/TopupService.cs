@@ -20,13 +20,13 @@ namespace Yvtu.Infra.Services
             this._db = db;
             _partnerManager = partnerManager;
         }
-        public async Task<string> DoRecharge(RechargeCollection recharge, string endpoint, string apiUser, 
+        public async Task<RechargeCollection> DoRecharge(RechargeCollection recharge, string endpoint, string apiUser, 
             string apiPassword, string remoteAddress, string successCode)
         {
             //Thread.Sleep(2000);
-            var watch = System.Diagnostics.Stopwatch.StartNew();
+           
             int resultCode;
-            string transNo = "0";
+            string transNo = recharge.ApiTransaction.ToString();
             string resultDesc;
             #region Local test
             //resultCode = int.Parse(successCode);
@@ -38,6 +38,10 @@ namespace Yvtu.Infra.Services
             if (paymentValue != null)
             {
                 profileId = paymentValue.ProfileId;
+            }
+            else
+            {
+                profileId = Convert.ToInt64(recharge.Amount) * 100;
             }
             BasicHttpBinding httpBinding = new BasicHttpBinding();
             EndpointAddress p = new EndpointAddress(endpoint);
@@ -89,31 +93,25 @@ namespace Yvtu.Infra.Services
                     transNo = "0";
                 }
         // End Send Request -------------------------------
-             watch.Stop();
-            double elapsedMs = watch.ElapsedMilliseconds;
-            var collection = new RechargeCollection();
-            collection.Id = recharge.Id;
-            collection.Status.Id = resultCode == int.Parse(successCode) ? 1 : 2;
-            collection.RefNo = resultCode.ToString();
-            collection.RefMessage = resultDesc;
-            collection.RefTransNo = transNo;
-            collection.RefTime = DateTime.Now;
-            collection.DebugInfo = resultDesc + " OCS(" + elapsedMs + ")";
+            
+            recharge.Status.Id = resultCode == int.Parse(successCode) ? 1 : 2;
+            recharge.RefNo = resultCode.ToString();
+            recharge.RefMessage = resultDesc;
+            recharge.RefTransNo = transNo;
+            recharge.RefTime = DateTime.Now;
+            
             //watch = System.Diagnostics.Stopwatch.StartNew();
-            var dbResult = new RechargeRepo(_db, null).UpdateWithBalance(collection);
-            if (collection.Status.Id == 1)
-            {
-                new NotificationRepo(_db, _partnerManager).SendNotification("Recharge.Create", recharge.Id, recharge, 1);
-            }
+            return recharge;
+            
             
             //watch.Stop();
             //elapsedMs = watch.ElapsedMilliseconds;
-            return JsonSerializer.Serialize( new  {
-                               resultCode = resultCode == int.Parse(successCode) ? 0 : resultCode,
-                               resultDesc = resultDesc,
-                               sequence = transNo,
-                               payId = recharge.Id,
-                               duration =  elapsedMs });
+            //return JsonSerializer.Serialize( new  {
+            //                   resultCode = resultCode == int.Parse(successCode) ? 0 : resultCode,
+            //                   resultDesc = resultDesc,
+            //                   sequence = transNo,
+            //                   payId = recharge.Id,
+            //                   duration =  elapsedMs });
         }
     }
 }

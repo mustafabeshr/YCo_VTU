@@ -13,15 +13,21 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
-      }
+      },
+      "ancmHostingModel": "OutOfProcess"
     },
     "Yvtu.Web": {
-      "commandName": "Project",
+      "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "ancmHostingModel": "OutOfProcess",
       "applicationUrl": "https://localhost:5001;http://localhost:5000"
+    },
+    "Out": {
+      "commandName": "IISExpress",
+      "ancmHostingModel": "OutOfProcess"
     }
   }
 }

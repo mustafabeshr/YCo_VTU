@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Yvtu.api.Dtos;
 using Yvtu.api.Errors;
+using Yvtu.api.Logger;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -18,15 +20,18 @@ namespace Yvtu.api.Controllers
         private readonly IAppDbContext _db;
         private readonly IPartnerManager _partnerManager;
         private readonly IConfiguration _config;
+        private readonly ILoggerManager _logger;
 
         public TopupController(IAppDbContext db,
               IPartnerManager partnerManager,
-              IConfiguration config
+              IConfiguration config,
+              ILoggerManager logger
              )
         {
             this._db = db;
             this._partnerManager = partnerManager;
             this._config = config;
+            _logger = logger;
         }
 
         [HttpPost("/api/topup/pay")]
@@ -52,6 +57,8 @@ namespace Yvtu.api.Controllers
                 if (result.AffectedCount == -512) return BadRequest(new ApiResponse(-3008, "Sorry, inconsistent data"));
                 if (result.AffectedCount == -514) return BadRequest(new ApiResponse(-3009, $"Sorry, duplicated sequence {topup.seq}"));
                 if (result.AffectedCount == -515) return BadRequest(new ApiResponse(-3010, $"Sorry, amount not allowed"));
+                return BadRequest(new ApiResponse(500, $"Sorry, {result.Error}"));
+
             }
             recharge.Id = result.AffectedCount;
             // call web service 
@@ -60,8 +67,29 @@ namespace Yvtu.api.Controllers
             var apiPassword = _config["OCS:Password"];
             var remoteAddress = _config["OCS:RemoteAddress"];
             var successCode = _config["OCS:SuccessCode"];
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             var payResult = await new TopupService(_db, _partnerManager).DoRecharge(recharge, endpoint, apiUser, apiPassword, remoteAddress, successCode);
-            return Ok(payResult);
+            watch.Stop();
+            double elapsedMs = watch.ElapsedMilliseconds;
+            payResult.DebugInfo = payResult.RefMessage + " OCS(" + elapsedMs + ")";
+            var dbResult = new RechargeRepo(_db, null).UpdateWithBalance(payResult);
+            if (!dbResult.Success)
+            {
+                _logger.LogError($"EMERGENCY-CHECk PayId={payResult.Id} {dbResult.Error}");
+            }
+            if (payResult.Status.Id == 1)
+            {
+                new NotificationRepo(_db, _partnerManager).SendNotification("Recharge.Create", payResult.Id, payResult, 1);
+            }
+            var finalResult = JsonSerializer.Serialize(new
+                {
+                    resultCode = payResult.Status.Id == 1 ? 0 : payResult.Status.Id,
+                    resultDesc = payResult.RefMessage,
+                    sequence = payResult.ApiTransaction,
+                    payId = recharge.Id,
+                    duration = elapsedMs
+            });
+            return Ok(finalResult);
         }
 
         [HttpGet("/api/topup/query/{id}")]

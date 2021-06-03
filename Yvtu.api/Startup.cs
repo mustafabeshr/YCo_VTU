@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -6,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using NLog;
+using Yvtu.api.Logger;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Infra.Services;
@@ -16,6 +20,7 @@ namespace Yvtu.api
     {
         public Startup(IConfiguration configuration)
         {
+            LogManager.LoadConfiguration(String.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
             Configuration = configuration;
         }
 
@@ -29,6 +34,7 @@ namespace Yvtu.api
             services.AddSingleton<IAppDbContext, AppDbContext>();
             services.AddSingleton<IApiDbLog, ApiLogFileRepo>();
             services.AddSingleton<ITokenService, TokenService>();
+            services.AddSingleton<ILoggerManager, LoggerManager>();
             services.AddControllers();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                .AddJwtBearer(options =>

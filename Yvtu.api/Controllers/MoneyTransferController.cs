@@ -156,21 +156,31 @@ namespace Yvtu.api.Controllers
 
                 var results = await new MoneyTransferRepo(_db, _partnerManager, _partnerActivity).GetMoneyTransfers(
                     currentUser.Account, startDate, endDate, maxRecords);
-                if (results == null || results.Count <= 0) return Ok("No Data");
+                if (results == null || results.Count <= 0) return Ok(
+                        new
+                        {
+                            resultCode = 0,
+                            resultDesc = "No data",
+                            success = "yes",
+                            queryTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
+                            data = new object()
+                        });
                 var retResults = new List<object>();
                 foreach (var obj in results)
                 {
                     retResults.Add(new
                     {
-                        transDate = obj.CreatedOn,
-                        fromAccount = obj.CreatedBy.Account,
-                        fromMobile = obj.CreatedBy.Id,
-                        fromName = obj.CreatedBy.Name,
-                        fromBalance = obj.CreatedBy.Balance,
-                        toAccount = obj.Partner.Account,
-                        toMobile = obj.Partner.Id,
-                        toName = obj.Partner.Name,
-                        toBalance = obj.Partner.Balance,
+                        transferTime = obj.CreatedOn,
+                        transferId = obj.Id,
+                        seq = obj.ApiTransaction,
+                        sourceAccount = obj.CreatedBy.Account,
+                        sourceMobile = obj.CreatedBy.Id,
+                        sourceName = obj.CreatedBy.Name,
+                        sourceBalance = obj.CreatedBy.Balance,
+                        targetAccount = obj.Partner.Account,
+                        targetMobile = obj.Partner.Id,
+                        targetName = obj.Partner.Name,
+                        targetBalance = obj.Partner.Balance,
                         amount = obj.Amount,
                         netAmount = obj.NetAmount,
                         taxPercent = obj.TaxPercent,
@@ -183,7 +193,14 @@ namespace Yvtu.api.Controllers
                     });
                 }
 
-                return Ok(retResults);
+                return Ok(
+                    new {
+                            resultCode = 0,
+                            resultDesc = "OK",
+                            success = "yes",
+                            queryTime = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss"),
+                            data = retResults
+                    });
             }
             catch (Exception ex)
             {

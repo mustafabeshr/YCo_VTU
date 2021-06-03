@@ -595,6 +595,7 @@ namespace Yvtu.SMSRec
                         
                         #endregion
                         #endregion
+
                     } else if (ClientMessage.Message == "ف")
                     {
                         #region Query about payment values

@@ -406,8 +406,8 @@ namespace Yvtu.Infra.Data
             var creatorAccount = row["creator_acc"] == DBNull.Value ? -1 : int.Parse(row["creator_acc"].ToString());
             var partRoleId = row["part_role_id"] == DBNull.Value ? -1 : int.Parse(row["part_role_id"].ToString());
             var creatorRoleId = row["creator_role_id"] == DBNull.Value ? -1 : int.Parse(row["creator_role_id"].ToString());
-            var partBalance = row["part_bal"] == DBNull.Value ? -1 : long.Parse(row["part_bal"].ToString());
-            var creatorBalance = row["creator_bal"] == DBNull.Value ? 0 : long.Parse(row["creator_bal"].ToString());
+            var partBalance = row["part_bal"] == DBNull.Value ? -1 : double.Parse(row["part_bal"].ToString());
+            var creatorBalance = row["creator_bal"] == DBNull.Value ? 0 : double.Parse(row["creator_bal"].ToString());
 
             var payType = row["pay_type"] == DBNull.Value ? string.Empty : row["pay_type"].ToString();
             moneyTransfer.PayType = new CommonCodeRepo(db).GetCodesById(payType, "pay.type");
