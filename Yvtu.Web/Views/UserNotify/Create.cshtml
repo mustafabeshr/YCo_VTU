@@ -1,37 +1,39 @@
 ﻿@model Yvtu.Web.Dto.UserNotifyDto
 
+
 @{
     ViewData["Title"] = "Create Notify";
 }
 
-@await Component.InvokeAsync("NToastNotify")
+
 
 <div class="row">
+    
     <div class="col-md-12 shadow-sm LoginBox">
-        <div class="mb-2 text-center pb-1" style="background-color:rebeccapurple; border-radius:8px;color:white;">
-            <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">انشاء تعميم جديد</p>
+        <div class="mb-2 text-center pb-1" style="background-color: rebeccapurple; border-radius: 8px; color: white;">
+            <p style="font-family: 'ArefRuqaa-Bold'; font-size: 28px;">انشاء تعميم جديد</p>
         </div>
         <form method="post">
             <div class="form-group col-md-12">
                 <label asp-for="Subject" class="FormLabel">الموضوع :</label>
-                <input asp-for="Subject" class="form-control RequiredInput" style="color:darkgreen;" />
+                <input asp-for="Subject" class="form-control RequiredInput" style="color: darkgreen;" />
                 <span asp-validation-for="Subject" class="text-danger"></span>
             </div>
             <div class="form-group col-md-12">
                 <label asp-for="Content" class="FormLabel">نص التعميم :</label>
-                <label id="lblMessageCount" class="FormLabel float-left" style="font-size:16px;">0</label>
-                <textarea id="txtMessage" asp-for="Content" class="form-control RequiredInput" style="height:200px;"></textarea>
+                <label id="lblMessageCount" class="FormLabel float-left" style="font-size: 16px;">0</label>
+                <textarea id="txtMessage" asp-for="Content" class="form-control RequiredInput" style="height: 200px;"></textarea>
                 <span asp-validation-for="Content" class="text-danger"></span>
             </div>
             <div class="form-group col-12">
-                <label asp-for="PriorityId" class="FormLabel">درجة الاهمية  :</label>
-                <select asp-for="PriorityId" class="form-control RequiredInput" style="padding:0px;font-size:12px;"
-                        asp-items="@(new SelectList(Model.Priorities,"Id","Name"))">
+                <label asp-for="PriorityId" class="FormLabel">درجة الاهمية :</label>
+                <select asp-for="PriorityId" class="form-control RequiredInput" style="padding: 0px; font-size: 12px;"
+                        asp-items="@(new SelectList(Model.Priorities, "Id", "Name"))">
                 </select>
             </div>
             <div class="form-group col-12">
                 <label asp-for="ExpireOn" class="FormLabel">تاريخ الانتهاء :</label>
-                <input asp-for="ExpireOn" class="form-control RequiredInput" style="color:darkgreen;" />
+                <input asp-for="ExpireOn" class="form-control RequiredInput" style="color: darkgreen;" />
                 <span asp-validation-for="ExpireOn" class="text-danger"></span>
             </div>
             <div class="form-group col-md-12">
@@ -39,7 +41,7 @@
                 <div class="row d-flex justify-content-center mt-100">
                     <div class="col-md-12">
                         <select id="choices-multiple-remove-button" multiple asp-for="NotifyToList"
-                                class="form-control RequiredInput" asp-items="@(new SelectList(Model.Roles,"Id","Name"))">
+                                class="form-control RequiredInput" asp-items="@(new SelectList(Model.Roles, "Id", "Name"))">
                             <option></option>
                         </select>
                         <span asp-validation-for="SelectedRoles" class="text-danger"></span>
@@ -48,9 +50,10 @@
             </div>
             <input id="TargetRoles" hidden asp-for="SelectedRoles" />
             <button type="submit" class="btn btn-outline-success"
-                    style="width:100%;border-radius:10px;">
-                <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
+                    style="width: 100%; border-radius: 10px;">
+                <i class="fa fa-save"></i>&nbsp;&nbsp; حفظ
             </button>
+           
             @Html.HiddenFor(m => m.Id)
         </form>
     </div>

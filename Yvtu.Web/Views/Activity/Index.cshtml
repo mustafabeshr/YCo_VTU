@@ -11,7 +11,7 @@
             <p style="font-family: 'ArefRuqaa-Bold';font-size:28px;">الاستعلام عن الاجراءات </p>
         </div>
         <form asp-controller="Activity" asp-action="Index" method="post">
-            @await Component.InvokeAsync("NToastNotify")
+           
             <div class="form-row">
                 <div class="form-group col-11  row">
                     <label asp-for="QName" class="FormLabel pt-2">اسم الاجراء:</label>

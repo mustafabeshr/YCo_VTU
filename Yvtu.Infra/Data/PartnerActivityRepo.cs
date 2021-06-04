@@ -324,15 +324,16 @@ namespace Yvtu.Infra.Data
             };
             var masterDataTable = this.db.GetData("Select * from V_PARTNER_ACTIVITY_DETAIL  where act_id=:actId and fromroleid=:fromId and toroleid=:toId ", parameters);
 
-            var partAct = new PartnerActivityDetail();
             if (masterDataTable != null && masterDataTable.Rows.Count > 0)
             {
+                var partAct = new PartnerActivityDetail();
                 DataRow row = masterDataTable.Rows[0];
                 partAct = ConvertDataRowToDetailDataModel(row);
                 if (withMaster) partAct.Parent = GetPartActOnly(partAct.ParentId);
-
+                return partAct;
             }
-            return partAct;
+
+            return null;
         }
         public OpertionResult CreateDetail(PartnerActivityDetail model)
         {

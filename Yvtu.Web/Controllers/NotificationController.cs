@@ -32,10 +32,20 @@ namespace Yvtu.Web.Controllers
 
         public IActionResult Index()
         {
-            var model = new SMSOutBackDto();
-            model.StartDate = DateTime.Today.AddMonths(-1);
-            model.EndDate = DateTime.Today;
-            return View(model);
+            var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("Notification.Query", currentRole);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+            else
+            {
+                var model = new SMSOutBackDto();
+                model.StartDate = DateTime.Today.AddMonths(-1);
+                model.EndDate = DateTime.Today;
+                return View(model);
+            }
         }
         [HttpPost]
         public IActionResult Index(SMSOutBackDto model)

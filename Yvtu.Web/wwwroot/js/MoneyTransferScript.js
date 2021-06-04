@@ -19,7 +19,7 @@ $(document).ready(function () {
             data: { pId:  id}, 
             traditional: true,
             success: function (result) {
-                console.log(result);
+                //console.log(result);
                 if (result.error == "N/A") {
                     document.getElementById('lblPartnerName').innerHTML = result.partnerName;
                     document.getElementById('lblPartnerRoleName').innerHTML = result.partnerRoleName;

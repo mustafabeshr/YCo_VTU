@@ -412,6 +412,13 @@ namespace Yvtu.Web.Controllers
 
         public IActionResult Suspend()
         {
+            var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Suspend", currentRole);
+            if (permission == null)
+            {
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new CreateChangeStatusDto();
             model.NewStatus = new PartnerStatusRepo(_db).GetStatus(3);
             model.NewStatusExpireOn = DateTime.Today.Add(TimeSpan.FromDays(30));

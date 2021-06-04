@@ -21,7 +21,7 @@
                     <label asp-for="Error" class="alert alert-danger" style="font-size:12px;">@Model.Error</label>
                 </div>
             }
-            @await Component.InvokeAsync("NToastNotify")
+           
             <div class="form-group col-12">
                 <label asp-for="OldPass" class="FormLabel">كلمة المرور القديمة :</label>
                 <input asp-for="OldPass" class="form-control text-center RequiredInput" />
