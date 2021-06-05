@@ -119,6 +119,7 @@ namespace Yvtu.Web.Controllers
             model.TaxPercent = moneyTransfer.TaxPercent;
             model.BonusPercent = moneyTransfer.BonusPercent;
             model.BounsTaxPercent = moneyTransfer.BounsTaxPercent;
+            model.FixedFactor = moneyTransfer.FixedFactor;
             return View(model);
         }
         [HttpPost]
@@ -141,11 +142,20 @@ namespace Yvtu.Web.Controllers
                 {
                     switch (result.AffectedCount)
                     {
+                        case -513:
+                            model.Error = "ليس لديك الصلاحية الكافية لاجراء التسوية";
+                            break;
                         case -505:
                             model.Error = "هناك خطأ في احدى القيم ، مما ادى الى فشل اجراء التسوية";
                             break;
                         case -500:
                             model.Error = "هناك احدى البيانات المهمة لم تعد متوفرة";
+                            break;
+                        case -502:
+                            model.Error = "مبلغ التسوية اقل من المبلغ المسموح به";
+                            break;
+                        case -503:
+                            model.Error = "مبلغ التسوية اكبر من المبلغ المسموح به";
                             break;
                         case -509:
                             model.Error = "تم عمل تسوية في وقت سابق";

@@ -22,14 +22,14 @@
         var OTaxAmount = document.getElementById('txtOTaxAmount').value;
         var OBounsAmount = document.getElementById('txtOBounsAmount').value;
         var OBounsTaxAmount = document.getElementById('txtOBounsTaxAmount').value;
+        var OFixedFactor = document.getElementById('txtOFixedFactor').value;
 
-
-
-        var netAmount = (amount / ((taxPer / 100) + 1));
+       
+        var netAmount = (amount * OFixedFactor);
         var taxAmount = netAmount * (taxPer / 100);
         var bounsAmount = netAmount * (bonusPer / 100);
         var bounsTaxAmount = bounsAmount * (bonustaxPer / 100);
-        var recAmount = (amount - bounsAmount + bounsTaxAmount);
+        var recAmount = (netAmount);
 
         var ExpAmount = Number(OAmount) - Number(amount);
         var ExpNetAmount = Number(ONetAmount) - netAmount;

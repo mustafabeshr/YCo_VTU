@@ -169,6 +169,7 @@ namespace Yvtu.Infra.Data
             adjustment.BounsTaxAmount = row["bonus_tax_amt"] == DBNull.Value ? 0 : double.Parse(row["bonus_tax_amt"].ToString());
             adjustment.ReceivedAmount = row["received_amt"] == DBNull.Value ? 0 : double.Parse(row["received_amt"].ToString());
             adjustment.NetAmount = row["net_amount"] == DBNull.Value ? 0 : double.Parse(row["net_amount"].ToString());
+            adjustment.FixedFactor = row["fixed_factor"] == DBNull.Value ? 0 : double.Parse(row["fixed_factor"].ToString());
             adjustment.Note = row["note"] == DBNull.Value ? string.Empty : row["note"].ToString();
             adjustment.CreatedBy.Id = row["createdby"] == DBNull.Value ? string.Empty : row["createdby"].ToString();
             adjustment.CreatedBy.Account = row["createdbyacc"] == DBNull.Value ? -1 : int.Parse(row["createdbyacc"].ToString());
