@@ -137,6 +137,10 @@ namespace Yvtu.Web.Controllers
                 var result = new AdjustmentRepo(db, partnerManager, partnerActivity).Create(adj);
                 if (result.Success)
                 {
+                    adj.DestPartner = partnerManager.GetPartnerByAccount(model.OriginTrans.Partner.Account);
+                    adj.SrcPartner = partnerManager.GetPartnerByAccount(model.OriginTrans.CreatedBy.Account);
+                    toastNotification.AddInfoToastMessage("تم انشاء التسوية بنجاح ");
+                    new NotificationRepo(db, partnerManager).SendNotification<Adjustment>("MoneyTransfer.Adjustment", result.AffectedCount, adj);
                     return RedirectToAction("Index", "Home");
                 }else
                 {

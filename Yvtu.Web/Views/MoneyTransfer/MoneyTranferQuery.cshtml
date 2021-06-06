@@ -148,7 +148,7 @@
                     <tbody>
                         @foreach (var item in Model.Results)
                         {
-                            string rowColor = item.Adjusted ? "yellow" : "white";
+                            string rowColor = item.Adjusted ? "#fcf8a6" : "white";
                             <tr style="background-color:@rowColor">
                                 <td style="font-size:16px;font-weight:bold;">@item.Id</td>
                                 <td style="font-family:Amiri-Regular">@item.CreatedOn.ToString("yyyy/MM/dd H:mm:ss")</td>

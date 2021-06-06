@@ -336,7 +336,7 @@ namespace Yvtu.Infra.Data
                             var res = ReflectionHelper.GetPropValue(obj, member);
                             if (res == null)
                             {
-                                rawMessage = rawMessage.Replace(word, " ");
+                                rawMessage = rawMessage.Replace("{" + member + "}", " ");
                             } else
                             {
                                 rawMessage = rawMessage.Replace(word, Convert.ToString(res));

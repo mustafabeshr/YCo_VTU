@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,16 +18,25 @@ namespace Yvtu.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IAppDbContext db;
+        private readonly IPartnerActivityRepo _partnerActivityRepo;
 
-        public HomeController(ILogger<HomeController> logger, IAppDbContext db)
+        public HomeController(ILogger<HomeController> logger, IAppDbContext db, IPartnerActivityRepo partnerActivityRepo)
         {
             _logger = logger;
             this.db = db;
+            _partnerActivityRepo = partnerActivityRepo;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var roleId = int.Parse(User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName)?.Value);
+            var model = _partnerActivityRepo.GetListByFrom(roleId);
+            if (model != null)
+            {
+                return View(model);
+            }
+
+            return null;
         }
 
         public IActionResult globalparam()
