@@ -63,6 +63,14 @@
             </div>
         </div>
     </div>
+    @Html.HiddenFor(m => m.StartDate)
+    @Html.HiddenFor(m => m.EndDate)
+    @Html.HiddenFor(m => m.IncludeDates)
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.Message)
+    @Html.HiddenFor(m => m.Receiver)
+    @Html.HiddenFor(m => m.CreatedById)
+    @Html.HiddenFor(m => m.CreatedByAccount)
 </form>
 @if (Model.Results != null && Model.Results.Count > 0)
 {

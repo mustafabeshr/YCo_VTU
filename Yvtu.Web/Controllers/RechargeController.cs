@@ -41,7 +41,7 @@ namespace Yvtu.Web.Controllers
             model.QFromDate = DateTime.Today.AddMonths(-1);
             model.QToDate = DateTime.Today;
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             model.Paging.Count = 0;
             return View(model);
         }

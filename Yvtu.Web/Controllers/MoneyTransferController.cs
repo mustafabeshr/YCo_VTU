@@ -291,7 +291,7 @@ namespace Yvtu.Web.Controllers
             }
             var model = new MoneyTransferQueryDto();
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             model.Paging.Count = 0;
             model.QFromDate = DateTime.Today.AddMonths(-1);
             model.QToDate = DateTime.Today;
@@ -348,6 +348,9 @@ namespace Yvtu.Web.Controllers
             {
                 model.Paging.PageNo += 1;
             }
+
+            if (model.QFromDate == DateTime.MinValue) model.QFromDate = DateTime.Today.AddMonths(-1);
+            if (model.QToDate == DateTime.MinValue) model.QFromDate = DateTime.Today;
 
             model.QueryUser = _partnerManager.GetCurrentUserId(this.HttpContext);
             model.QScope = permission.Scope.Id;

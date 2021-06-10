@@ -44,7 +44,7 @@ namespace Yvtu.Web.Controllers
             model.StartDate = DateTime.Today.AddMonths(-1);
             model.EndDate = DateTime.Today;
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             return View(model);
         }
         [HttpPost]
@@ -89,29 +89,34 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("MoneyTransfer.Adjustment", currentRoleId);
             if (permission == null)
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
            
             if (permission.Details == null )
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             if (permission.Details.Count == 0)
             {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var moneyTransfer = new MoneyTransferRepo(db, partnerManager, partnerActivity).GetSingleOrDefault(mt);
             if (moneyTransfer == null)
             {
+                toastNotification.AddErrorToastMessage("لا توجد بيانات ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             if (moneyTransfer.Adjusted || moneyTransfer.AdjustmentNo > 0)
             {
+                toastNotification.AddErrorToastMessage("تم اجراء تسوية سابقة على هذه العملية ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             if (!permission.Details.Any(x => x.ToRole.Id == moneyTransfer.CreatedBy.Role.Id))
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية لاجراء تسوية لهذه الجهة ");
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreateAdjustmentDto();

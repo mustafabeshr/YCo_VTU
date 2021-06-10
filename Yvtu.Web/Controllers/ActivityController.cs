@@ -126,6 +126,7 @@ namespace Yvtu.Web.Controllers
                 var audit = new DataAudit();
                 audit.Activity.Id = "ActivityMessage.Delete";
                 audit.PartnerId = partnerManager.GetCurrentUserId(this.HttpContext);
+                audit.PartnerAccount = partnerManager.GetCurrentUserAccount(this.HttpContext);
                 audit.Action.Id = "Delete";
                 audit.Success = true;
                 audit.OldValue = old.ToString();

@@ -38,8 +38,20 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Index()
         {
-          
-            var  model = new ListPartnerActivityDto();
+
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+
+            var model = new ListPartnerActivityDto();
 
             model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
             model.FromRoles =  new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
@@ -50,6 +62,18 @@ namespace Yvtu.Web.Controllers
         [HttpPost]
         public IActionResult Index(ListPartnerActivityDto model)
         {
+
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             if (model == null)
             {
                 model = new ListPartnerActivityDto();
@@ -84,6 +108,16 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Edit", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new CreatePartnerActivity2Dto();
             var result = _partActRepo.GetPartAct(id);
             if (result != null)
@@ -115,6 +149,17 @@ namespace Yvtu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = _partActRepo.GetPartAct("PartnerActivity.Edit", currentRoleId);
+                if (permission == null)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 var old = _partActRepo.GetPartAct(model.Id);
                 if (old == null) return View(model);
 
@@ -133,6 +178,7 @@ namespace Yvtu.Web.Controllers
                     var audit = new DataAudit();
                     audit.Activity.Id = "PartnerActivity.Edit";
                     audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.PartnerAccount = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
                     audit.Action.Id = "Update";
                     audit.Success = true;
                     audit.OldValue = old.ToString();
@@ -158,12 +204,24 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult Delete(int id)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Delete", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var old = _partActRepo.GetPartAct(id);
             if (old != null)
             {
                 var audit = new DataAudit();
                 audit.Activity.Id = "PartnerActivity.Delete";
                 audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                audit.PartnerAccount = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
                 audit.Action.Id = "Delete";
                 audit.Success = true;
                 audit.OldValue = old.ToString();
@@ -194,6 +252,18 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult CreateRule()
         {
+
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Create", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var model = new CreatePartnerActivity2Dto();
             var detailModel = new List<CreatePartnerActivityDetailDto>();
             var fromRoles = new RoleRepo(db, _partActRepo).GetRoles();
@@ -221,6 +291,17 @@ namespace Yvtu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = _partActRepo.GetPartAct("PartnerActivity.Create", currentRoleId);
+                if (permission == null)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 var pAct = new PartnerActivity();
                 pAct.Activity.Id = model.ActivityId;
                 pAct.FromRole.Id = model.FromRoleId ?? 0;
@@ -260,6 +341,17 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Detail(int id)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var result =  _partActRepo.GetPartAct(id);
 
             return View(result);
@@ -268,6 +360,16 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult AddDetail(int id)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Create", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var masterModel = _partActRepo.GetPartAct(id);
             if (masterModel == null) return null;
             var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
@@ -286,6 +388,18 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult MoreDetail(int id, int parentId)
         {
+
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var model = _partActRepo.GetDetail(id, parentId, true);
             if (model == null) return null;
             return View(model);
@@ -295,6 +409,18 @@ namespace Yvtu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Create", currentRoleId);
+                if (permission == null)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 var masterModel = _partActRepo.GetPartAct(model.ParentId);
                 if (masterModel == null) return null;
                 var originObject = new PartnerActivityDetail();
@@ -322,6 +448,17 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult EditDetail(int id, int parentId)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Edit", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var model = _partActRepo.GetDetail(id, parentId, true);
             if (model == null) return null;
             var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
@@ -349,6 +486,17 @@ namespace Yvtu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+                var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Edit", currentRoleId);
+                if (permission == null)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 var old = _partActRepo.GetDetail(model.Id, model.ParentId);
                 if (old == null) return View(model);
 
@@ -371,6 +519,7 @@ namespace Yvtu.Web.Controllers
                     var audit = new DataAudit();
                     audit.Activity.Id = "PartnerActivity.Detail.Edit";
                     audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.PartnerAccount = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
                     audit.Action.Id = "Update";
                     audit.Success = true;
                     audit.OldValue = old.ToString();
@@ -388,12 +537,24 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult DeleteDetail(int id, int parentId)
         {
+            var currentRoleId = _PartnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partActRepo.GetPartAct("PartnerActivity.Detail.Delete", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
             var old = _partActRepo.GetDetail(id, parentId);
             if (old != null)
             {
                 var audit = new DataAudit();
                 audit.Activity.Id = "PartnerActivity.Detail";
                 audit.PartnerId = _PartnerManager.GetCurrentUserId(this.HttpContext);
+                audit.PartnerAccount = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
                 audit.Action.Id = "Delete";
                 audit.Success = true;
                 audit.OldValue = old.ToString();

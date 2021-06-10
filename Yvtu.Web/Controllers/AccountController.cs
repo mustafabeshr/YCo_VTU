@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DinkToPdf;
@@ -60,7 +61,7 @@ namespace Yvtu.Web.Controllers
             model.Roles = roles;
             model.Statuses = statuses;
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             model.Paging.Count = 0;
             return View(model);
         }
@@ -333,6 +334,10 @@ namespace Yvtu.Web.Controllers
                 var result = await _partnerManager.CreateAsync(createdPartner);
                 if (result.Success)
                 {
+                    _toastNotification.AddSuccessToastMessage("تم انشاء جهة جديدة بنجاح", new ToastrOptions
+                    {
+                        Title = "انشاء جهة"
+                    });
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -499,6 +504,8 @@ namespace Yvtu.Web.Controllers
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Suspend", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
+                return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
             partner.Error = "N/A";
             return partner;
         }
@@ -512,6 +519,8 @@ namespace Yvtu.Web.Controllers
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Cancel", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
+                return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
             partner.Error = "N/A";
             return partner;
         }
@@ -525,6 +534,8 @@ namespace Yvtu.Web.Controllers
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Reactive", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
+                return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
             partner.Error = "N/A";
             return partner;
         }
@@ -538,6 +549,10 @@ namespace Yvtu.Web.Controllers
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Confiscate", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
+                return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            if (partner.Balance <= 0)
+                return new PartBasicInfo { Error = "عذرا لا يوجد رصيد لمصادرته " };
             partner.Error = "N/A";
             return partner;
         }
@@ -565,6 +580,8 @@ namespace Yvtu.Web.Controllers
                 var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Edit", currentRole);
                 if (permission == null) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
                 if (permission.Details == null || permission.Details.Count == 0) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
+                if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0) 
+                    return new Partner { Extra = " ليس لديك الصلاحية الكافية لتعديل هذه الجهة" };
                 partner.Extra = "N/A";
                 return partner;
             }
@@ -868,7 +885,7 @@ namespace Yvtu.Web.Controllers
             model.StartDate = DateTime.Today.Subtract(TimeSpan.FromDays(30));
             model.EndDate = DateTime.Today;
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             return View(model);
         }
         [HttpPost]
@@ -1057,6 +1074,16 @@ namespace Yvtu.Web.Controllers
                     var result = await _partnerManager.EditAsync(oldResult.Partner, newPartner);
                     if (result.Success)
                     {
+                        newPartner = _partnerManager.GetPartnerByAccount(newPartner.Account);
+                        var audit = new DataAudit();
+                        audit.Activity.Id = "Partner.Edit";
+                        audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);
+                        audit.PartnerAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
+                        audit.Action.Id = "Update";
+                        audit.Success = true;
+                        audit.OldValue = oldResult.Partner.ToString();
+                        audit.NewValue = newPartner.ToString();
+                        var auditResult = new DataAuditRepo(_db).Create(audit);
                         _toastNotification.AddSuccessToastMessage("تم تعديل البيانات بنجاح", new ToastrOptions
                         {
                             Title = "تنبيه"

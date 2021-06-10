@@ -1,12 +1,32 @@
 ﻿
 $(document).ready(function () {
-    $("#txtPartnerId").blur(function () {
+    $("#txtPartnerId").keyup(function (param) {
+        CheckThenGetData();
+    });
+
+
+    $("#txtPartnerId").keydown(function (param) {
+        var code = param.keyCode || param.which;
+        if (code === 9) {
+            CheckThenGetData();
+        }
+    });
+
+    $("#txtPartnerId").keyup(function (param) {
+        var code = param.keyCode || param.which;
+        console.log(code);
+        CheckThenGetData();
+    });
+
+    function CheckThenGetData() {
         if ($("#txtPartnerId").val().length == 9) {
             if (matchString($("#txtPartnerId").val()) === 1) {
                 callBasicInfo($("#txtPartnerId").val());
             }
         }
-    });
+    }
+
+    CheckThenGetData();
 
     //if ($("#txtPartnerId").val().length == 9) {
     //    callBasicInfo($("#txtPartnerId").val());

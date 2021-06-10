@@ -131,6 +131,16 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult SendSMSOne()
         {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("SMS.SendOne", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = "تنبيه"
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new SMSOneDto();
             return View(model);
         }
@@ -139,6 +149,18 @@ namespace Yvtu.Web.Controllers
         {
             if (ModelState.IsValid)
             {
+
+                var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = partnerActivity.GetPartAct("SMS.SendOne", currentRoleId);
+                if (permission == null)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                    {
+                        Title = "تنبيه"
+                    });
+                    return Redirect(Request.Headers["Referer"].ToString());
+                }
+
                 var inserted = new SMSOne();
                 inserted.Message = model.Message;
                 inserted.Note = model.Note;

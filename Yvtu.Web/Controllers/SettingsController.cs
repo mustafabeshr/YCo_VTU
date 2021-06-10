@@ -121,6 +121,7 @@ namespace Yvtu.Web.Controllers
                     var audit = new DataAudit();
                     audit.Activity.Id = "PayemntValues.Remove";
                     audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.PartnerAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
                     audit.Action.Id = "Delete";
                     audit.Success = true;
                     audit.OldValue = removedObj.ToString();
@@ -173,6 +174,7 @@ namespace Yvtu.Web.Controllers
                     var audit = new DataAudit();
                     audit.Activity.Id = "API.IpBlacklist.Remove";
                     audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);
+                    audit.PartnerAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
                     audit.Action.Id = "Delete";
                     audit.Success = true;
                     audit.OldValue = removedObj.ToString();

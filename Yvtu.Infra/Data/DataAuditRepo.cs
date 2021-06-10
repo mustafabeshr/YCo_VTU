@@ -32,7 +32,7 @@ namespace Yvtu.Infra.Data.Interfaces
                     new OracleParameter{ ParameterName = "v_new_value",OracleDbType = OracleDbType.NVarchar2,  Value = data.NewValue },
                     new OracleParameter{ ParameterName = "v_system_note",OracleDbType = OracleDbType.NVarchar2,  Value = data.SystemNote },
                     new OracleParameter{ ParameterName = "v_error",OracleDbType = OracleDbType.Varchar2,  Value = data.Error },
-                    new OracleParameter{ ParameterName = "v_success",OracleDbType = OracleDbType.Int32,  Value = data.Success ? 1 : 0 },
+                    new OracleParameter{ ParameterName = "v_success",OracleDbType = OracleDbType.Int32,  Value = data.Success ? 1 : 0 }
                 };
                 #endregion
                 var result =  db.ExecuteStoredProc("pk_utility.sp_create_audit", parameters);

@@ -45,7 +45,7 @@ namespace Yvtu.Web.Controllers
             model.StartDate = DateTime.Today.AddMonths(-1);
             model.EndDate = DateTime.Today.AddDays(1);
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             model.Paging.Count = 0;
             return View(model);
         }
@@ -213,7 +213,7 @@ namespace Yvtu.Web.Controllers
             model.StartDate = DateTime.Today.AddMonths(-1);
             model.EndDate = DateTime.Today.AddDays(1);
             model.Paging.PageNo = 1;
-            model.Paging.PageSize = 10;
+            model.Paging.PageSize = 50;
             model.Paging.Count = 0;
             model.PartnerId = partnerManager.GetCurrentUserId(this.HttpContext);
             return View(model);

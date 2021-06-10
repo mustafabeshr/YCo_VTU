@@ -200,17 +200,25 @@ namespace Yvtu.Infra.Data
         {
             string WhereClause = string.Empty;
             var parameters = BuildCriteria(param, ref WhereClause);
-
+            var ps = param.Paging.PageSize > 0 ? param.Paging.PageSize : 50;
             var strSqlStatment = new StringBuilder();
             strSqlStatment.Append("Select * from ( ");
             strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
             strSqlStatment.Append("Select * from v_money_transfer  " + WhereClause + " order by createdon desc ");
             strSqlStatment.Append(") main_data ) ");
-            strSqlStatment.Append($"WHERE seq > ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {param.Paging.PageSize}");
+            strSqlStatment.Append($"WHERE seq > ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {ps}");
             var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
 
-            if (masterDataTable == null) return null;
-            if (masterDataTable.Rows.Count == 0) return null;
+            if (masterDataTable == null)
+            {
+                param.Results = null;
+                return param;
+            }
+            if (masterDataTable.Rows.Count == 0)
+            {
+                param.Results = null;
+                return param;
+            }
 
             var moneyTransfer = new List<MoneyTransferDetailQueryDto>();
             foreach (DataRow row in masterDataTable.Rows)

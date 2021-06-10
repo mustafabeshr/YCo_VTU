@@ -617,15 +617,16 @@ namespace Yvtu.Infra.Data
 
                 if (result > 0)
                 {
-                    newPartner = GetActivePartner(newPartner.Id);
-                    var audit = new DataAudit();
-                    audit.Activity.Id = "Partner.Edit";
-                    audit.PartnerId = newPartner.CreatedBy.Id;
-                    audit.Action.Id = "Update";
-                    audit.Success = true;
-                    audit.OldValue = oldPartner.ToString();
-                    audit.NewValue = newPartner.ToString();
-                    var auditResult = new DataAuditRepo(db).Create(audit);
+                    //newPartner = GetActivePartner(newPartner.Id);
+                    //var audit = new DataAudit();
+                    //audit.Activity.Id = "Partner.Edit";
+                    //audit.PartnerId = newPartner.CreatedBy.Id;
+                    //audit.PartnerAccount = newPartner.CreatedBy.Account;
+                    //audit.Action.Id = "Update";
+                    //audit.Success = true;
+                    //audit.OldValue = oldPartner.ToString();
+                    //audit.NewValue = newPartner.ToString();
+                    //var auditResult = new DataAuditRepo(db).Create(audit);
                     return new OpertionResult { AffectedCount = result, Success = true, Error = string.Empty };
                 }
                 else
