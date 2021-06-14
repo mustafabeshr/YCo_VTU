@@ -13,7 +13,7 @@ namespace Yvtu.Web.Dto
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
         public string Id { get; set; }
 
-        [Required(ErrorMessage = "يجب ادخال كلمة المرور")]
+        [Required(ErrorMessage = "يجب ادخال الرقم السري")]
         [MaxLength(4, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
         //[RegularExpression(@"^d*", ErrorMessage = "كلمة المرور غير صحيحة")]
         [DataType(DataType.Password)]

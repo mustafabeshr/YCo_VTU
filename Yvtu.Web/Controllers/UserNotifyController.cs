@@ -90,7 +90,7 @@ namespace Yvtu.Web.Controllers
             }
             var model = new UserNotifyDto();
             model.Priorities = new CommonCodeRepo(db).GetCodesByType("priority");
-            model.Roles = new RoleRepo(db, partnerActivity).GetRoles();
+            model.Roles = new RoleRepo(db, partnerActivity).GetAuthorizedRoles("UserNotify.Create", currentRoleId);
             var expiredAfter = Convert.ToInt32(new AppGlobalSettingsRepo(db).GetSingle("UserInstructExpireDays").SettingValue);
             model.ExpireOn = DateTime.Today.AddDays(expiredAfter);
             return View(model);
@@ -147,7 +147,7 @@ namespace Yvtu.Web.Controllers
                 }
             }
             model.Priorities = new CommonCodeRepo(db).GetCodesByType("priority");
-            model.Roles = new RoleRepo(db, partnerActivity).GetRoles();
+            model.Roles = new RoleRepo(db, partnerActivity).GetAuthorizedRoles("UserNotify.Create", currentRoleId);
             return View(model);
         }
         public string delete(int id)
@@ -162,6 +162,7 @@ namespace Yvtu.Web.Controllers
         public string PostNotify(int id)
         {
             var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var currentAccount = partnerManager.GetCurrentUserAccount(this.HttpContext);
             var permission = partnerActivity.GetPartAct("UserNotify.Post", currentRoleId);
             if (permission == null)
             {
@@ -172,7 +173,7 @@ namespace Yvtu.Web.Controllers
                 //return Redirect(Request.Headers["Referer"].ToString());
             }else
             {
-                var result = new UserNotifyRepo(db).Post(id);
+                var result = new UserNotifyRepo(db).Post(id, permission.Scope.Id, currentAccount);
                 if (result.Success)
                 {
                     toastNotification.AddSuccessToastMessage("تم ترحيل التعميم على كافة المستخدمين", new ToastrOptions

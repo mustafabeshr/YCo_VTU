@@ -18,6 +18,8 @@ namespace Yvtu.Core.Queries
         [StringLength(9)]
         public string QPartnerId { get; set; }
         public string QCreatorId { get; set; }
+        public int QCreatorAccount { get; set; }
+        public int QCreatorRoleId { get; set; }
         //[MaxLength(100)]
         public string QPartnerName { get; set; }
         [StringLength(9)]

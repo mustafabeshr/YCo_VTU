@@ -206,14 +206,16 @@ namespace Yvtu.Infra.Data
             return results;
         }
 
-        public OpertionResult Post(int id)
+        public OpertionResult Post(int id, string scope, int creatorAccount)
         {
             try
             {
                 #region Parameters
                 var parameters = new List<OracleParameter> {
                  new OracleParameter{ ParameterName = "retVal",OracleDbType = OracleDbType.Int32,  Direction = ParameterDirection.ReturnValue },
-                 new OracleParameter{ ParameterName = "v_ins_id",OracleDbType = OracleDbType.Int32,  Value = id }
+                 new OracleParameter{ ParameterName = "v_ins_id",OracleDbType = OracleDbType.Int32,  Value = id }//,
+                // new OracleParameter{ ParameterName = "v_creatorbyacc",OracleDbType = OracleDbType.Int32,  Value = creatorAccount },
+                // new OracleParameter{ ParameterName = "v_scope",OracleDbType = OracleDbType.Varchar2,  Value = scope }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_infra.fn_userinstruct_post", parameters);

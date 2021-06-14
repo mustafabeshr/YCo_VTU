@@ -110,14 +110,15 @@ namespace Yvtu.Web.Controllers
                 else
                 {
                     partnerModel.CreatedBy.Id = _partnerManager.GetCurrentUserId(this.HttpContext);
+                    partnerModel.CreatedBy.Account = _partnerManager.GetCurrentUserAccount(this.HttpContext);
                     var result = _partnerManager.ResetPassword(partnerModel);
                     if (result)
                     {
                         model.PartnerId = partnerModel.Id;
                         model.PartnerName = partnerModel.Name;
                         model.Error = string.Empty;
-                        model.Success = "تم تغيير كلمة المرور";
-                        _toastNotification.AddSuccessToastMessage("تم اعادة تعيين كلمة المرور بنجاح");
+                        model.Success = "تم تغيير الرقم السري";
+                        _toastNotification.AddSuccessToastMessage("تم اعادة تعيين الرقم السري بنجاح");
                     }
                 }
             }
@@ -138,6 +139,11 @@ namespace Yvtu.Web.Controllers
             {
                 model.Paging.PageNo += 1;
             }
+
+            model.QCreatorId = _partnerManager.GetCurrentUserId(this.HttpContext);
+            model.QCreatorAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
+            model.QCreatorRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+
             model.Partners = _partnerManager.GetPartnersWithPaging(model);
             if (model != null && model.Partners != null)
             {
@@ -239,7 +245,7 @@ namespace Yvtu.Web.Controllers
                             bool lockAccount = false;
                             if (partnerResult.Partner.WrongPwdAttempts >= 2) lockAccount = true;
                             _partnerManager.IncreaseWrongPwdAttempts(partnerResult.Partner.Id, lockAccount);
-                            _toastNotification.AddInfoToastMessage("عذرا ، رمز المستخدم او كلمة المرور غير صحيح" + Environment.NewLine 
+                            _toastNotification.AddInfoToastMessage("عذرا ، رمز المستخدم او الرقم السري غير صحيح" + Environment.NewLine 
                                 +"(" + partnerResult.Partner.WrongPwdAttempts + ")");
                             return View(model);
                         }
@@ -377,7 +383,7 @@ namespace Yvtu.Web.Controllers
                 var currentPartner = _partnerManager.GetPartnerByAccount(_partnerManager.GetCurrentUserAccount(this.HttpContext));
                 if (currentPartner == null)
                 {
-                    model.Error = "عذرا ، لا يمكنك تغيير كلمة المرور الخاصة بك";
+                    model.Error = "عذرا ، لا يمكنك تغيير الرقم السري الخاص بك";
                     return View(model);
                 }
                 if (currentPartner.Status.Id > 2)
@@ -392,9 +398,10 @@ namespace Yvtu.Web.Controllers
                 }
                 if (!System.Text.RegularExpressions.Regex.IsMatch(model.NewPass.ToString(), "^[0-9]{4,6}$"))
                 {
-                    model.Error = "كلمة المرور الجديدة غير مستوفية للشروط";
+                    model.Error = "الرقم السري الجديد غير مستوفية للشروط";
                     return View(model);
                 }
+
                 byte[] salt = Convert.FromBase64String(currentPartner.Extra);
                 string hash = Pbkdf2Hasher.ComputeHash(model.OldPass.ToString(), salt);
 
@@ -403,12 +410,30 @@ namespace Yvtu.Web.Controllers
                     bool lockAccount = false;
                     if (currentPartner.WrongPwdAttempts >= 2) lockAccount = true;
                     _partnerManager.IncreaseWrongPwdAttempts(currentPartner.Id, lockAccount);
-                    model.Error = "كلمة المرور القديمة غير صحيح" + Environment.NewLine + "(" + currentPartner.WrongPwdAttempts + ")";
+                    model.Error = "الرقم السري القديم غير صحيح" + Environment.NewLine + "(" + currentPartner.WrongPwdAttempts + ")";
                     return View(model);
                 }
+                byte[] newSalt = Pbkdf2Hasher.GenerateRandomSalt();
+                string newHash = Pbkdf2Hasher.ComputeHash(model.NewPass.ToString(), newSalt);
 
-                _partnerManager.ChangePwd(currentPartner.Account, currentPartner.Id, model.NewPass.ToString(),true);
-                _toastNotification.AddSuccessToastMessage("تم تغيير كلمة المرور بنجاح");
+                var changeSecret =  new ChangeSecretHistory();
+                changeSecret.CreatedBy.Id = currentPartner.Id;
+                changeSecret.CreatedBy.Account = currentPartner.Account;
+                changeSecret.AccessChannel.Id = "web";
+                changeSecret.OldSalt = currentPartner.Extra;
+                changeSecret.OldHash = currentPartner.Pwd;
+                changeSecret.NewSalt = Convert.ToBase64String(newSalt);
+                changeSecret.NewHash = newHash;
+                changeSecret.ChangeType.Id = "change";
+                changeSecret.NotifyBy.Id = "none";
+                changeSecret.PartAppUser.Id = currentPartner.Id;
+                changeSecret.PartAppUser.Account = currentPartner.Account;
+                var result = new ChangeSecretHistoryRepo(_db, _partnerManager, _partnerActivity).Create(changeSecret);
+                //_partnerManager.ChangePwd(currentPartner.Account, currentPartner.Id, model.NewPass.ToString(),false);
+                if (result.Success)
+                {
+                  _toastNotification.AddSuccessToastMessage("تم تغيير الرقم السري بنجاح");
+                }
             }
 
             return View(model);
@@ -500,12 +525,21 @@ namespace Yvtu.Web.Controllers
             if (!Utility.ValidYMobileNo(id)) return new PartBasicInfo { Error = "رقم غير صحيح" };
             var partner = _partnerManager.GetPartnerBasicInfo(id);
             if (partner == null) return new PartBasicInfo { Error = "البيانات غير متوفرة" };
+            var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
             var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Suspend", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
                 return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            if (permission.Scope.Id == "CurOpOnly" && currentId != id)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
+            if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != currentId)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
             partner.Error = "N/A";
             return partner;
         }
@@ -515,12 +549,21 @@ namespace Yvtu.Web.Controllers
             if (!Utility.ValidYMobileNo(id)) return new PartBasicInfo { Error = "رقم غير صحيح" };
             var partner = _partnerManager.GetPartnerBasicInfo(id);
             if (partner == null) return new PartBasicInfo { Error = "البيانات غير متوفرة" };
+            var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
             var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Cancel", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
                 return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            if (permission.Scope.Id == "CurOpOnly" && currentId != id)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
+            if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != currentId)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
             partner.Error = "N/A";
             return partner;
         }
@@ -530,12 +573,21 @@ namespace Yvtu.Web.Controllers
             if (!Utility.ValidYMobileNo(id)) return new PartBasicInfo { Error = "رقم غير صحيح" };
             var partner = _partnerManager.GetPartnerBasicInfo(id);
             if (partner == null) return new PartBasicInfo { Error = "البيانات غير متوفرة" };
+            var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
             var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Reactive", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
             if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0)
                 return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            if (permission.Scope.Id == "CurOpOnly" && currentId != id)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
+            if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != currentId)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
             partner.Error = "N/A";
             return partner;
         }
@@ -545,6 +597,7 @@ namespace Yvtu.Web.Controllers
             if (!Utility.ValidYMobileNo(id)) return new PartBasicInfo { Error = "رقم غير صحيح" };
             var partner = _partnerManager.GetPartnerBasicInfo(id);
             if (partner == null) return new PartBasicInfo { Error = "البيانات غير متوفرة" };
+            var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
             var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
             var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Confiscate", currentRole);
             if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
@@ -553,6 +606,14 @@ namespace Yvtu.Web.Controllers
                 return new PartBasicInfo { Error = " ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
             if (partner.Balance <= 0)
                 return new PartBasicInfo { Error = "عذرا لا يوجد رصيد لمصادرته " };
+            if (permission.Scope.Id == "CurOpOnly" && currentId != id)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
+            if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != currentId)
+            {
+                return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية لتنفيذ هذا الاجراء على هذه الجهة" };
+            }
             partner.Error = "N/A";
             return partner;
         }
@@ -560,12 +621,12 @@ namespace Yvtu.Web.Controllers
         public async Task<List<IdName>> GetAccounts(string id)
         {
             if (!Utility.ValidYMobileNo(id)) return null;
-            var accounts = await _partnerManager.GetAccountsAsync(id);
+            var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var accounts = await _partnerManager.GetAuthorizedAccountsAsync(id, "Partner.PFR.Query", currentRole);
             if (accounts == null) return null;
-            //var currentRole = partnerManager.GetCurrentUserRole(this.HttpContext);
-            //var permission = new PartnerActivityRepo(db).GetPartAct("Partner.Confiscate", currentRole);
-            //if (permission == null) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
-            //if (permission.Details == null || permission.Details.Count == 0) return new PartBasicInfo { Error = "ليس لديك الصلاحية الكافية" };
+            var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.PFR.Query", currentRole);
+            if (permission == null) return null;
+            if (permission.Details == null || permission.Details.Count == 0) return null;
             //accounts.Error = "N/A";
             return accounts;
         }
@@ -576,12 +637,21 @@ namespace Yvtu.Web.Controllers
             if (getResult.Success)
             {
                 var partner = getResult.Partner;
+                var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
                 var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
                 var permission = new PartnerActivityRepo(_db).GetPartAct("Partner.Edit", currentRole);
                 if (permission == null) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
                 if (permission.Details == null || permission.Details.Count == 0) return new Partner { Extra = "ليس لديك الصلاحية الكافية" };
                 if (!permission.Details.Any(x => x.ToRole.Id == partner.Role.Id) || permission.Details.Count == 0) 
                     return new Partner { Extra = " ليس لديك الصلاحية الكافية لتعديل هذه الجهة" };
+                if (permission.Scope.Id == "CurOpOnly" && id != currentId)
+                {
+                    return new Partner { Extra = " ليس لديك الصلاحية الكافية لتعديل هذه الجهة" };
+                }
+                if (permission.Scope.Id == "Exclusive" && partner.RefPartner.Id != currentId)
+                {
+                    return new Partner { Extra = " ليس لديك الصلاحية الكافية لتعديل هذه الجهة" };
+                }
                 partner.Extra = "N/A";
                 return partner;
             }

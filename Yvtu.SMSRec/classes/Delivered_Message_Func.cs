@@ -113,7 +113,7 @@ namespace Yvtu.SMSRec
             public static string REQUEST_TOO_SHORT = "عذرا طلب غير صحيح ، يرجى التأكد من صيغة الطلب و المحاولة لاحقا";
             public static string UNKNOWN_COMMAND = "عذرا رقم الطلب غير صحيح";
             public static string WRONG_MOBILE = "رقم موبايل خاطئ يرجى التاكد و المحاولة لاحقا";
-            public static string Wrong_password = "كلمة المرور غير صحيحة يرجى التأكد و المحاولة لاحقا";
+            public static string Wrong_password = "الرقم السري غير صحيح يرجى التأكد و المحاولة لاحقا";
             public static string Balance_not_enough = "عذرا رصيدك غير كافي لاجراء العملية";
             public static string SendingCardFailed = "فشلت عملية ارسال كرت للرقم {0} رصيدك {1} يرجى المحاولة لاحقا";
         }

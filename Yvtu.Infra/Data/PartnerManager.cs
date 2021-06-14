@@ -36,6 +36,9 @@ namespace Yvtu.Infra.Data
             }
             return false;
         }
+
+
+
         public bool ChangePwd(int PartnerAcc, string PartnerId,string newPwd, bool notify = true)
         {
             //var pass = Utility.GenerateNewCode(4);
@@ -59,7 +62,7 @@ namespace Yvtu.Infra.Data
                 {
                     if (notify)
                     {
-                        var msg = "تم تغيير كلمة المرور الخاصبة بك الى " + newPwd;
+                        var msg = "تم تغيير الرقم السري الخاصب بك الى " + newPwd;
                         new OutSMSRepo(db).Create(new SMSOut
                         {
                             Receiver = PartnerId,
@@ -126,7 +129,7 @@ namespace Yvtu.Infra.Data
 
                 if (result > 0)
                 {
-                    var msg = "تم انشاء حساب لك بخدمة الشاحن الفوري و كلمة المرور هي  " + partner.Pwd;
+                    var msg = "تم انشاء حساب لك بخدمة الشاحن الفوري و الرقم السري الخاصب بك هو  " + partner.Pwd;
                     new OutSMSRepo(db).Create(new SMSOut
                     {
                         Receiver = partner.Id,
@@ -169,7 +172,7 @@ namespace Yvtu.Infra.Data
 
                 if (result > 0)
                 {
-                    var msg = "تم اعادة تعيين كلمة المرور الخاصة بك الى " + pass;
+                    var msg = "تم اعادة تعيين الرقم السري الخاص بك الى " + pass;
                     new OutSMSRepo(db).Create(new SMSOut
                     {
                         Receiver = partner.Id,
@@ -537,6 +540,16 @@ namespace Yvtu.Infra.Data
         {
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
+            var permission = partnerActivity.GetPartAct("Partner.Query", param.QCreatorRoleId);
+            if (permission == null || permission.Scope.Id == "CurOpOnly")
+            {
+                var parm = new OracleParameter { ParameterName = "QPartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.QCreatorId };
+                WhereClause.Append(" WHERE partner_id=:QPartnerId ");
+                parameters.Add(parm);
+                return parameters;
+            }
+
+
             if (!string.IsNullOrEmpty(param.QPartnerId))
             {
                 var parm = new OracleParameter { ParameterName = "QPartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.QPartnerId };
@@ -576,6 +589,26 @@ namespace Yvtu.Infra.Data
                 var parm = new OracleParameter { ParameterName = "QPartnerName", OracleDbType = OracleDbType.NVarchar2, Value = param.QPartnerName };
                 parameters.Add(parm);
             }
+
+            if (permission.Scope.Id == "Exclusive")
+            {
+                var parm = new OracleParameter { ParameterName = "RefId", OracleDbType = OracleDbType.Varchar2, Value = param.QCreatorId };
+                WhereClause.Append(" WHERE ref_partner=:RefId ");
+                parameters.Add(parm);
+            }
+
+            if (permission.Details == null || permission.Details.Count == 0)
+            {
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE roleid=-1 " : " AND roleid=-1  ");
+            }
+            else
+            {
+                var allowedRoles = string.Join(",", permission.Details.Select(x => x.ToRole.Id).ToList());
+                WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString())
+                    ? $" WHERE roleid in ( {allowedRoles} )"
+                    : $" AND roleid in ( {allowedRoles} )");
+            }
+
             criteria = WhereClause.ToString();
             return parameters;
         }
@@ -650,6 +683,40 @@ namespace Yvtu.Infra.Data
             parameters.Add(parm);
             var dataTable = await this.db.GetDataAsync("Select * from partner  " + WhereClause + " order by partner_acc desc", parameters);
 
+            if (dataTable == null) return null;
+            if (dataTable.Rows.Count == 0) return null;
+
+            var partners = new List<IdName>();
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var account = new IdName();
+                account.Id = row["partner_acc"] == DBNull.Value ? -1 : int.Parse(row["partner_acc"].ToString());
+                var partnerName = row["partner_name"] == DBNull.Value ? string.Empty : row["partner_name"].ToString();
+                account.Name = $"{account.Id} - {partnerName}";
+                partners.Add(account);
+            }
+            return partners;
+        }
+
+        public async Task<List<IdName>> GetAuthorizedAccountsAsync(string id, string activityId, int currentRoleId)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            var WhereClause = new StringBuilder();
+            var parameters = new List<OracleParameter>();
+            var param = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = id };
+            parameters.Add(param);
+
+            var param2 = new OracleParameter { ParameterName = "activityId", OracleDbType = OracleDbType.Varchar2, Value = activityId };
+            parameters.Add(param2);
+
+            var param3 = new OracleParameter { ParameterName = "currentRoleId", OracleDbType = OracleDbType.Int32, Value = currentRoleId };
+            parameters.Add(param3);
+
+            var sql = $"Select partner_id, partner_acc, partner_name  from partner " +
+                      $" where partner_id = :PartnerId and  partner.roleid in " +
+                      $" (select det.toroleid  from V_PARTNER_ACTIVITY_DETAIL det where det.act_id = :activityId and det.fromroleid = :currentRoleId) " +
+                      $" order by partner_acc desc";
+            var dataTable = await this.db.GetDataAsync(sql, parameters);
             if (dataTable == null) return null;
             if (dataTable.Rows.Count == 0) return null;
 

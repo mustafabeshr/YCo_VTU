@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
+using NToastNotify;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
@@ -28,10 +29,11 @@ namespace Yvtu.Web.Controllers
         private readonly IConverter converter;
         private readonly IWebHostEnvironment environment;
         private readonly ILogger<MoneyTransferController> logger;
+        private readonly IToastNotification _toastNotification;
 
         public MoneyTransferController(IAppDbContext db, IPartnerManager partnerManager
             , IPartnerActivityRepo partnerActivity, IConverter converter, IWebHostEnvironment environment,
-            ILogger<MoneyTransferController> logger)
+            ILogger<MoneyTransferController> logger,  IToastNotification toastNotification)
         {
             this._db = db;
             this._partnerManager = partnerManager;
@@ -39,6 +41,7 @@ namespace Yvtu.Web.Controllers
             this.converter = converter;
             this.environment = environment;
             this.logger = logger;
+            _toastNotification = toastNotification;
         }
         //[HttpGet]
         public IActionResult CreatePDF(int id)
@@ -88,6 +91,13 @@ namespace Yvtu.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
+            var currentRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _partnerActivity.GetPartAct("MoneyTransfer.Create", currentRoleId);
+            if (permission == null)
+            {
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new CreateMoneyTransferDto();
             var currentPartAccount = _partnerManager.GetCurrentUserAccount(this.HttpContext);
             var currentPart = _partnerManager.GetPartnerByAccount(currentPartAccount);
@@ -209,12 +219,33 @@ namespace Yvtu.Web.Controllers
             var validateResult =  _partnerManager.Validate(pId);
             if (validateResult.Success)
             {
+                var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
                 var partner = validateResult.Partner;
-                var roleId = User.Claims.FirstOrDefault(p => p.Type == ClaimTypes.GivenName).Value;
-                var moneyTransferSettings = _partnerActivity.GetDetail("MoneyTransfer.Create", int.Parse(roleId), partner.Role.Id, true);
+                var currentRoleId = _partnerManager.GetCurrentUserRole(this.HttpContext);
+                var permission = _partnerActivity.GetPartAct("MoneyTransfer.Create", currentRoleId);
+                if (permission == null)
+                {
+                    return new CreateMoneyTransferDto { Error = "ليس لديك الصلاحية الكافية" };
+                }
+
+                if (permission.Details == null || permission.Details?.Count == 0)
+                {
+                    return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
+                }
+
+                var moneyTransferSettings = permission.Details.Find(x => x.ToRole.Id == partner.Role.Id);
                 if (moneyTransferSettings == null) 
                     return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
-                
+
+                if (permission.Scope.Id == "CurOpOnly")
+                {
+                    return new CreateMoneyTransferDto { Error = "نظرا للقيود التي تم تعريفها على العملية لا يمكنك تنفيذ الاجراء" };
+                }
+                if (permission.Scope.Id == "Exclusive" && partner.RefPartner.Id != currentId)
+                {
+                    return new CreateMoneyTransferDto { Error = "ليس لديك الصلاحية الكافية لنقل رصيد الى هذه الجهة" };
+                }
+
                 var model = new CreateMoneyTransferDto
                 {
                     PartnerId = partner.Id,
