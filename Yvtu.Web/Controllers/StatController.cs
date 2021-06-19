@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using ClosedXML.Excel;
+﻿using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Yvtu.Core.rpt;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -29,7 +27,7 @@ namespace Yvtu.Web.Controllers
             this.partnerActivity = partnerActivity;
             this.toastNotification = toastNotification;
         }
-        
+
         public IActionResult Collection()
         {
             var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
@@ -38,7 +36,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -63,18 +61,18 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
                 var result = new CollectionRepo(db).GetStatReport(new CollectionRptQueryParam
                 {
-                     ChannelId = model.Param.ChannelId,
-                     PosId = model.Param.PosId,
-                     StatusId = model.Param.StatusId,
-                     LevelId = model.Param.LevelId,
-                     StartDate = model.Param.StartDate,
-                     EndDate = model.Param.EndDate
+                    ChannelId = model.Param.ChannelId,
+                    PosId = model.Param.PosId,
+                    StatusId = model.Param.StatusId,
+                    LevelId = model.Param.LevelId,
+                    StartDate = model.Param.StartDate,
+                    EndDate = model.Param.EndDate
                 });
                 model.Results = result;
             }
@@ -84,7 +82,7 @@ namespace Yvtu.Web.Controllers
             model.Statuses = statuses;
             return View(model);
         }
-        public async Task<IActionResult> CollectionToExcel(CollectionRptQuery model)
+        public IActionResult CollectionToExcel(CollectionRptQuery model)
         {
             if (ModelState.IsValid)
             {
@@ -94,7 +92,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -126,7 +124,7 @@ namespace Yvtu.Web.Controllers
                         worksheet.Row(1).Style.Font.FontSize = 16;
                         ++currRow;
                         worksheet.Cell(currRow, 1).Value = "القناة";
-                        worksheet.Cell(currRow, 2).Value = model.Param.LevelId == "pos" ? "رقم النقطة" : "اليوم"; 
+                        worksheet.Cell(currRow, 2).Value = model.Param.LevelId == "pos" ? "رقم النقطة" : "اليوم";
                         worksheet.Cell(currRow, 3).Value = model.Param.LevelId == "pos" ? "رقم النقطة" : "";
                         worksheet.Cell(currRow, 4).Value = "الحالة";
                         worksheet.Cell(currRow, 5).Value = "عدد العمليات";
@@ -184,7 +182,7 @@ namespace Yvtu.Web.Controllers
                             return File(
                                     content,
                                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                    "Collection"+DateTime.Today.ToString("yyyyMMdd")+".xlsx"
+                                    "Collection" + DateTime.Today.ToString("yyyyMMdd") + ".xlsx"
                                     );
                         }
                     }
@@ -205,7 +203,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -230,7 +228,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -262,7 +260,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -292,7 +290,7 @@ namespace Yvtu.Web.Controllers
                         worksheet.Row(1).Height = 100;
                         worksheet.Row(1).Style.Font.Bold = true;
                         worksheet.Row(1).Style.Font.FontSize = 16;
-                       ++currRow;
+                        ++currRow;
                         worksheet.Cell(currRow, 1).Value = "القناة";
                         worksheet.Cell(currRow, 2).Value = model.Param.LevelId == "pos" ? "رقم النقطة" : "اليوم";
                         worksheet.Cell(currRow, 3).Value = model.Param.LevelId == "pos" ? "رقم النقطة" : "";
@@ -316,7 +314,7 @@ namespace Yvtu.Web.Controllers
                             worksheet.Cell(currRow, 3).Value = model.Param.LevelId == "pos" ? item.Partner.Name : "";
                             worksheet.Cell(currRow, 4).Value = item.Count;
                             worksheet.Cell(currRow, 5).Value = item.Amount;
-                            worksheet.Row(currRow).Height = 20; 
+                            worksheet.Row(currRow).Height = 20;
                         }
                         ++currRow;
                         worksheet.Row(currRow).Style.Alignment.SetHorizontal(XLAlignmentHorizontalValues.Center);
@@ -324,8 +322,8 @@ namespace Yvtu.Web.Controllers
                         worksheet.Row(currRow).Height = 25;
                         worksheet.Row(currRow).Style.Font.Bold = true;
                         worksheet.Row(currRow).Style.Font.FontSize = 12;
-                        worksheet.Cell(currRow , "D").SetFormulaA1("=SUM(D3:D"+ (currRow - 1) + ")");
-                        worksheet.Cell(currRow , "E").SetFormulaA1("=SUM(E3:E"+ (currRow -1) + ")");
+                        worksheet.Cell(currRow, "D").SetFormulaA1("=SUM(D3:D" + (currRow - 1) + ")");
+                        worksheet.Cell(currRow, "E").SetFormulaA1("=SUM(E3:E" + (currRow - 1) + ")");
                         worksheet.Range(currRow, 1, currRow, 3).Merge().Value = "الاجــمـــالــي";
                         worksheet.Range(currRow, 1, currRow, 5).Style.Fill.BackgroundColor = XLColor.LightPastelPurple;
                         worksheet.Range(1, 1, currRow, 5).Style.Border.BottomBorder = XLBorderStyleValues.Thick;

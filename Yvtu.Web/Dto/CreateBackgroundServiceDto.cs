@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data.CustomeValidationAttribute;
 
 namespace Yvtu.Web.Dto
 {
-    public class CreateBackgroundServiceDto 
+    public class CreateBackgroundServiceDto
     {
         public int Id { get; set; }
         [Required(ErrorMessage = "يجب ادخال وصف الطلب")]
@@ -22,7 +20,7 @@ namespace Yvtu.Web.Dto
         public string PartnerName { get; set; }
         public int PartnerAccount { get; set; }
         [DataType(DataType.Date)]
-        [DateRangeAttributeValidation(ErrorMessage ="تاريخ خاطئ")]
+        [DateRangeAttributeValidation(ErrorMessage = "تاريخ خاطئ")]
         public DateTime? StartDate { get; set; }
         [DataType(DataType.Date)]
         [DateRangeAttributeValidation(ErrorMessage = "تاريخ خاطئ")]

@@ -78,19 +78,19 @@ namespace Yvtu.Infra.Data
                 }
                 if (!string.IsNullOrEmpty(param.CreatorId))
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdby = :CreatorId" : " AND createdby = :CreatorId");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND createdby = :CreatorId" : " WHERE createdby = :CreatorId");
                     var p = new OracleParameter { ParameterName = "CreatorId", OracleDbType = OracleDbType.Varchar2, Value = param.CreatorId };
                     parameters.Add(p);
                 }
                 if (param.PartnerAccount > 0)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :PartnerAccount" : " AND partner_acc = :PartnerAccount");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND partner_acc = :PartnerAccount" : " WHERE partner_acc = :PartnerAccount");
                     var p = new OracleParameter { ParameterName = "PartnerAccount", OracleDbType = OracleDbType.Int32, Value = param.PartnerAccount };
                     parameters.Add(p);
                 }
                 if (param.CreatorAccount > 0)
                 {
-                    whereCluase.Append(whereCluase.Length > 0 ? " WHERE partner_acc = :createdbyacc" : " AND createdbyacc = :CreatorAccount");
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND partner_acc = :createdbyacc" : " WHERE createdbyacc = :CreatorAccount");
                     var p = new OracleParameter { ParameterName = "CreatorAccount", OracleDbType = OracleDbType.Int32, Value = param.CreatorAccount };
                     parameters.Add(p);
                 }
@@ -98,13 +98,13 @@ namespace Yvtu.Infra.Data
                 {
                     if (param.StartDate > DateTime.MinValue && param.StartDate != null)
                     {
-                        whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon >= :StartDate" : " AND createdon >= :StartDate");
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon >= :StartDate" : " WHERE createdon >= :StartDate");
                         var p = new OracleParameter { ParameterName = "StartDate", OracleDbType = OracleDbType.Date, Value = param.StartDate };
                         parameters.Add(p);
                     }
                     if (param.EndDate > DateTime.MinValue && param.EndDate != null)
                     {
-                        whereCluase.Append(whereCluase.Length > 0 ? " WHERE createdon <= :EndDate" : " AND createdon <= :EndDate");
+                        whereCluase.Append(whereCluase.Length > 0 ? " AND createdon <= :EndDate" : " WHERE createdon <= :EndDate");
                         var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate };
                         parameters.Add(p);
                     }

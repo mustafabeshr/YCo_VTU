@@ -160,7 +160,7 @@ namespace Yvtu.Infra.Data
 
             #endregion
 
-            string strSql = $"select * from PARTNER_STATUS_LOG {whereCluase} order by log_id";
+            string strSql = $"select * from PARTNER_STATUS_LOG {whereCluase} order by log_id DESC";
 
             DataTable masterDataTable;
             masterDataTable = db.GetData(strSql, parameters);

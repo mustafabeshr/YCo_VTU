@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -46,17 +43,17 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        public IActionResult Index(RechargeQuery model, [FromQuery (Name = "direction")] string direction)
+        public IActionResult Index(RechargeQuery model, [FromQuery(Name = "direction")] string direction)
         {
             model.Error = string.Empty;
-            
+
             var currUserId = partner.GetCurrentUserId(this.HttpContext);
             var currRoleId = partner.GetCurrentUserRole(this.HttpContext);
             var currAccountId = partner.GetCurrentUserAccount(this.HttpContext);
             var permission = partnerActivity.GetPartAct("Recharge.Query", currRoleId);
             if (permission == null || permission.Details == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
                 model.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
                 model.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
                 return View(model);
@@ -65,14 +62,14 @@ namespace Yvtu.Web.Controllers
             {
                 if (!string.IsNullOrEmpty(model.QPosId) && model.QPosId != currUserId)
                 {
-                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم");
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم", new ToastrOptions { Title = "" });
                     model.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
                     model.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
                     return View(model);
                 }
                 else if (model.QPosAccount > 0 && model.QPosAccount != currAccountId)
                 {
-                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الحساب");
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الحساب", new ToastrOptions { Title = "" });
                     model.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
                     model.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
                     return View(model);
@@ -90,13 +87,13 @@ namespace Yvtu.Web.Controllers
             model.QueryScope = permission.Scope.Id;
             model.CurrentUserId = currUserId;
             model.CurrentUserAccount = currAccountId;
-            var result = new RechargeQuery();  
+            var result = new RechargeQuery();
             result = new RechargeRepo(db, partner).QueryWithPaging(model);
             result.Statuses = new CommonCodeRepo(db).GetCodesByType("Collection.Status");
             result.AccessChannel = new CommonCodeRepo(db).GetCodesByType("access.channel");
             if (result.Results == null)
             {
-                toastNotification.AddInfoToastMessage("عذرا لا توجد بيانات");
+                toastNotification.AddInfoToastMessage("عذرا لا توجد بيانات", new ToastrOptions { Title = "" });
             }
             if (result != null && result.Results != null)
             {
@@ -108,8 +105,8 @@ namespace Yvtu.Web.Controllers
             }
 
             return View(result);
-            
-           
+
+
         }
 
         public IActionResult Detail(int id)

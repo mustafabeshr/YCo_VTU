@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using NToastNotify;
+using System;
+using System.Collections.Generic;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -12,7 +12,7 @@ using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class PartActivityController : Controller
     {
         private readonly IAppDbContext db;
@@ -24,8 +24,8 @@ namespace Yvtu.Web.Controllers
         public IPartnerManager _PartnerManager { get; }
 
         public PartActivityController(IAppDbContext db, IPartnerActivityRepo partActRepo
-            , IPartnerManager partnerManager, IDataAuditRepo auditing  
-            ,IToastNotification toastNotification, 
+            , IPartnerManager partnerManager, IDataAuditRepo auditing
+            , IToastNotification toastNotification,
             ILogger<PartActivityController> logger)
         {
             this.db = db;
@@ -45,7 +45,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -54,7 +54,7 @@ namespace Yvtu.Web.Controllers
             var model = new ListPartnerActivityDto();
 
             model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
-            model.FromRoles =  new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
+            model.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
             return View(model);
         }
@@ -69,7 +69,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -82,8 +82,8 @@ namespace Yvtu.Web.Controllers
             model.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
             model.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
 
-            if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0 )
-            { 
+            if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId == 0)
+            {
                 var result = _partActRepo.GetAllList();
                 model.PartnerActivities = result;
             }
@@ -93,11 +93,13 @@ namespace Yvtu.Web.Controllers
                 {
                     var result = _partActRepo.GetListByActivity(model.ActivityId);
                     model.PartnerActivities = result;
-                } else if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId > 0)
+                }
+                else if (model != null && string.IsNullOrEmpty(model.ActivityId) && model.FromRoleId > 0)
                 {
                     var result = _partActRepo.GetListByFrom(model.FromRoleId);
                     model.PartnerActivities = result;
-                } else
+                }
+                else
                 {
                     var result = _partActRepo.GetListByActivityWithFromRole(model.ActivityId, model.FromRoleId);
                     model.PartnerActivities = result;
@@ -114,7 +116,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -155,7 +157,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -172,7 +174,7 @@ namespace Yvtu.Web.Controllers
                 pAct.Scope.Id = model.ScopeId;
                 pAct.OnlyPartnerChildren = model.OnlyPartnerChildren;
                 pAct.LastEditOn = DateTime.Now;
-                var result =  _partActRepo.Edit(pAct);
+                var result = _partActRepo.Edit(pAct);
                 if (result.Success)
                 {
                     var audit = new DataAudit();
@@ -183,7 +185,7 @@ namespace Yvtu.Web.Controllers
                     audit.Success = true;
                     audit.OldValue = old.ToString();
                     audit.NewValue = pAct.ToString();
-                     _auditing.Create(audit);
+                    _auditing.Create(audit);
                     return RedirectToAction("Index");
                 }
                 else
@@ -210,7 +212,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -225,7 +227,7 @@ namespace Yvtu.Web.Controllers
                 audit.Action.Id = "Delete";
                 audit.Success = true;
                 audit.OldValue = old.ToString();
-                 _auditing.Create(audit);
+                _auditing.Create(audit);
                 _partActRepo.Delete(id);
             }
             return RedirectToAction("Index");
@@ -259,7 +261,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -297,7 +299,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -312,17 +314,28 @@ namespace Yvtu.Web.Controllers
                 pAct.CreatedBy.Id = _PartnerManager.GetCurrentUserId(this.HttpContext);
                 pAct.CreatedBy.Account = _PartnerManager.GetCurrentUserAccount(this.HttpContext);
 
-                var result =  _partActRepo.Create(pAct);
+                var result = _partActRepo.Create(pAct);
                 if (result.Success)
                 {
                     var listModel = new ListPartnerActivityDto();
                     listModel.Activities = new SelectList(new ActivityRepo(db, _PartnerManager).GetActivities(), "Id", "Name");
                     listModel.FromRoles = new SelectList(new RoleRepo(db, _partActRepo).GetRoles(), "Id", "Name");
-                    return View("Index", listModel);
+                    //return View("Index", listModel);
+                    return RedirectToAction("Detail", "PartActivity", new { id = result.AffectedCount });
                 }
-                else
+                else if (result.AffectedCount == -504)
                 {
-                    model.Error = result.Error;
+                    var permission2 = _partActRepo.GetPartAct("PartnerActivity.Query", currentRoleId);
+                    if (permission2 == null)
+                    {
+                        toastNotification.AddErrorToastMessage("تم انشاء هذه الصلاحية مسبقا ", new ToastrOptions {Title = ""});
+                    } else
+                    {
+                       return RedirectToAction("Detail", "PartActivity", new { id = permission2.Id });
+                    }
+                } else
+                {
+                    toastNotification.AddErrorToastMessage("لم يتم انشاء الصلاحية ، يرجى المحاولة لاحقا ", new ToastrOptions { Title = "" });
                 }
             }
 
@@ -347,12 +360,12 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
-            var result =  _partActRepo.GetPartAct(id);
+            var result = _partActRepo.GetPartAct(id);
 
             return View(result);
         }
@@ -366,7 +379,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -395,7 +408,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -416,7 +429,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -437,10 +450,10 @@ namespace Yvtu.Web.Controllers
                 var result = _partActRepo.CreateDetail(originObject);
                 if (result.Success)
                 {
-                   
+
                     return RedirectToAction("Detail", new { id = model.ParentId });
                 }
-               
+
             }
             model.ToRoles = new RoleRepo(db, _partActRepo).GetRoles();
             return View(model);
@@ -454,7 +467,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -462,7 +475,7 @@ namespace Yvtu.Web.Controllers
             var model = _partActRepo.GetDetail(id, parentId, true);
             if (model == null) return null;
             var toRoles = new RoleRepo(db, _partActRepo).GetRoles();
-            
+
             var viewModel = new CreatePartnerActivityDetailDto
             {
                 ParentId = model.Parent.Id,
@@ -492,7 +505,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -500,7 +513,7 @@ namespace Yvtu.Web.Controllers
                 var old = _partActRepo.GetDetail(model.Id, model.ParentId);
                 if (old == null) return View(model);
 
-                
+
                 var originObject = new PartnerActivityDetail();
                 originObject.Id = model.Id;
                 originObject.ParentId = model.ParentId;
@@ -524,7 +537,7 @@ namespace Yvtu.Web.Controllers
                     audit.Success = true;
                     audit.OldValue = old.ToString();
                     audit.NewValue = originObject.ToString();
-                    var auditResult =_auditing.Create(audit);
+                    var auditResult = _auditing.Create(audit);
                     if (!auditResult.Success)
                     {
                         _logger.LogError($"Edit Partner Activity Detail no[{originObject.Id}] , Error was {auditResult.Error}");
@@ -543,7 +556,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -573,7 +586,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -593,7 +606,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }

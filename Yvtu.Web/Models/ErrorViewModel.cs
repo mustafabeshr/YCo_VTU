@@ -1,5 +1,3 @@
-using System;
-
 namespace Yvtu.Web.Models
 {
     public class ErrorViewModel

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Yvtu.Web.Dto
 {
@@ -10,9 +6,9 @@ namespace Yvtu.Web.Dto
     {
         public int PartnerAccount { get; set; }
         public string PartnerId { get; set; }
-        [Required(ErrorMessage ="يجب ادخال الرقم السري القديم")]
+        [Required(ErrorMessage = "يجب ادخال الرقم السري القديم")]
         [DataType(DataType.Password)]
-        
+
         public int? OldPass { get; set; }
         [Required(ErrorMessage = "يجب ادخال الرقم السري الجديد")]
         [DataType(DataType.Password)]

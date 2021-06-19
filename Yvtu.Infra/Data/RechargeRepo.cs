@@ -101,7 +101,7 @@ namespace Yvtu.Infra.Data
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE subs_no=:QSubsId " : " AND subs_no=:QSubsId ");
                 parameters.Add(parm);
             }
-            if (param.StatusId > 0)
+            if (param.StatusId >= 0)
             {
                 var parm = new OracleParameter { ParameterName = "StatusId", OracleDbType = OracleDbType.Int32, Value = param.StatusId };
                 WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");

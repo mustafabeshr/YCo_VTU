@@ -5,7 +5,7 @@
     ViewData["Title"] = "Conf. Query";
 }
 
-@await Component.InvokeAsync("NToastNotify")
+
 
 <div class="row">
     <div class="col-md-12 shadow-sm bg-white pb-3">
@@ -94,7 +94,7 @@
                 <tr style="font-size:12px;">
                     <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
                     <td>@item.Amount.ToString("N2")</td>
-                    <td>@item.Partner.Id - @item.Partner.Name</td>
+                    <td>@item.Partner.Id - @item.Partner.Name  - [@item.Partner.Account]</td>
                     <td>@item.Note</td>
                     <td>@item.CreatedBy.Id - @item.CreatedBy.Name</td>
                     <td>@item.Id</td>

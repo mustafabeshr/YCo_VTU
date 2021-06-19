@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -75,7 +73,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -84,17 +82,18 @@ namespace Yvtu.Web.Controllers
             model.Sources = sources;
             return View(model);
         }
-         [HttpPost]
-         [AutoValidateAntiforgeryToken]
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
         public IActionResult Create(CreateBackgroundServiceDto model)
         {
             if (model.Id > 0)
             {
                 toastNotification.AddErrorToastMessage("لم يتم حفظ الطلب ، لقد تم حفظه مسبقا", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
-            }else if (ModelState.IsValid)
+            }
+            else if (ModelState.IsValid)
             {
                 var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
                 var permission = partnerActivity.GetPartAct("BgService.Create", currentRoleId);
@@ -102,14 +101,15 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
                 if (model.StartDate != null && model.EndDate != null && model.StartDate > model.EndDate)
                 {
-                   ModelState.AddModelError("EndDate", "تاريخ النهاية اقل من تاريخ البداية");
-                } else
+                    ModelState.AddModelError("EndDate", "تاريخ النهاية اقل من تاريخ البداية");
+                }
+                else
                 {
                     var createdObj = new AppBackgroundService();
                     createdObj.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
@@ -129,14 +129,14 @@ namespace Yvtu.Web.Controllers
                         model.Id = result.AffectedCount;
                         toastNotification.AddSuccessToastMessage("تم حفظ العملية بنجاح، لمعرفة حالتها يرجى الاستعلام من شاشة استعلام الطلبات", new ToastrOptions
                         {
-                            Title = "تنبيه"
+                            Title = ""
                         });
                     }
                     else
                     {
                         toastNotification.AddErrorToastMessage("لم يتم حفظ الطلب " + result.AffectedCount, new ToastrOptions
                         {
-                            Title = "تنبيه"
+                            Title = ""
                         });
                     }
                 }
@@ -157,7 +157,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("البيانات غير متوفرة", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -176,7 +176,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("الملف لم يعد موجودا", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }

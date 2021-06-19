@@ -1,17 +1,13 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.Web.Reports
 {
-    public  class PFRTemplate
+    public class PFRTemplate
     {
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
@@ -25,8 +21,8 @@ namespace Yvtu.Web.Reports
             this.environment = environment;
             this.partnerActivity = partnerActivity;
         }
-       
-        public  string GetHTMLString(int account, string id, bool includeDates, DateTime startDate, DateTime endDate)
+
+        public string GetHTMLString(int account, string id, bool includeDates, DateTime startDate, DateTime endDate)
         {
             int partAccount = 0;
             string partName = string.Empty;
@@ -71,11 +67,11 @@ namespace Yvtu.Web.Reports
                     resultSb.Append(@"
                                     <tr style='font-size:14px;'>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.Balance.ToString("N2") + @"</td>
-                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.Amount.ToString("N2")+ @"</td>
-                                    <td style='font-size:14px;width:7%;padding:5px;'>" + item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")+ @"</td>
-                                    <td style='text-align:right;font-size:14px;width:9%;padding:5px;'>" + item.ActivityName+ @"</td>
-                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.PartnerAccount+ @"</td>
-                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.CreatedBy.Account+ @"</td>
+                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.Amount.ToString("N2") + @"</td>
+                                    <td style='font-size:14px;width:7%;padding:5px;'>" + item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H") + @"</td>
+                                    <td style='text-align:right;font-size:14px;width:9%;padding:5px;'>" + item.ActivityName + @"</td>
+                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.PartnerAccount + @"</td>
+                                    <td style='font-size:14px;width:5%;padding:5px;'>" + item.CreatedBy.Account + @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.CreatedBy.Id + @"</td>
                                     <td style='text-align:right;font-size:14px;width:10%;padding:5px;'>" + item.CreatedBy.Name + @"</td>
                                     <td style='font-size:14px;width:5%;padding:5px;'>" + item.TransNo + @"</td>

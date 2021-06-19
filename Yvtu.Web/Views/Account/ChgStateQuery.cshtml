@@ -5,7 +5,7 @@
     ViewData["Title"] = "State Query";
 }
 
-@await Component.InvokeAsync("NToastNotify")
+
 
 <div class="row">
     <div class="col-md-12 shadow-sm bg-white pb-3">
@@ -93,9 +93,9 @@
                 {
                     <tr style="font-size:12px;">
                         <td>@item.CreatedOn.ToString("yyyy/MM/dd ss:mm:H")</td>
-                        <td>@item.OldStatus.Name</td>
-                        <td>@item.NewStatus.Name</td>
-                        <td>@item.Partner.Id - @item.Partner.Name</td>
+                        <td  style="color:#0000FF">@item.OldStatus.Name</td>
+                        <td  style="color:#008000">@item.NewStatus.Name</td>
+                        <td>@item.Partner.Id - @item.Partner.Name - [@item.Partner.Account]</td>
                         <td>@item.CreatedBy.Id - @item.CreatedBy.Name</td>
                         <td>@item.Note</td>
                     </tr>

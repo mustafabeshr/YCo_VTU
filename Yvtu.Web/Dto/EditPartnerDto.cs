@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Web.Helpers;
 
@@ -15,7 +13,7 @@ namespace Yvtu.Web.Dto
         public int Account { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال الاسم")]
-        [StringLength(100, ErrorMessage ="يجب ان يكون طول الاسم بين 3 و 100 حرف", MinimumLength = 3)]
+        [StringLength(100, ErrorMessage = "يجب ان يكون طول الاسم بين 3 و 100 حرف", MinimumLength = 3)]
         public string Name { get; set; }
         [StringLength(100, ErrorMessage = "يجب ان يكون طول الاسم التجاري بين 1 و 100 حرف", MinimumLength = 1)]
         public string BrandName { get; set; }

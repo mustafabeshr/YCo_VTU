@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System;
+using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
@@ -16,19 +14,21 @@ namespace Yvtu.Web.Controllers
     [Authorize(Roles = "Admin")]
     public class msgController : Controller
     {
-        
+
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IToastNotification toastNotification;
         private readonly IPartnerActivityRepo partnerActivity;
+        private readonly IDataAuditRepo auditing;
 
-        public msgController(IAppDbContext db, IPartnerManager partnerManager,  IToastNotification toastNotification,
-            IPartnerActivityRepo partnerActivity)
+        public msgController(IAppDbContext db, IPartnerManager partnerManager, IToastNotification toastNotification,
+            IPartnerActivityRepo partnerActivity, IDataAuditRepo auditing)
         {
             this.db = db;
             this.partnerManager = partnerManager;
             this.toastNotification = toastNotification;
             this.partnerActivity = partnerActivity;
+            this.auditing = auditing;
         }
         public IActionResult Index()
         {
@@ -54,7 +54,7 @@ namespace Yvtu.Web.Controllers
             var message = new MessageTemplateRepo(db, partnerManager).GetSingle(id);
             if (message == null)
             {
-                toastNotification.AddErrorToastMessage("البيانات غير موجودة ");
+                toastNotification.AddErrorToastMessage("البيانات غير موجودة ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreateMessageTemplateDto();
@@ -73,7 +73,7 @@ namespace Yvtu.Web.Controllers
                 var message = new MessageTemplateRepo(db, partnerManager).GetSingle(model.Id);
                 if (message == null)
                 {
-                    toastNotification.AddErrorToastMessage("البيانات غير موجودة ");
+                    toastNotification.AddErrorToastMessage("البيانات غير موجودة ", new ToastrOptions { Title = "" });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
                 var param = new MessageTemplate();
@@ -81,20 +81,51 @@ namespace Yvtu.Web.Controllers
                 param.Title = model.Title;
                 param.ToWho = model.ToWho;
                 param.Message = model.Message;
-                param.CreatedBy.Id =  partnerManager.GetCurrentUserId(this.HttpContext);
-                param.CreatedBy.Account  = partnerManager.GetCurrentUserAccount(this.HttpContext);
+                param.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
+                param.CreatedBy.Account = partnerManager.GetCurrentUserAccount(this.HttpContext);
                 var result = new MessageTemplateRepo(db, partnerManager).Update(param);
                 if (result.Success)
                 {
-                    toastNotification.AddSuccessToastMessage("تم تعديل البيانات بنجاح ");
-                }else
+                    toastNotification.AddSuccessToastMessage("تم تعديل البيانات بنجاح ", new ToastrOptions { Title = "" });
+                }
+                else
                 {
-                    toastNotification.AddErrorToastMessage("لم يتم تعديل البيانات بنجاح ");
+                    toastNotification.AddErrorToastMessage("لم يتم تعديل البيانات بنجاح ", new ToastrOptions { Title = "" });
                 }
             }
             model.Dictionary = new MessageTemplateRepo(db, partnerManager).GetDictionaryAll();
             return View(model);
         }
+
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("MessageTemplate.Delete", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            var old = new MessageTemplateRepo(db, partnerManager).GetSingle(id);
+            if (old != null)
+            {
+                var audit = new DataAudit();
+                audit.Activity.Id = "MessageTemplate.Delete";
+                audit.PartnerId = partnerManager.GetCurrentUserId(this.HttpContext);
+                audit.PartnerAccount = partnerManager.GetCurrentUserAccount(this.HttpContext);
+                audit.Action.Id = "Delete";
+                audit.Success = true;
+                audit.OldValue = old.ToString();
+                auditing.Create(audit);
+                new MessageTemplateRepo(db, partnerManager).RemoveMessage(id);
+            }
+            return RedirectToAction("Index");
+        }
+
+
         [HttpPost]
         public IActionResult Create(CreateMessageTemplateDto model)
         {
@@ -113,16 +144,17 @@ namespace Yvtu.Web.Controllers
                     var result = new MessageTemplateRepo(db, partnerManager).Create(insertedObj);
                     if (result.AffectedCount > 0)
                     {
-                        toastNotification.AddSuccessToastMessage("تم الحفظ بنجاح رقم " + result.AffectedCount);
-                         model.Id = result.AffectedCount;
-                    } else
+                        toastNotification.AddSuccessToastMessage("تم الحفظ بنجاح رقم " + result.AffectedCount, new ToastrOptions { Title = "" });
+                        model.Id = result.AffectedCount;
+                    }
+                    else
                     {
-                        toastNotification.AddWarningToastMessage("لم تنجح عملية الحفظ ");
+                        toastNotification.AddWarningToastMessage("لم تنجح عملية الحفظ ", new ToastrOptions { Title = "" });
                     }
                 }
                 else
                 {
-                    toastNotification.AddErrorToastMessage("هذه الرسالة موجودة مسبقا ");
+                    toastNotification.AddErrorToastMessage("هذه الرسالة موجودة مسبقا ", new ToastrOptions { Title = "" });
                 }
             }
             model.Dictionary = new MessageTemplateRepo(db, partnerManager).GetDictionaryAll();
@@ -137,7 +169,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -156,7 +188,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -172,11 +204,11 @@ namespace Yvtu.Web.Controllers
                 {
                     ModelState.Clear();
                     model.Receiver = string.Empty;
-                    toastNotification.AddSuccessToastMessage("تم حفظ الرسالة بنجاح وسيتم ارساله فورا ");
+                    toastNotification.AddSuccessToastMessage("تم حفظ الرسالة بنجاح وسيتم ارساله فورا ", new ToastrOptions { Title = "" });
                 }
                 else
                 {
-                    toastNotification.AddInfoToastMessage("فشل عملية حفظ الرسالة ");
+                    toastNotification.AddInfoToastMessage("فشل عملية حفظ الرسالة ", new ToastrOptions { Title = "" });
                 }
             }
             return View(model);
@@ -190,7 +222,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -209,12 +241,12 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
-            var results = new SMSOneRepo(db, partnerManager).GetList(new SMSOneRepo.GetListParam  
+            var results = new SMSOneRepo(db, partnerManager).GetList(new SMSOneRepo.GetListParam
             {
                 Receiver = model.Receiver,
                 Message = model.Message,
@@ -236,7 +268,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -256,7 +288,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using NToastNotify;
+using System;
+using System.Linq;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -37,7 +34,7 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("MoneyTransfer.Adjustment.Query", currRoleId);
             if (permission == null || permission.Details == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new AdjustmentQueryDto();
@@ -54,7 +51,7 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("MoneyTransfer.Adjustment.Query", currRoleId);
             if (permission == null || permission.Details == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             ModelState.Clear();
@@ -89,18 +86,18 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("MoneyTransfer.Adjustment", currentRoleId);
             if (permission == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
-           
-            if (permission.Details == null )
+
+            if (permission.Details == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             if (permission.Details.Count == 0)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var moneyTransfer = new MoneyTransferRepo(db, partnerManager, partnerActivity).GetSingleOrDefault(mt);
@@ -111,12 +108,12 @@ namespace Yvtu.Web.Controllers
             }
             if (moneyTransfer.Adjusted || moneyTransfer.AdjustmentNo > 0)
             {
-                toastNotification.AddErrorToastMessage("تم اجراء تسوية سابقة على هذه العملية ");
+                toastNotification.AddErrorToastMessage("تم اجراء تسوية سابقة على هذه العملية ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             if (!permission.Details.Any(x => x.ToRole.Id == moneyTransfer.CreatedBy.Role.Id))
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية لاجراء تسوية لهذه الجهة ");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية لاجراء تسوية لهذه الجهة ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreateAdjustmentDto();
@@ -144,10 +141,11 @@ namespace Yvtu.Web.Controllers
                 {
                     adj.DestPartner = partnerManager.GetPartnerByAccount(model.OriginTrans.Partner.Account);
                     adj.SrcPartner = partnerManager.GetPartnerByAccount(model.OriginTrans.CreatedBy.Account);
-                    toastNotification.AddInfoToastMessage("تم انشاء التسوية بنجاح ");
+                    toastNotification.AddInfoToastMessage("تم انشاء التسوية بنجاح ", new ToastrOptions { Title = "" });
                     new NotificationRepo(db, partnerManager).SendNotification<Adjustment>("MoneyTransfer.Adjustment", result.AffectedCount, adj);
                     return RedirectToAction("Index", "Home");
-                }else
+                }
+                else
                 {
                     switch (result.AffectedCount)
                     {
@@ -185,7 +183,7 @@ namespace Yvtu.Web.Controllers
                             model.Error = "لم يتم اجراء التسوية بنجاح" + result.AffectedCount;
                             break;
                     }
-                    
+
                 }
             }
             return View(model);

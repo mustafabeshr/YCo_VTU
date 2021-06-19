@@ -3,12 +3,12 @@ using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NToastNotify;
 using System;
-using Microsoft.AspNetCore.Mvc;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 
@@ -38,22 +38,23 @@ namespace Yvtu.Web
             services.AddScoped<IPartnerManager, PartnerManager>();
             services.AddScoped<IPartnerActivityRepo, PartnerActivityRepo>();
             services.AddScoped<IDataAuditRepo, DataAuditRepo>();
-            services.AddSingleton<IAppDbContext,AppDbContext>();
+            services.AddSingleton<IAppDbContext, AppDbContext>();
             services.AddSingleton(typeof(IConverter), new SynchronizedConverter(new PdfTools()));
             services.AddControllersWithViews()
                 .AddNToastNotifyNoty(new NToastNotify.NotyOptions()
-            {
-                ProgressBar = true,
-                Text = "",
-                Timeout = 2000,
-                Theme = "mint"
-            }).AddNToastNotifyToastr(new ToastrOptions()
-            {
-                ProgressBar = false,
-                Title = "",
-                TimeOut = 2000,
-                PositionClass = ToastPositions.TopCenter
-            })
+                {
+                    ProgressBar = true,
+                    Text = "",
+                    Timeout = 2000,
+                    Theme = "mint",
+                    Modal = true
+                }).AddNToastNotifyToastr(new ToastrOptions()
+                {
+                    ProgressBar = false,
+                    Title = "",
+                    TimeOut = 2000,
+                    PositionClass = ToastPositions.TopCenter
+                })
             .AddRazorRuntimeCompilation();
             services.AddControllersWithViews(options =>
             {

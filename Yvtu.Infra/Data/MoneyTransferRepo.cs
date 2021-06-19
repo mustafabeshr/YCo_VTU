@@ -204,7 +204,7 @@ namespace Yvtu.Infra.Data
             var strSqlStatment = new StringBuilder();
             strSqlStatment.Append("Select * from ( ");
             strSqlStatment.Append("select rownum as seq , main_data.* from ( ");
-            strSqlStatment.Append("Select * from v_money_transfer  " + WhereClause + " order by createdon desc ");
+            strSqlStatment.Append("Select * from v_money_transfer  t " + WhereClause + " order by createdon desc ");
             strSqlStatment.Append(") main_data ) ");
             strSqlStatment.Append($"WHERE seq > ({param.Paging.PageNo - 1}) * {param.Paging.PageSize} AND ROWNUM <= {ps}");
             var masterDataTable = this.db.GetData(strSqlStatment.ToString(), parameters);
@@ -386,7 +386,7 @@ namespace Yvtu.Infra.Data
             string WhereClause = string.Empty;
             var parameters = BuildCriteria(param, ref WhereClause);
             var strSqlStatment = new StringBuilder();
-            strSqlStatment.Append($"Select count(*) val from v_money_transfer  { WhereClause }" );
+            strSqlStatment.Append($"Select count(*) val from v_money_transfer t { WhereClause }" );
             var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
             return count;
         }

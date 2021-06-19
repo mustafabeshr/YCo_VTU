@@ -167,6 +167,7 @@ namespace Yvtu.Infra.Data
             var parm2 = new OracleParameter { ParameterName = "StatusId", OracleDbType = OracleDbType.Varchar2, Value = status };
             WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE status=:StatusId " : " AND status=:StatusId ");
             parameters.Add(parm2);
+            WhereClause.Append(string.IsNullOrEmpty(WhereClause.ToString()) ? " WHERE trunc(sysdate)<= expire_time " : " AND  trunc(sysdate)<= expire_time ");
             var strSqlStatment = new StringBuilder();
             strSqlStatment.Append($"Select count(*) val from USERS_INSTRUCT_HIS  { WhereClause }");
             var count = this.db.GetIntScalarValue(strSqlStatment.ToString(), parameters);
@@ -179,7 +180,7 @@ namespace Yvtu.Infra.Data
             var WhereClause = new StringBuilder();
             var parameters = new List<OracleParameter>();
             var parm = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = partnerId };
-            WhereClause.Append(" WHERE partner_id=:PartnerId AND status = 'unread' ");
+            WhereClause.Append(" WHERE partner_id=:PartnerId AND status = 'unread' AND trunc(sysdate)<= t.expire_time ");
             parameters.Add(parm);
 
             var strSqlStatment = new StringBuilder();

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 using Yvtu.Web.Helpers;
 
@@ -10,18 +8,18 @@ namespace Yvtu.Web.Dto
 {
     public class CreatePartnerDto
     {
-        [Required (ErrorMessage ="يجب ادخال رقم الموبايل")]
+        [Required(ErrorMessage = "يجب ادخال رقم الموبايل")]
         [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
         [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
         public string Id { get; set; }
 
         [Required(ErrorMessage = "يجب ادخال الاسم")]
-        [StringLength(100, ErrorMessage ="يجب ان يكون طول الاسم بين 10 و 100 حرف", MinimumLength = 10)]
+        [StringLength(100, ErrorMessage = "يجب ان يكون طول الاسم بين 10 و 100 حرف", MinimumLength = 10)]
         public string Name { get; set; }
         [StringLength(100, ErrorMessage = "يجب ان يكون طول الاسم التجاري بين 1 و 100 حرف", MinimumLength = 1)]
         public string BrandName { get; set; }
         [Required(ErrorMessage = "يجب تحديد نوع الجهة")]
-        public int?  RoleId { get; set; }
+        public int? RoleId { get; set; }
         [Required(ErrorMessage = "يجب تحديد نوع الهوية")]
         public int? PersonalIdType { get; set; }
         [Required(ErrorMessage = "يجب ادخال رقم الهوية")]

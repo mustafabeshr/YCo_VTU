@@ -119,8 +119,25 @@ namespace Yvtu.api.Controllers
                 return BadRequest(new ApiResponse(-3103, "Sorry, incorrect credentials"));
             }
 
-            var result = _partnerManager.ChangePwd(currentUser.Account, currentUser.Id, model.newSecret.ToString(), false);
-            if (!result) return BadRequest(new ApiResponse(-3104, $"Sorry, change secrect was failed, please try later"));
+            byte[] newSalt = Pbkdf2Hasher.GenerateRandomSalt();
+            string newHash = Pbkdf2Hasher.ComputeHash(model.newSecret.ToString(), newSalt);
+
+            var changeSecret = new ChangeSecretHistory();
+            changeSecret.CreatedBy.Id = currentUser.Id;
+            changeSecret.CreatedBy.Account = currentUser.Account;
+            changeSecret.AccessChannel.Id = "api";
+            changeSecret.OldSalt = currentUser.Extra;
+            changeSecret.OldHash = currentUser.Pwd;
+            changeSecret.NewSalt = Convert.ToBase64String(newSalt);
+            changeSecret.NewHash = newHash;
+            changeSecret.ChangeType.Id = "change";
+            changeSecret.NotifyBy.Id = "none";
+            changeSecret.PartAppUser.Id = currentUser.Id;
+            changeSecret.PartAppUser.Account = currentUser.Account;
+            var result = new ChangeSecretHistoryRepo(_db, _partnerManager, null).Create(changeSecret);
+
+            //var result = _partnerManager.ChangePwd(currentUser.Account, currentUser.Id, model.newSecret.ToString(), false);
+            if (!result.Success) return BadRequest(new ApiResponse(-3104, $"Sorry, change secrect was failed, please try later"));
 
             return Ok(new ApiResponse(0, $"Changed successfully"));
         }

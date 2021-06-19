@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System;
 using Yvtu.Core.Entities;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
@@ -36,7 +33,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -84,7 +81,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -104,7 +101,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -112,7 +109,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("تم الحفظ مسبقا", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -140,7 +137,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddSuccessToastMessage("تم اضافة التعميم بنجاح", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     ModelState.Clear();
                     model.Id = result.AffectedCount;
@@ -168,17 +165,18 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 //return Redirect(Request.Headers["Referer"].ToString());
-            }else
+            }
+            else
             {
                 var result = new UserNotifyRepo(db).Post(id, permission.Scope.Id, currentAccount);
                 if (result.Success)
                 {
                     toastNotification.AddSuccessToastMessage("تم ترحيل التعميم على كافة المستخدمين", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return "suceess";
                 }
@@ -205,7 +203,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -230,7 +228,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -243,7 +241,7 @@ namespace Yvtu.Web.Controllers
                 {
                     toastNotification.AddErrorToastMessage("يرجى التأكد من الرقم المراد الاستعلام عنه", new ToastrOptions
                     {
-                        Title = "تنبيه"
+                        Title = ""
                     });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
@@ -252,7 +250,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
@@ -260,7 +258,7 @@ namespace Yvtu.Web.Controllers
             {
                 toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم", new ToastrOptions
                 {
-                    Title = "تنبيه"
+                    Title = ""
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }

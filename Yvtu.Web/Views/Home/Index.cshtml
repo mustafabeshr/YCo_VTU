@@ -9,7 +9,7 @@
     var hasInfoTabPageRight = partnerActivity.GetPartAct("System.HotInfo", currentPartnerRoleId) != null;
 }
 
-@await Component.InvokeAsync("NToastNotify")
+
 
 <ul class="nav nav-tabs nav-fill justify-content-center p-0" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
@@ -264,7 +264,7 @@
                                             </a>
                                         </div>
                                     }
-                                    @if (currentPartnerRoleId == 1 || Model.Any(x => x.Activity.Id == "MessageTemplate.Create"))
+                                    @if (currentPartnerRoleId == 1 || Model.Any(x => x.Activity.Id == "MessageTemplate.Query"))
                                     {
                                         <div class="col-md-2">
                                             <a asp-action="Index" asp-controller="msg" style="text-decoration: none;">
@@ -275,14 +275,18 @@
                                             </a>
                                         </div>
                                     }
-                                    <div class="col-md-2">
-                                        <a asp-action="Index" asp-controller="Activity" style="text-decoration: none;">
-                                            <div class="pt-2  m-auto  text-center MainLink">
-                                                <i class="far fa-dot-circle fa-3x" style="color: blue;"></i>
-                                                <br /> الاجراءات
-                                            </div>
-                                        </a>
-                                    </div>
+                                    @if (currentPartnerRoleId == 1 || Model.Any(x => x.Activity.Id == "Activity.Query"))
+                                    {
+                                        <div class="col-md-2">
+                                            <a asp-action="Index" asp-controller="Activity" style="text-decoration: none;">
+                                                <div class="pt-2  m-auto  text-center MainLink">
+                                                    <i class="far fa-dot-circle fa-3x" style="color: blue;"></i>
+                                                    <br /> الاجراءات
+                                                </div>
+                                            </a>
+                                        </div>
+                                    }
+
                                     @if (currentPartnerRoleId == 1 || Model.Any(x => x.Activity.Id == "Partner.ChangeStateQuery"))
                                     {
                                         <div class="col-md-2">
@@ -311,7 +315,7 @@
                                             <a asp-action="Index" asp-controller="Bgserv" style="text-decoration: none;">
                                                 <div class="pt-2  m-auto  text-center MainLink">
                                                     <i class="fas fa-database fa-3x"></i>
-                                                    <br/> معالج البيانات
+                                                    <br /> معالج البيانات
                                                 </div>
                                             </a>
                                         </div>

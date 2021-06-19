@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
+using System.Collections.Generic;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
@@ -10,22 +10,38 @@ using Yvtu.Web.Dto;
 
 namespace Yvtu.Web.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class ActivityController : Controller
     {
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
         private readonly IToastNotification toastNotification;
+        private readonly IPartnerActivityRepo _activityRepo;
 
-        public ActivityController(IAppDbContext db, IPartnerManager partnerManager, IToastNotification toastNotification)
+        public ActivityController(IAppDbContext db, IPartnerManager partnerManager, IToastNotification toastNotification,
+            IPartnerActivityRepo activityRepo)
         {
             this.db = db;
             this.partnerManager = partnerManager;
             this.toastNotification = toastNotification;
+            _activityRepo = activityRepo;
         }
         public IActionResult Index(string id)
         {
-            if (!string.IsNullOrEmpty(id)){
+
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = _activityRepo.GetPartAct("Activity.Query", currentRoleId);
+            if (permission == null)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
+                {
+                    Title = ""
+                });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+            if (!string.IsNullOrEmpty(id))
+            {
                 var activity = new ActivityRepo(db, partnerManager).GetActivity(id, true);
                 if (activity != null)
                 {
@@ -38,7 +54,8 @@ namespace Yvtu.Web.Controllers
                     var model = new ActivityQuery();
                     return View(model);
                 }
-            } else
+            }
+            else
             {
                 var activities = new ActivityRepo(db, partnerManager).GetActivities(id, true);
                 var model = new ActivityQuery();
@@ -59,7 +76,7 @@ namespace Yvtu.Web.Controllers
             var activity = new ActivityRepo(db, partnerManager).GetActivity(id);
             if (activity == null)
             {
-                toastNotification.AddErrorToastMessage("البيانات غير موجودة ");
+                toastNotification.AddErrorToastMessage("البيانات غير موجودة ", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new AssignActivityMessageDto();
@@ -138,11 +155,11 @@ namespace Yvtu.Web.Controllers
             return RedirectToAction("Index");
         }
 
-        public IActionResult OrderUp (string actId, int msgId)
+        public IActionResult OrderUp(string actId, int msgId)
         {
             var currentMessage = new ActivityMessageRepo(db, partnerManager).GetSingle(actId, msgId);
 
-            if (currentMessage.MessageOrder <= 1 ) return Redirect("~/Activity/AssignMessage/" + actId);
+            if (currentMessage.MessageOrder <= 1) return Redirect("~/Activity/AssignMessage/" + actId);
 
             var actList = new ActivityMessageRepo(db, partnerManager).GetList(actId, -1);
             foreach (var item in actList)
@@ -160,7 +177,7 @@ namespace Yvtu.Web.Controllers
         {
             var currentMessage = new ActivityMessageRepo(db, partnerManager).GetSingle(actId, msgId);
             var actList = new ActivityMessageRepo(db, partnerManager).GetList(actId, -1);
-            
+
             if (currentMessage.MessageOrder >= actList.Count) return Redirect("~/Activity/AssignMessage/" + actId);
             foreach (var item in actList)
             {

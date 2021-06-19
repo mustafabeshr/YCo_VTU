@@ -595,8 +595,8 @@ namespace Yvtu.SMSRec
                         
                         #endregion
                         #endregion
-
-                    } else if (ClientMessage.Message == "ف")
+                    } 
+                    else if (ClientMessage.Message == "ف")
                     {
                         #region Query about payment values
                             var amountValues = new PaymentValuesRepo(db, partnerManager).GetAllPaymentValues();
@@ -619,6 +619,250 @@ namespace Yvtu.SMSRec
                                 ret.Ret_Message_to_Client = msg;
                                 return ret;
                             }
+                        #endregion
+                    }
+                    else if (Tokens[0] == "س" || Tokens[0].ToLower() == "s")
+                    {
+                        #region Change Secret
+                        if (Tokens.Length < 3)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "REQUEST_TOO_SHORT";
+                            ret.Ret_Message_to_Client = "عذرا طلب غير مكتمل ، يرجى التأكد و المحاولة مرة اخرى";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[1], SharedParams.PINCodePattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "INVALID_PIN_CODE";
+                            ret.Ret_Message_to_Client = "الرقم السري الجديد غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[2], SharedParams.PINCodePattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "INVALID_PIN_CODE";
+                            ret.Ret_Message_to_Client = "الرقم السري غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        
+                        var partnerResult = partnerManager.Validate(ClientMessage.Mobile_No);
+
+                        if (!partnerResult.Success)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Not_Found";
+                            ret.Ret_Message_to_Client = "عذرا ليس لديك حساب بالخدمة";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        else if (partnerResult.Partner.Status.Id != 1)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_State";
+                            ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء هذا الطلب ، حالة حسابك )" + partnerResult.Partner.Status.Name + "(";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
+                        }
+                        var partner = partnerResult.Partner;
+                        
+                        #region Client weather authonticated or not  
+                        if (partner.Status.Id == 1)
+                        {
+                            var isCorrectPass = partnerManager.CheckPass(partner, Tokens[2]);
+                            if (isCorrectPass)
+                            {
+                                #region Do Change Secret
+                                byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
+                                string hash = Pbkdf2Hasher.ComputeHash(Tokens[1], salt);
+
+                                var changeSecret = new ChangeSecretHistory();
+                                changeSecret.CreatedBy.Id = partner.Id;
+                                changeSecret.CreatedBy.Account = partner.Account;
+                                changeSecret.AccessChannel.Id = "sms";
+                                changeSecret.OldSalt = partner.Extra;
+                                changeSecret.OldHash = partner.Pwd;
+                                changeSecret.NewSalt = Convert.ToBase64String(salt);
+                                changeSecret.NewHash = hash;
+                                changeSecret.ChangeType.Id = "change";
+                                changeSecret.NotifyBy.Id = "sms";
+                                changeSecret.PartAppUser.Id = partner.Id;
+                                changeSecret.PartAppUser.Account = partner.Account;
+                                var result = new ChangeSecretHistoryRepo(db, partnerManager, null).Create(changeSecret);
+                                //var result = new MoneyTransferRepo(db, partnerManager, partnerActivityRepo).Create(moneyTransfer);
+                                if (result.Success)
+                                {
+                                    ret.Ret_ID = result.AffectedCount;
+                                    ret.Ret_Status = true;
+                                    parsedRequest.Id = 1;
+                                    //parsedRequest.RequestId = 3;
+                                    parsedRequest.RequestName = "Change Secret";
+                                    parsedRequest.Status = 1;
+                                    parsedRequest.MobileNo = partner.Id;
+                                    parsedRequest.ReplayDesc = "تم تغيير الرقم السري الخاص برقمكم هذا بنجاح";
+                                    new OutSMSRepo(db).Create(new SMSOut
+                                    {
+                                        Receiver = parsedRequest.MobileNo,
+                                        Message = parsedRequest.ReplayDesc
+                                    });
+                                    return ret;
+                                }
+                                else if (result.AffectedCount < 0)
+                                {
+                                    _logger.LogError($"mobile={parsedRequest.MobileNo},id={parsedRequest.Id},result={result.AffectedCount},result error={result.Error}");
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "UnExpectedError";
+                                    ret.Ret_Message_to_Client = "عذرا لم تتم عملية نقل الرصيد لحدوث خطأ في السيرفر " + result.AffectedCount;
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                #endregion
+                            }
+                            else
+                            {
+                                ret.Ret_ID = -1;
+                                ret.Ret_Message = "WrongPass";
+                                ret.Ret_Message_to_Client = "عذرا الرقم السري غير صحيح  ";
+                                ret.Ret_Status = false;
+                                parsedRequest.RequestId = 2;
+                                return ret;
+                            }
+                        }
+
+                        #endregion
+                        #endregion
+                    }
+                    else if (Tokens[0] == "ع" || Tokens[0].ToLower() == "r")
+                    {
+                        #region Reset Secret
+                        if (Tokens.Length < 2)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "REQUEST_TOO_SHORT";
+                            ret.Ret_Message_to_Client = "عذرا طلب غير مكتمل ، يرجى التأكد و المحاولة مرة اخرى";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        if (!Util.ValidRegEx(Tokens[1], SharedParams.MobileNumberPattern))
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "WRONG_MOBILE";
+                            ret.Ret_Message_to_Client = "رقم الموبايل غير صحيح ، يرجى التاكد و المحاولة لاحقا";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        
+                        var partnerResult = partnerManager.Validate(Tokens[1]);
+
+                        if (!partnerResult.Success)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Not_Found";
+                            ret.Ret_Message_to_Client = $"عذرا الرقم {Tokens[1]} ليس لديه حساب بالخدمة";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 2;
+                            return ret;
+                        }
+                        else if (ClientMessage.Mobile_No != partnerResult.Partner.PairMobile)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_Pair_Number";
+                            ret.Ret_Message_to_Client = $"عذرا لا يمكنك اعادة تعيين الرقم السري للرقم {Tokens[1]}";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
+                        }
+                        else if (partnerResult.Partner.Status.Id != 1)
+                        {
+                            ret.Ret_ID = -1;
+                            ret.Ret_Message = "Wrong_State";
+                            ret.Ret_Message_to_Client = "عذرا لايمكنك اجراء هذا الطلب ، حالة الحساب )" + partnerResult.Partner.Status.Name + "(";
+                            ret.Ret_Status = false;
+                            parsedRequest.RequestId = 3;
+                            return ret;
+                        }
+
+                        var partner = partnerResult.Partner;
+                        
+                        #region Client weather authonticated or not  
+                        if (partner.Status.Id == 1)
+                        {
+                            //var isCorrectPass = partnerManager.CheckPass(partner, Tokens[2]);
+                            //if (isCorrectPass)
+                            {
+                                #region Do Reset Secret
+                                var pass = Utility.GenerateNewCode(4);
+                                byte[] salt = Pbkdf2Hasher.GenerateRandomSalt();
+                                string hash = Pbkdf2Hasher.ComputeHash(pass, salt);
+
+                                var changeSecret = new ChangeSecretHistory();
+                                changeSecret.CreatedBy.Id = ClientMessage.Mobile_No;
+                                changeSecret.CreatedBy.Account = -1;
+                                changeSecret.AccessChannel.Id = "sms";
+                                changeSecret.OldSalt = partner.Extra;
+                                changeSecret.OldHash = partner.Pwd;
+                                changeSecret.NewSalt = Convert.ToBase64String(salt);
+                                changeSecret.NewHash = hash;
+                                changeSecret.ChangeType.Id = "reset";
+                                changeSecret.NotifyBy.Id = "sms";
+                                changeSecret.PartAppUser.Id = partner.Id;
+                                changeSecret.PartAppUser.Account = partner.Account;
+                                var result = new ChangeSecretHistoryRepo(db, partnerManager, null).Create(changeSecret);
+                                //var result = new MoneyTransferRepo(db, partnerManager, partnerActivityRepo).Create(moneyTransfer);
+                                if (result.Success)
+                                {
+                                    ret.Ret_ID = result.AffectedCount;
+                                    ret.Ret_Status = true;
+                                    parsedRequest.Id = 1;
+                                    //parsedRequest.RequestId = 3;
+                                    parsedRequest.RequestName = "Reset Secret";
+                                    parsedRequest.Status = 1;
+                                    parsedRequest.ReplayDesc = "Reset secret successfully";
+                                    new OutSMSRepo(db).Create(new SMSOut
+                                    {
+                                        Receiver = parsedRequest.MobileNo,
+                                        Message = $"تم اعادة تعيين الرقم السري للرقم {partner.Id} بنجاح {Environment.NewLine} الرقم السري الجديد هو {pass}" 
+                                    });
+                                    new OutSMSRepo(db).Create(new SMSOut
+                                    {
+                                        Receiver = partner.Id,
+                                        Message = $"تم اعادة تعيين الرقم السري لرقمكم هذا بنجاح {Environment.NewLine} و تم ارسال الرقم السري الجديد الى الرقم  {parsedRequest.MobileNo}"
+                                    });
+                                    return ret;
+                                }
+                                else if (result.AffectedCount < 0)
+                                {
+                                    _logger.LogError($"mobile={parsedRequest.MobileNo},id={parsedRequest.Id},result={result.AffectedCount},result error={result.Error}");
+                                    ret.Ret_ID = -1;
+                                    ret.Ret_Message = "UnExpectedError";
+                                    ret.Ret_Message_to_Client = "عذرا لم تتم عملية نقل الرصيد لحدوث خطأ في السيرفر " + result.AffectedCount;
+                                    ret.Ret_Status = false;
+                                    return ret;
+                                }
+                                #endregion
+                            }
+                            //else
+                            //{
+                            //    ret.Ret_ID = -1;
+                            //    ret.Ret_Message = "WrongPass";
+                            //    ret.Ret_Message_to_Client = "عذرا الرقم السري غير صحيح  ";
+                            //    ret.Ret_Status = false;
+                            //    parsedRequest.RequestId = 2;
+                            //    return ret;
+                            //}
+                        }
+
+                        #endregion
                         #endregion
                     }
                     else

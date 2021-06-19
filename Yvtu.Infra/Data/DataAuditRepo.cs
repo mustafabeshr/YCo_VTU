@@ -100,6 +100,7 @@ namespace Yvtu.Infra.Data.Interfaces
                     whereClause += string.IsNullOrEmpty(whereClause) ? " WHERE trunc(createdon)<=:EndDate " : " AND trunc(createdon)<=:EndDate ";
                 }
             }
+            whereClause +=  " ORDER BY  createdon  DESC ";
 
             #endregion
 

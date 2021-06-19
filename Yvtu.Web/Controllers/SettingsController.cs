@@ -33,7 +33,7 @@ namespace Yvtu.Web.Controllers
             var permission = _partActRepo.GetPartAct("PayemntValues.View", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
@@ -48,7 +48,7 @@ namespace Yvtu.Web.Controllers
             var permission = _partActRepo.GetPartAct("PayemntValues.Create", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
@@ -64,12 +64,12 @@ namespace Yvtu.Web.Controllers
             {
                 if (model.PayValue <= 0)
                 {
-                    _toastNotification.AddErrorToastMessage("المبلغ غير صحيح");
+                    _toastNotification.AddErrorToastMessage("المبلغ غير صحيح", new ToastrOptions { Title = "" });
                     return View();
                 }
                 if (model.ProfileId <= 0)
                 {
-                    _toastNotification.AddErrorToastMessage("رقم المعرف غير صحيح");
+                    _toastNotification.AddErrorToastMessage("رقم المعرف غير صحيح", new ToastrOptions { Title = "" });
                     return View();
                 }
                 var created = new PaymentValues();
@@ -82,7 +82,7 @@ namespace Yvtu.Web.Controllers
                 {
                     if (result.AffectedCount == -504)
                     {
-                        _toastNotification.AddErrorToastMessage($"المبلغ {model.PayValue.ToString("N2")} موجود مسبقا");
+                        _toastNotification.AddErrorToastMessage($"المبلغ {model.PayValue.ToString("N2")} موجود مسبقا", new ToastrOptions { Title = "" });
                         return Redirect(Request.Headers["Referer"].ToString());
                     }
                 }
@@ -102,14 +102,14 @@ namespace Yvtu.Web.Controllers
             var permission = _partActRepo.GetPartAct("PayemntValues.Remove", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
             var removedObj = new PaymentValuesRepo(_db, _partnerManager).GetSingleOrDefault(pvalue);
             if (removedObj == null)
             {
-                _toastNotification.AddErrorToastMessage($"المبلغ {pvalue.ToString("N2")} غير موجود");
+                _toastNotification.AddErrorToastMessage($"المبلغ {pvalue.ToString("N2")} غير موجود", new ToastrOptions { Title = "" });
                 return View("PValues");
             }
             else
@@ -117,7 +117,7 @@ namespace Yvtu.Web.Controllers
                 var result = new PaymentValuesRepo(_db, _partnerManager).Remove(pvalue);
                 if (result.Success)
                 {
-                    _toastNotification.AddSuccessToastMessage($"المبلغ {pvalue.ToString("N2")} تم حذفه");
+                    _toastNotification.AddSuccessToastMessage($"المبلغ {pvalue.ToString("N2")} تم حذفه", new ToastrOptions { Title = "" });
                     var audit = new DataAudit();
                     audit.Activity.Id = "PayemntValues.Remove";
                     audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);
@@ -140,7 +140,7 @@ namespace Yvtu.Web.Controllers
             var permission = _partActRepo.GetPartAct("API.IpBlacklist.View", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
@@ -155,7 +155,7 @@ namespace Yvtu.Web.Controllers
             var permission = _partActRepo.GetPartAct("API.IpBlacklist.Remove", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
@@ -170,7 +170,7 @@ namespace Yvtu.Web.Controllers
                 var result = new ApiIPBlacklistRepo(_db).Remove(ipAddress);
                 if (result.Success)
                 {
-                    _toastNotification.AddSuccessToastMessage($"العنوان {ipAddress} تم حذفه");
+                    _toastNotification.AddSuccessToastMessage($"العنوان {ipAddress} تم حذفه", new ToastrOptions { Title = "" });
                     var audit = new DataAudit();
                     audit.Activity.Id = "API.IpBlacklist.Remove";
                     audit.PartnerId = _partnerManager.GetCurrentUserId(this.HttpContext);

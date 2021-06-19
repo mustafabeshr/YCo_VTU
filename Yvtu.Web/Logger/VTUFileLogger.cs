@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,9 +37,9 @@ namespace Yvtu.Web.Logger
             Task.Run(async () =>
             {
                 // Run in a seperate task so the thread isn't waiting for it to be finished.
-                var fullFilePath = vtufileLoggerProvider.Options.FolderPath + "/" + vtufileLoggerProvider.Options.FilePath.Replace("{date}", 
+                var fullFilePath = vtufileLoggerProvider.Options.FolderPath + "/" + vtufileLoggerProvider.Options.FilePath.Replace("{date}",
                     DateTimeOffset.UtcNow.ToString("yyyyMMdd")); // Get the full log file path. Seperated by day.
-                var logRecord = string.Format("{0} [{1}] [{2}] {3} {4}", "[" + DateTimeOffset.UtcNow.ToString("yyyy-MM-dd\\THH:mm:ss.fff\\Z") + "]", 
+                var logRecord = string.Format("{0} [{1}] [{2}] {3} {4}", "[" + DateTimeOffset.Now.ToString("yyyy-MM-dd\\TH:mm:ss.fff\\Z") + "]",
                     threadId, logLevel.ToString(), formatter(state, exception), exception != null ? "\n" + exception.GetType().FullName + "\n" + exception.Message + "\n" + exception.StackTrace : ""); // Format the log entry.
 
                 try

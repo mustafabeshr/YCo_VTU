@@ -1,16 +1,13 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.Web.Reports
 {
-    public  class MoneyTransferTemplate
+    public class MoneyTransferTemplate
     {
         private readonly IAppDbContext db;
         private readonly IPartnerManager partnerManager;
@@ -24,8 +21,8 @@ namespace Yvtu.Web.Reports
             this.environment = environment;
             this.partnerActivity = partnerActivity;
         }
-       
-        public  string GetHTMLString(int id)
+
+        public string GetHTMLString(int id)
         {
             var result = new MoneyTransferRepo(db, partnerManager, partnerActivity).GetSingleOrDefault(id);
             var sb = new StringBuilder();
@@ -39,7 +36,7 @@ namespace Yvtu.Web.Reports
   <td><img src='" + Path.Combine(environment.WebRootPath, "images", "Y-Logo2.png") + @"' alt='YCo Logo' class='brand-image' width='70' height='70' style='opacity: .8'></td>
   <td><h1>بيع رصيد شاحن فوري</h1></td>
   <td>
-<div style='display:bloack;'>"+DateTime.Now.ToString("yyyy/MM/dd")+ @"</div>
+<div style='display:bloack;'>" + DateTime.Now.ToString("yyyy/MM/dd") + @"</div>
 <div style='display:bloack;'>" + DateTime.Now.ToString("ss:mm:H") + @"</div>
 </td>
 </tr>
@@ -171,7 +168,7 @@ namespace Yvtu.Web.Reports
      <td style='width:33%;'>المحاسب </td>
     </tr>
  <tr style='height:50px;'>
-     <td style='width:33%;font-weight:bold;'>"+result.Partner.Name+@"</td>
+     <td style='width:33%;font-weight:bold;'>" + result.Partner.Name + @"</td>
      <td style='width:33%;'></td>
      <td style='width:33%;'></td>
     </tr>

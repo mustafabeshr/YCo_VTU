@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 
 namespace Yvtu.Web.Dto
@@ -20,7 +17,7 @@ namespace Yvtu.Web.Dto
         public Activity Activity { get; set; }
         [Required(ErrorMessage = "يجب تحديد الرسالة")]
         public int MessageId { get; set; }
-        public MessageTemplate  Message { get; set; }
+        public MessageTemplate Message { get; set; }
         [Required(ErrorMessage = "يجب تحديد توقيت الارسال")]
         public string SendingTimeId { get; set; }
         public List<CommonCode> SendingTime { get; set; }
@@ -32,7 +29,7 @@ namespace Yvtu.Web.Dto
 
     public class SelectedMessages
     {
-        public  MessageTemplate Message { get; set; }
+        public MessageTemplate Message { get; set; }
         public string SendingTimeId { get; set; }
         public List<CommonCode> SendingTime { get; set; }
     }

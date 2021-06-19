@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Security.Claims;
-using DinkToPdf;
+﻿using DinkToPdf;
 using DinkToPdf.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -11,6 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.Extensions.Logging;
 using NToastNotify;
+using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Security.Claims;
 using Yvtu.Core.Entities;
 using Yvtu.Core.Queries;
 using Yvtu.Infra.Data;
@@ -33,7 +33,7 @@ namespace Yvtu.Web.Controllers
 
         public MoneyTransferController(IAppDbContext db, IPartnerManager partnerManager
             , IPartnerActivityRepo partnerActivity, IConverter converter, IWebHostEnvironment environment,
-            ILogger<MoneyTransferController> logger,  IToastNotification toastNotification)
+            ILogger<MoneyTransferController> logger, IToastNotification toastNotification)
         {
             this._db = db;
             this._partnerManager = partnerManager;
@@ -59,10 +59,10 @@ namespace Yvtu.Web.Controllers
             {
                 ColorMode = ColorMode.Color,
                 Orientation = Orientation.Portrait,
-                PaperSize =  PaperKind.A4,
-                Margins = new MarginSettings { Top = 10},
+                PaperSize = PaperKind.A4,
+                Margins = new MarginSettings { Top = 10 },
                 DocumentTitle = "Money Transfer"
-                
+
             };
             var objectSettings = new ObjectSettings
             {
@@ -73,16 +73,17 @@ namespace Yvtu.Web.Controllers
                     DefaultEncoding = "utf-8",UserStyleSheet=Path.Combine(environment.WebRootPath, "css","Reports","rptMoneyTransfer.css")
                 },
                 //HeaderSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true},
-                FooterSettings = {FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]",Line=true, Center="Y Company"},
-                
-                
+                FooterSettings = { FontName = "Arial", FontSize = 9, Right = "page [page] of [topage]", Line = true, Center = "Y Company" },
+
+
             };
 
-            var pdf = new HtmlToPdfDocument {
+            var pdf = new HtmlToPdfDocument
+            {
                 GlobalSettings = globalSettings,
                 Objects = { objectSettings }
             };
-            
+
             var file = converter.Convert(pdf);
 
             return File(file, "application/pdf");
@@ -95,7 +96,7 @@ namespace Yvtu.Web.Controllers
             var permission = _partnerActivity.GetPartAct("MoneyTransfer.Create", currentRoleId);
             if (permission == null)
             {
-                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                _toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             var model = new CreateMoneyTransferDto();
@@ -128,7 +129,7 @@ namespace Yvtu.Web.Controllers
                 var result = GetBasicInfo(model.PartnerId, model.Amount);
                 if (result.Error != "N/A")
                 {
-                    model.Error =result.Error;
+                    model.Error = result.Error;
                     model.PayType = new CommonCodeRepo(_db).GetCodesByType("pay.type");
                     return View(model);
                 }
@@ -173,7 +174,7 @@ namespace Yvtu.Web.Controllers
             moneyTransfer.Note = model.Note;
             moneyTransfer.NetAmount = model.NetAmount;
             moneyTransfer.TaxPercent = model.TaxPercent;
-            moneyTransfer.TaxAmount =  model.TaxAmount;
+            moneyTransfer.TaxAmount = model.TaxAmount;
             moneyTransfer.BonusPercent = model.BonusPercent;
             moneyTransfer.BounsAmount = model.BounsAmount;
             moneyTransfer.BounsTaxPercent = model.BounsTaxPercent;
@@ -197,9 +198,10 @@ namespace Yvtu.Web.Controllers
                 if (result.AffectedCount == -500)
                 {
                     model.Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية";
-                } else if (result.AffectedCount == -501)
+                }
+                else if (result.AffectedCount == -501)
                 {
-                    model.Error =  $"رصيدك غير كافي { model.CreatorBalance.ToString("N0") } ";
+                    model.Error = $"رصيدك غير كافي { model.CreatorBalance.ToString("N0") } ";
                 }
                 else if (result.AffectedCount == -502)
                 {
@@ -216,7 +218,7 @@ namespace Yvtu.Web.Controllers
         public CreateMoneyTransferDto GetBasicInfo(string pId, double amount = 0)
         {
             if (pId.Length != 9) return new CreateMoneyTransferDto { Error = "رقم خاطئ" };
-            var validateResult =  _partnerManager.Validate(pId);
+            var validateResult = _partnerManager.Validate(pId);
             if (validateResult.Success)
             {
                 var currentId = _partnerManager.GetCurrentUserId(this.HttpContext);
@@ -234,7 +236,7 @@ namespace Yvtu.Web.Controllers
                 }
 
                 var moneyTransferSettings = permission.Details.Find(x => x.ToRole.Id == partner.Role.Id);
-                if (moneyTransferSettings == null) 
+                if (moneyTransferSettings == null)
                     return new CreateMoneyTransferDto { Error = "لم يتم تعريف هذا الاجراء او ليس لديك الصلاحية الكافية" };
 
                 if (permission.Scope.Id == "CurOpOnly")
@@ -262,7 +264,7 @@ namespace Yvtu.Web.Controllers
 
                 if (moneyTransferSettings.MaxValue > 0 && amount > moneyTransferSettings.MaxValue)
                 {
-                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue.ToString("N0")} " ;
+                    model.Error = $"المبلغ اكبر من الاحد الاعلى المسموح به {moneyTransferSettings.MaxValue.ToString("N0")} ";
                     return model;
                 }
                 if (moneyTransferSettings.MinValue > 0 && amount < moneyTransferSettings.MinValue)
@@ -280,7 +282,7 @@ namespace Yvtu.Web.Controllers
                 model.CreatorBalance = currPart.Balance - currPart.Reserved;
                 if (moneyTransferSettings.CheckBalanceRequired)
                 {
-                    
+
                     if (amount > model.CreatorBalance)
                     {
                         model.Error = $"رصيدك غير كافي { model.CreatorBalance.ToString("N0") } ";
@@ -288,7 +290,7 @@ namespace Yvtu.Web.Controllers
                     }
                 }
 
-                var netAmount = amount * (moneyTransferSettings.FixedFactor <= 0 ? 1 : moneyTransferSettings.FixedFactor) ;
+                var netAmount = amount * (moneyTransferSettings.FixedFactor <= 0 ? 1 : moneyTransferSettings.FixedFactor);
                 var taxAmount = netAmount * (moneyTransferSettings.TaxPercent / 100);
                 var bounsAmount = netAmount * (moneyTransferSettings.BonusPercent / 100);
                 var bounsTaxAmount = bounsAmount * (moneyTransferSettings.BonusTaxPercent / 100);
@@ -308,7 +310,7 @@ namespace Yvtu.Web.Controllers
             {
                 return new CreateMoneyTransferDto { Error = "غير موجود" };
             }
-            
+
 
         }
         [HttpGet]
@@ -330,9 +332,9 @@ namespace Yvtu.Web.Controllers
             return View(model);
         }
         [HttpPost]
-        
+
         public IActionResult MoneyTranferQuery(MoneyTransferQueryDto model, [FromQuery
-        (Name = "direction")] string direction  )
+        (Name = "direction")] string direction)
         {
             #region Prepare Query
             model.Error = string.Empty;
@@ -362,13 +364,13 @@ namespace Yvtu.Web.Controllers
                 model.Error = "ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم";
                 return View(model);
             }
-            else if (permission.Scope.Id == "Exclusive" && targetPartner != null &&  targetPartner.RefPartner.Id != currUserId)
+            else if (permission.Scope.Id == "Exclusive" && targetPartner != null && targetPartner.RefPartner.Id != currUserId)
             {
                 model.Error = "ليس لديك الصلاحيات الكافية للاستعلام عن هذا الرقم";
                 return View(model);
             }
 
-            
+
             #endregion
             ModelState.Clear();
             if (direction == "pre" && model.Paging.PageNo > 1)
@@ -394,9 +396,9 @@ namespace Yvtu.Web.Controllers
             {
                 model.Paging.Count = 0;
             }
-            
+
             return View(result);
-     
+
         }
         [HttpGet]
         public IActionResult Detail(int id)

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using Yvtu.Core.Entities;
 
 namespace Yvtu.Web.Dto
@@ -22,24 +20,24 @@ namespace Yvtu.Web.Dto
         public int Id { get; set; }
         [Required(ErrorMessage = "يجب تحديد الاجراء")]
         public string ActivityId { get; set; }
-       
+
         [Required(ErrorMessage = "يجب تحديد نوع الجهة المصدر")]
         public int? FromRoleId { get; set; }
-       
+
         [Required(ErrorMessage = "يجب تحديد نوع الجهة المستهدفة")]
         public int? ToRoleId { get; set; }
-        
+
         public bool CheckBalanceRequired { get; set; }
         [Required(ErrorMessage = "يجب تحديد أعلى قيمة")]
         [Range(0, 10000000, ErrorMessage = "القيمة الصحيحة هي أقل من عشرة مليون")]
         public int MaxValue { get; set; }
         [Required(ErrorMessage = "يجب تحديد إقل قيمة")]
-        
+
         [Range(0, 1000000, ErrorMessage = "القيمة الصحيحة هي بين أقل من مليون")]
-        
+
         public int MinValue { get; set; }
         [Required(ErrorMessage = "يجب تحديد نسبة البونص")]
-        [Range(0, 100 , ErrorMessage ="نسبة البونص غير صحيحة") ]
+        [Range(0, 100, ErrorMessage = "نسبة البونص غير صحيحة")]
         public double BonusPercent { get; set; }
         [Required(ErrorMessage = "يجب تحديد نسبة ضريبة البونص")]
         [Range(0, 100, ErrorMessage = "نسبة ضريبة البونص غير صحيحة")]
@@ -95,7 +93,7 @@ namespace Yvtu.Web.Dto
         public virtual List<CommonCode> MaxQueryDuration { get; set; }
         public virtual List<CommonCode> Scopes { get; set; }
 
-        public  List<CreatePartnerActivityDetailDto> Details { get; set; }
+        public List<CreatePartnerActivityDetailDto> Details { get; set; }
 
     }
     public class CreatePartnerActivityDetailDto

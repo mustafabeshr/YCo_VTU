@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NToastNotify;
-using Yvtu.Core.Entities;
-using Yvtu.Core.Queries;
+using System;
 using Yvtu.Infra.Data;
 using Yvtu.Infra.Data.Interfaces;
 using Yvtu.Web.Dto;
@@ -36,7 +31,7 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("Notification.Query", currentRole);
             if (permission == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
             else
@@ -55,31 +50,31 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("Notification.Query", currentRole);
             if (permission == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
             }
             else if (permission.Details == null || permission.Details.Count == 0)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
             }
             else if (permission.Scope.Id == "CurOpOnly")
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
             }
             else if (permission.Scope.Id == "Exclusive" && partner.RefPartnerId != partnerManager.GetCurrentUserId(this.HttpContext))
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية");
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
             }
             else
-            { 
-                
-                    model.Results = new SMSOutBackRepo(db, partnerManager).GetList(new SMSOutBackRepo.GetListParam
-                    {
-                        Message = model.Message,
-                        Receiver = model.Receiver,
-                        IncludeDates = model.IncludeDates,
-                        StartDate = model.StartDate,
-                        EndDate = model.EndDate
-                    });
+            {
+
+                model.Results = new SMSOutBackRepo(db, partnerManager).GetList(new SMSOutBackRepo.GetListParam
+                {
+                    Message = model.Message,
+                    Receiver = model.Receiver,
+                    IncludeDates = model.IncludeDates,
+                    StartDate = model.StartDate,
+                    EndDate = model.EndDate
+                });
             }
 
             return View(model);
