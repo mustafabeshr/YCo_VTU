@@ -71,7 +71,7 @@ namespace Yvtu.Infra.Data
                 parameters.Add(p);
             }
 
-            if (IncludeDates)
+            //if (IncludeDates)
             {
                 if (startDate > DateTime.MinValue && startDate != null)
                 {

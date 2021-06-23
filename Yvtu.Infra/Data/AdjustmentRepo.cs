@@ -187,7 +187,7 @@ namespace Yvtu.Infra.Data
 
             var destPartnerAccount = row["dest_acc"] == DBNull.Value ? -1 : int.Parse(row["dest_acc"].ToString());
             adjustment.DestPartner = partnerManager.GetPartnerByAccount(destPartnerAccount);
-            adjustment.DestPartner.Balance = row["dest_bal"] == DBNull.Value ? -1 : long.Parse(row["dest_bal"].ToString());
+            adjustment.DestPartner.Balance = row["dest_bal"] == DBNull.Value ? -1 : double.Parse(row["dest_bal"].ToString());
             adjustment.DestPartner.Role.Id = row["dest_role_id"] == DBNull.Value ? -1 : int.Parse(row["dest_role_id"].ToString());
             adjustment.DestPartner.Role.Name = row["dest_role_name"] == DBNull.Value ? string.Empty : row["dest_role_name"].ToString();
             adjustment.DestPartner.Status.Name = row["dest_status_name"] == DBNull.Value ? string.Empty : row["dest_status_name"].ToString();

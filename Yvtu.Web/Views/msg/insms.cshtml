@@ -22,9 +22,9 @@
         </div>
         <div class="col-md-5">
             <div class="row mb-3 text-center" id="PeriodDiv">
-                <div class="col-sm-1 text-center">
+                @*<div class="col-sm-1 text-center">
                     <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
-                </div>
+                </div>*@
                 @*<label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>*@
                 <div class="col-sm-5">
                     <input id="txtStartDate" asp-for="StartDate" class="form-control text-center" style="font-size:14px;">
@@ -49,6 +49,12 @@
             </button>
         </div>
     </div>
+    @Html.HiddenFor(m => m.StartDate)
+    @Html.HiddenFor(m => m.EndDate)
+    @Html.HiddenFor(m => m.Message)
+    @*@Html.HiddenFor(m => m.IncludeDates)*@
+    @Html.HiddenFor(m => m.Sender)
+    @Html.HiddenFor(m => m.Receiver)
 </form>
 
 @if (Model != null && Model.Results != null)
@@ -121,7 +127,7 @@
 
 
 
-    @section Scripts{
+    @*@section Scripts{
         <script>
             $('#chPeriod').change(function () {
                 if ($(this).prop("checked")) {
@@ -141,4 +147,4 @@
                 $("#txtEndDate").prop('disabled', true);
             }
         </script>
-    }
+    }*@

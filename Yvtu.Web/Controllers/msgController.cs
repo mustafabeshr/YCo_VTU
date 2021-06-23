@@ -239,10 +239,7 @@ namespace Yvtu.Web.Controllers
             var permission = partnerActivity.GetPartAct("SMS.SendOne.Query", currentRoleId);
             if (permission == null)
             {
-                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
-                {
-                    Title = ""
-                });
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
 
