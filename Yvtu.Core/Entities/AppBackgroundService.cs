@@ -10,6 +10,7 @@ namespace Yvtu.Core.Entities
         public AppBackgroundService()
         {
             CreatedBy = new AppUser();
+            ActionPartner = new AppUser();
             Partner = new AppUser();
             Status = new CommonCode();
             Source = new CommonCode();
@@ -46,5 +47,6 @@ namespace Yvtu.Core.Entities
         public string FileSizeFormat { get {
                 return FileSizeFormatter.FormatSize(this.FileSize);
             } }
+        public AppUser ActionPartner { get; set; }
     }
 }

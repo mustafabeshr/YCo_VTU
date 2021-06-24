@@ -228,7 +228,7 @@ namespace Yvtu.Infra.Data
 
             var actDataTable = this.db.GetData("Select * from v_partner_activity where row_id=:pactrowid ", parameters);
             var partAct = new PartnerActivity();
-            if (actDataTable != null)
+            if (actDataTable != null && actDataTable.Rows.Count > 0)
             {
                 DataRow row = actDataTable.Rows[0];
                 partAct = ConvertDataRowToDataModel(row);

@@ -31,6 +31,8 @@ namespace Yvtu.Web.Dto
         public DateTime? ActiveTime { get; set; }
         [StringLength(150, ErrorMessage = "يجب ان يكون طول الملاحظات اقل من 150 حرفا")]
         public string Note { get; set; }
+        public string ActionPartnerId { get; set; }
+        public int ActionPartnerAccount { get; set; }
 
         public List<CommonCode> Sources { get; set; }
     }

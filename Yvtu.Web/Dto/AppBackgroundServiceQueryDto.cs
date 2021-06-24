@@ -20,6 +20,8 @@ namespace Yvtu.Web.Dto
         public string CreatedById { get; set; }
         [StringLength(9)]
         public string PartnerId { get; set; }
+        public int ActionPartnerAccount { get; set; }
+        public string ActionPartnerId { get; set; }
         public string Status { get; set; }
 
         public virtual List<CommonCode> Statuses { get; set; }

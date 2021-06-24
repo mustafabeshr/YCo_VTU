@@ -99,10 +99,7 @@ namespace Yvtu.Web.Controllers
                 var permission = partnerActivity.GetPartAct("BgService.Create", currentRoleId);
                 if (permission == null)
                 {
-                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions
-                    {
-                        Title = ""
-                    });
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
                     return Redirect(Request.Headers["Referer"].ToString());
                 }
                 if (model.StartDate != null && model.EndDate != null && model.StartDate > model.EndDate)
@@ -121,6 +118,8 @@ namespace Yvtu.Web.Controllers
                     createdObj.StartDate = model.StartDate ?? DateTime.MinValue;
                     createdObj.EndDate = model.EndDate ?? DateTime.MinValue;
                     createdObj.Note = model.Note;
+                    createdObj.ActionPartner.Id = model.ActionPartnerId;
+                    createdObj.ActionPartner.Account = model.ActionPartnerAccount;
                     createdObj.ActiveTime = model.ActiveTime ?? DateTime.MinValue;
                     var result = new AppBackgroundServiceRepo(db).Create(createdObj);
                     if (result.Success)

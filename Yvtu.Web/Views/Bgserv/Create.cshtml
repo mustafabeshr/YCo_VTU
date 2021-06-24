@@ -14,7 +14,7 @@
         <form method="post">
             <div class="form-group col-md-12">
                 <label asp-for="Name" class="FormLabel">وصف الطلب :</label>
-                <input asp-for="Name"  class="form-control RequiredInput"  />
+                <input asp-for="Name" class="form-control RequiredInput" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-row">
@@ -31,20 +31,47 @@
                     <input asp-for="Id" readonly class="form-control text-center" style="color:maroon;font-weight:bold;font-size:20px;" />
                 </div>
             </div>
+
+
             <div class="form-row">
-                <div class="form-group col-6">
+                <div class="form-group col-12">
+                    <fieldset class="box-border" style="background-color:#fffccc">
+                        <legend class="box-border">الجهة المطلوب بياناتها</legend>
+                        <div class="form-row">
+                            <div class="col-md-12 d-inline-flex">
+                                <div class="form-group col-md-3">
+                                    <label asp-for="PartnerId" class="FormLabel">الرقم:</label>
+                                    <input id="txtId" asp-for="PartnerId" class="form-control text-center" />
+                                    <span asp-validation-for="PartnerId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-9">
+                                    <label asp-for="PartnerAccount" class="FormLabel">الحساب :</label>
+                                    <label id="lblCnt" style="color:red;">(0)</label>
+                                    <select id="selAccounts" asp-for="PartnerAccount" class="form-control" style="padding:0px;">
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+
+            @*<div class="form-row">
+                <div class="form-group col-md-3">
                     <label asp-for="PartnerId" class="FormLabel">رقم النقطة :</label>
                     <input id="txtId" asp-for="PartnerId" class="form-control text-center" />
                     <span asp-validation-for="PartnerId" class="text-danger"></span>
                 </div>
-                <div class="form-group col-6">
+                <div class="form-group col-md-9">
                     <label asp-for="PartnerAccount" class="FormLabel">الحساب :</label>
                     <label id="lblCnt" style="color:red;">(0)</label>
                     <select id="selAccounts" asp-for="PartnerAccount" class="form-control" style="padding:0px;">
                     </select>
 
                 </div>
-            </div>
+            </div>*@
             <div class="form-row">
                 <div class="form-group col-6">
                     <label asp-for="StartDate" class="FormLabel">من تاريخ :</label>
@@ -71,6 +98,30 @@
                     <span asp-validation-for="Note" class="text-danger"></span>
                 </div>
             </div>
+            <div class="form-row">
+                <div class="form-group col-12">
+                    <fieldset class="box-border" style="background-color:#ddf2ff">
+                        <legend class="box-border">الجهة التي لديها صلاحية الاطلاع على نتائج الطلب</legend>
+                        <div class="form-row">
+                            <div class="col-md-12 d-inline-flex">
+                                <div class="form-group col-md-3">
+                                    <label asp-for="ActionPartnerId" class="FormLabel">الرقم:</label>
+                                    <input id="txtActionId" asp-for="ActionPartnerId" class="form-control text-center" />
+                                    <span asp-validation-for="ActionPartnerId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group col-md-9">
+                                    <label asp-for="ActionPartnerAccount" class="FormLabel">الحساب :</label>
+                                    <label id="lblActionCnt" style="color:red;">(0)</label>
+                                    <select id="selActionAccounts" asp-for="ActionPartnerAccount" class="form-control" style="padding:0px;">
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
             <button type="submit" class="btn btn-outline-success"
                     style="width:100%;border-radius:10px;">
                 <i class="fa fa-save"></i>&nbsp;&nbsp;  حفظ
@@ -81,6 +132,8 @@
             @Html.HiddenFor(m => m.Note)
             @Html.HiddenFor(m => m.StartDate)
             @Html.HiddenFor(m => m.EndDate)
+            @Html.HiddenFor(m => m.ActionPartnerId)
+            @Html.HiddenFor(m => m.ActionPartnerAccount)
         </form>
     </div>
 </div>

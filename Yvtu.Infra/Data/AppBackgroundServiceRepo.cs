@@ -21,6 +21,7 @@ namespace Yvtu.Infra.Data
             public string Source { get; set; }
             public string CreatedById { get; set; }
             public string PartnerId { get; set; }
+            public int ActionPartnerAccount { get; set; }
             public string Status { get; set; }
         }
 
@@ -48,7 +49,9 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_end_date",OracleDbType = OracleDbType.Date,  Value = obj.EndDate },
                  new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Note },
                  new OracleParameter{ ParameterName = "v_active_time",OracleDbType = OracleDbType.Date,  Value = obj.ActiveTime },
-                 new OracleParameter{ ParameterName = "v_service_name",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Name }
+                 new OracleParameter{ ParameterName = "v_service_name",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Name },
+                 new OracleParameter{ ParameterName = "v_action_partner_acc",OracleDbType = OracleDbType.Int32,  Value = obj.ActionPartner.Account },
+                 new OracleParameter{ ParameterName = "v_action_partner_id",OracleDbType = OracleDbType.Varchar2,  Value = obj.ActionPartner.Id }
                 };
                 #endregion
                 db.ExecuteStoredProc("pk_infra.fn_create_bgservice", parameters);
@@ -130,6 +133,13 @@ namespace Yvtu.Infra.Data
                 {
                     whereCluase.Append(whereCluase.Length > 0 ? " AND createdby = :CreatedById" : " WHERE createdby = :CreatedById");
                     var p = new OracleParameter { ParameterName = "CreatedById", OracleDbType = OracleDbType.Varchar2, Value = param.CreatedById };
+                    parameters.Add(p);
+                }
+
+                if (param.ActionPartnerAccount > 0)
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? " AND action_partner_acc = :ActionPartnerAcc " : " WHERE action_partner_acc = :ActionPartnerAcc ");
+                    var p = new OracleParameter { ParameterName = "ActionPartnerAcc", OracleDbType = OracleDbType.Int32, Value = param.ActionPartnerAccount };
                     parameters.Add(p);
                 }
 
@@ -258,6 +268,9 @@ namespace Yvtu.Infra.Data
             obj.ActiveTime = row["active_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["active_time"].ToString());
             obj.FileSize = row["file_size"] == DBNull.Value ? 0 : Int64.Parse(row["file_size"].ToString());
             obj.ActualStartTime = row["actual_start_time"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["actual_start_time"].ToString());
+            obj.ActionPartner.Account = row["action_partner_acc"] == DBNull.Value ? 0 : int.Parse(row["action_partner_acc"].ToString());
+            obj.ActionPartner.Id = row["action_partner_id"] == DBNull.Value ? string.Empty : row["action_partner_id"].ToString();
+            obj.ActionPartner.Name = row["action_partner_name"] == DBNull.Value ? string.Empty : row["action_partner_name"].ToString();
             return obj;
         }
 
