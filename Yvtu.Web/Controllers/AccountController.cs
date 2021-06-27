@@ -657,6 +657,18 @@ namespace Yvtu.Web.Controllers
             //accounts.Error = "N/A";
             return accounts;
         }
+        public async Task<List<IdName>> GetAccountsForBG(string id)
+        {
+            if (!Utility.ValidYMobileNo(id)) return null;
+            var currentRole = _partnerManager.GetCurrentUserRole(this.HttpContext);
+            var accounts = await _partnerManager.GetAuthorizedAccountsAsync(id, "BgService.Create", currentRole);
+            if (accounts == null) return null;
+            var permission = new PartnerActivityRepo(_db).GetPartAct("BgService.Create", currentRole);
+            if (permission == null) return null;
+            if (permission.Details == null || permission.Details.Count == 0) return null;
+            //accounts.Error = "N/A";
+            return accounts;
+        }
         public Partner GetP(string id)
         {
             if (!Utility.ValidYMobileNo(id)) return new Partner { Extra = "رقم غير صحيح" };

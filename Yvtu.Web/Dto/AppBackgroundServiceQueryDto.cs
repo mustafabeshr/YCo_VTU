@@ -18,9 +18,13 @@ namespace Yvtu.Web.Dto
         public string Source { get; set; }
         [StringLength(9)]
         public string CreatedById { get; set; }
-        [StringLength(9)]
+        [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
+        [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
+        [Required(ErrorMessage = "يجب تحديد الجهة")]
         public string PartnerId { get; set; }
         public int ActionPartnerAccount { get; set; }
+        [MaxLength(9, ErrorMessage = "رقم الموبايل يجب ان يتكون من تسعة ارقام")]
+        [RegularExpression(@"^70\d*", ErrorMessage = "رقم موبايل غير صحيح")]
         public string ActionPartnerId { get; set; }
         public string Status { get; set; }
 

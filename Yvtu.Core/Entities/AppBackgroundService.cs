@@ -21,6 +21,7 @@ namespace Yvtu.Core.Entities
         public AppUser CreatedBy { get; set; }
         public CommonCode Source { get; set; }
         public AppUser Partner { get; set; }
+        public string RefPartner { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public int RecordCount { get; set; }

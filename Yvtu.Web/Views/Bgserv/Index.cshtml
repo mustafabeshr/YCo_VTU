@@ -26,7 +26,7 @@
         <div class="col-md-5">
             <div class="row mb-3 text-center" id="PeriodDiv">
                 <div class="col-sm-1 text-center">
-                    <input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />
+                    @*<input class="mt-2" id="chPeriod" type="checkbox" asp-for="IncludeDates" />*@
                 </div>
                 @*<label asp-for="StartDate" class="col-sm-1 col-form-label FormLabel">من:</label>*@
                 <div class="col-sm-5">
@@ -149,6 +149,7 @@
             </div>
             <div class="row container-fluid">
                 <div class="col-md-4 text-center" style="color:green;">
+                    <span style="font-size:11px;color:gray;font-weight:bold;">جهة الطلب :</span>
                     @if (!string.IsNullOrEmpty(item.Partner.Id))
                     {
                         <span style="padding:4px;">@item.Partner.Id</span>
@@ -160,20 +161,20 @@
                         <span></span>
                     }
                 </div>
-                <div class="col-md-4 text-center text-muted">
-                    <span style="padding:4px;">@item.CreatedBy.Id</span>
-                    <span style="padding: 4px; border-right: 1px solid #dfcffc;">@item.CreatedBy.Account</span>
-                    <span style="padding: 4px; border-right: 1px solid #ECE2FF;">@item.CreatedBy.Name</span>
-                </div>
+               
                 <div class="col-md-4 text-right">
+                    <span style="font-size:11px;color:gray;font-weight:bold;">الفترة :</span>
                     <span style="padding:4px;">@item.StartDate.ToString("yyyy/MM/dd")</span>  &hArr;<span style="padding:4px;">@item.EndDate.ToString("yyyy/MM/dd")</span>
+
+                </div>
+                <div class="col-md-4 text-center text-muted">
                     <span id="deleteConfirmSpan_@item.Id" style="display:none;">
                         <br />
                         <span style="color:red;">هل انت متاكد من الحذف؟</span>
                         <a asp-action="Delete" asp-controller="Bgserv" asp-route-id="@Model.Id" class="btn btn_link" style="font-size:12px;color:red; width:10px;">نعم</a>
                         <a href="#" class="btn btn_link" onclick="confirmDelete(@item.Id, false)" style="font-size:12px;color:black; width:10px;">لا</a>
                     </span>
-                    @if(item.Status.Id != "processing" && item.Status.Id != "closed")
+                    @if (item.Status.Id != "processing" && item.Status.Id != "closed")
                     {
                         <span id="deleteSpan_@item.Id" class="float-left">
                             <a href="#" onclick="confirmDelete(@item.Id,true)" data-toggle="tooltip" data-placement="top" title="حذف"><i class="far fa-trash-alt  text-danger"></i></a>
@@ -213,32 +214,46 @@
                     </div>
                 </div>
             </div>
+            <div class="row container-fluid mt-2 m-auto" style="border-top:solid 1px gray;">
+                <div class="col-md-4 text-center text-muted mt-2">
+                    <span style="font-size:11px;color:gray;font-weight:bold;">مخصص لـ :</span>
+                    <span style="padding:4px;">@item.ActionPartner.Id</span>
+                    <span style="padding: 4px; border-right: 1px solid #dfcffc;">@item.ActionPartner.Account</span>
+                    <span style="padding: 4px; border-right: 1px solid #ECE2FF;">@item.ActionPartner.Name</span>
+                </div>
+                <div class="col-md-4 text-center text-muted mt-2">
+                    <span style="font-size:11px;color:gray;font-weight:bold;">انشاء بواسطة :</span>
+                    <span style="padding:4px;">@item.CreatedBy.Id</span>
+                    <span style="padding: 4px; border-right: 1px solid #dfcffc;">@item.CreatedBy.Account</span>
+                    <span style="padding: 4px; border-right: 1px solid #ECE2FF;">@item.CreatedBy.Name</span>
+                </div>
+            </div>
         </div>
     }
 }
 
 @section Scripts{
     <script>
-        $('#chPeriod').change(function () {
-            if ($(this).prop("checked")) {
-                $("#txtStartDate").prop('disabled', false);
-                $("#txtEndDate").prop('disabled', false);
-            } else {
-                $("#txtStartDate").prop('disabled', true);
-                $("#txtEndDate").prop('disabled', true);
-            }
-        });
+        //$('#chPeriod').change(function () {
+        //    if ($(this).prop("checked")) {
+        //        $("#txtStartDate").prop('disabled', false);
+        //        $("#txtEndDate").prop('disabled', false);
+        //    } else {
+        //        $("#txtStartDate").prop('disabled', true);
+        //        $("#txtEndDate").prop('disabled', true);
+        //    }
+        //});
 
-        if ($(this).prop("checked")) {
-            $("#txtStartDate").prop('disabled', false);
-            $("#txtEndDate").prop('disabled', false);
-        } else {
-            $("#txtStartDate").prop('disabled', true);
-            $("#txtEndDate").prop('disabled', true);
-        }
-        function confirmDelete(id,isDeleteClicked) {
-            var deleteSpan = 'deleteSpan_'+id;
-            var confirmDeleteSpan = 'deleteConfirmSpan_'+ id;
+        //if ($(this).prop("checked")) {
+        //    $("#txtStartDate").prop('disabled', false);
+        //    $("#txtEndDate").prop('disabled', false);
+        //} else {
+        //    $("#txtStartDate").prop('disabled', true);
+        //    $("#txtEndDate").prop('disabled', true);
+        //}
+        function confirmDelete(id, isDeleteClicked) {
+            var deleteSpan = 'deleteSpan_' + id;
+            var confirmDeleteSpan = 'deleteConfirmSpan_' + id;
 
             if (isDeleteClicked) {
                 $('#' + deleteSpan).hide();

@@ -105,17 +105,17 @@
                         <div class="form-row">
                             <div class="col-md-12 d-inline-flex">
                                 <div class="form-group col-md-3">
-                                    <label asp-for="ActionPartnerId" class="FormLabel">الرقم:</label>
-                                    <input id="txtActionId" asp-for="ActionPartnerId" class="form-control text-center" />
+                                    @*<label asp-for="ActionPartnerId" class="FormLabel">الرقم:</label>*@
+                                    <input id="txtActionId" asp-for="ActionPartnerId" class="form-control text-center" style="font-size:26px;font-weight:bold;"  />
                                     <span asp-validation-for="ActionPartnerId" class="text-danger"></span>
                                 </div>
-                                <div class="form-group col-md-9">
+                                @*<div class="form-group col-md-9">
                                     <label asp-for="ActionPartnerAccount" class="FormLabel">الحساب :</label>
                                     <label id="lblActionCnt" style="color:red;">(0)</label>
                                     <select id="selActionAccounts" asp-for="ActionPartnerAccount" class="form-control" style="padding:0px;">
                                     </select>
 
-                                </div>
+                                </div>*@
                             </div>
                         </div>
                     </fieldset>

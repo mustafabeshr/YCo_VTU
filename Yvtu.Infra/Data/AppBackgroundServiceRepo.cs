@@ -5,6 +5,7 @@ using System.Data;
 using System.Text;
 using System.Threading.Tasks;
 using Yvtu.Core.Entities;
+using System.Linq;
 using Yvtu.Infra.Data.Interfaces;
 
 namespace Yvtu.Infra.Data
@@ -50,7 +51,6 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "v_note",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Note },
                  new OracleParameter{ ParameterName = "v_active_time",OracleDbType = OracleDbType.Date,  Value = obj.ActiveTime },
                  new OracleParameter{ ParameterName = "v_service_name",OracleDbType = OracleDbType.NVarchar2,  Value = obj.Name },
-                 new OracleParameter{ ParameterName = "v_action_partner_acc",OracleDbType = OracleDbType.Int32,  Value = obj.ActionPartner.Account },
                  new OracleParameter{ ParameterName = "v_action_partner_id",OracleDbType = OracleDbType.Varchar2,  Value = obj.ActionPartner.Id }
                 };
                 #endregion
@@ -108,7 +108,8 @@ namespace Yvtu.Infra.Data
             }
         }
 
-        public async Task<List<AppBackgroundService>> GetBackgroundServicesAsync(BackgroundServiceListParam param)
+        public async Task<List<AppBackgroundService>> GetBackgroundServicesAsync(BackgroundServiceListParam param, PartnerActivity permission, 
+            string currentPartnerId, int currentPartnerAccount)
         {
             #region Parameters
             var parameters = new List<OracleParameter>();
@@ -143,11 +144,23 @@ namespace Yvtu.Infra.Data
                     parameters.Add(p);
                 }
 
-                if (!string.IsNullOrEmpty(param.PartnerId))
+                if (permission.Scope.Id == "CurOpOnly")
+                {
+                    whereCluase.Append(whereCluase.Length > 0 ? $" AND (partner_id = :PartnerId OR action_partner_acc = {currentPartnerAccount})" : $" WHERE (partner_id = :PartnerId  OR action_partner_acc = {currentPartnerAccount})");
+                    var p = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = currentPartnerId };
+                    parameters.Add(p);
+                } else if (!string.IsNullOrEmpty(param.PartnerId))
                 {
                     whereCluase.Append(whereCluase.Length > 0 ? " AND partner_id = :PartnerId" : " WHERE partner_id = :PartnerId");
                     var p = new OracleParameter { ParameterName = "PartnerId", OracleDbType = OracleDbType.Varchar2, Value = param.PartnerId };
                     parameters.Add(p);
+                }
+                if (permission.Scope.Id == "Exclusive")
+                {
+                    var parm = new OracleParameter { ParameterName = "RefId", OracleDbType = OracleDbType.Varchar2, Value = currentPartnerId };
+                    whereCluase.Append(whereCluase.Length > 0 ? $" AND  (ref_partner=:RefId  OR action_partner_acc = {currentPartnerAccount})" 
+                        : $" WHERE (ref_partner=:RefId  OR action_partner_acc = {currentPartnerAccount})" );
+                    parameters.Add(parm);
                 }
 
                 if (!string.IsNullOrEmpty(param.Status) && param.Status != "-1")
@@ -164,7 +177,7 @@ namespace Yvtu.Infra.Data
                     parameters.Add(p);
                 }
 
-                if (param.IncludeDates)
+                //if (param.IncludeDates)
                 {
                     if (param.StartDate > DateTime.MinValue && param.StartDate != null)
                     {
@@ -178,6 +191,18 @@ namespace Yvtu.Infra.Data
                         var p = new OracleParameter { ParameterName = "EndDate", OracleDbType = OracleDbType.Date, Value = param.EndDate.AddDays(1) };
                         parameters.Add(p);
                     }
+                }
+
+                if (permission.Details == null || permission.Details.Count == 0)
+                {
+                    whereCluase.Append(string.IsNullOrEmpty(whereCluase.ToString()) ? " WHERE roleid=-1 " : " AND roleid=-1  ");
+                }
+                else
+                {
+                    var allowedRoles = string.Join(",", permission.Details.Select(x => x.ToRole.Id).ToList());
+                    whereCluase.Append(string.IsNullOrEmpty(whereCluase.ToString())
+                        ? $" WHERE (roleid in ( {allowedRoles} ) OR action_partner_acc = {currentPartnerAccount})"
+                        : $" AND ( roleid in ( {allowedRoles} ) OR action_partner_acc = {currentPartnerAccount})");
                 }
             }
             #endregion
@@ -254,6 +279,7 @@ namespace Yvtu.Infra.Data
             obj.Partner.Account = row["partner_acc"] == DBNull.Value ? 0 : int.Parse(row["partner_acc"].ToString());
             obj.Partner.Id = row["partner_id"] == DBNull.Value ? string.Empty : row["partner_id"].ToString();
             obj.Partner.Name = row["partner_name"] == DBNull.Value ? string.Empty : row["partner_name"].ToString();
+            obj.RefPartner = row["ref_partner"] == DBNull.Value ? string.Empty : row["ref_partner"].ToString();
             obj.StartDate = row["start_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["start_date"].ToString());
             obj.EndDate = row["end_date"] == DBNull.Value ? DateTime.MinValue : DateTime.Parse(row["end_date"].ToString());
             obj.RecordCount = row["record_count"] == DBNull.Value ? 0 : int.Parse(row["record_count"].ToString());

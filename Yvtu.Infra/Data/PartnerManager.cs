@@ -419,7 +419,7 @@ namespace Yvtu.Infra.Data
                  new OracleParameter{ ParameterName = "partnerAccount", OracleDbType = OracleDbType.Int32,  Value = account },
             };
             var partnerDataTable = db.GetData("select * from partner where partner_acc=:partnerAccount", parameters);
-            if (partnerDataTable == null) return null;
+            if (partnerDataTable == null || partnerDataTable.Rows.Count == 0) return null;
 
             #region Convert to Partner Object
             var partner = ConvertDataRowToPartner(partnerDataTable.Rows[0]);
@@ -731,6 +731,8 @@ namespace Yvtu.Infra.Data
             }
             return partners;
         }
+
+
 
         public async Task<int> GetUnreadUserNotifyCountAsync(string id)
         {

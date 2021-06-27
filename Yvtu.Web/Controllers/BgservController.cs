@@ -33,6 +33,13 @@ namespace Yvtu.Web.Controllers
         }
         public IActionResult Index()
         {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("BgService.Query", currentRoleId);
+            if (permission == null || permission.Details == null || permission.Details.Count == 0)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
             var model = new AppBackgroundServiceQueryDto();
             var sources = new CommonCodeRepo(db).GetCodesByType("bg_service_source");
             var statuses = new CommonCodeRepo(db).GetCodesByType("bg_service_status");
@@ -45,6 +52,17 @@ namespace Yvtu.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(AppBackgroundServiceQueryDto model)
         {
+            var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+            var currentId = partnerManager.GetCurrentUserId(this.HttpContext);
+            var currentAccount = partnerManager.GetCurrentUserAccount(this.HttpContext);
+            var permission = partnerActivity.GetPartAct("BgService.Query", currentRoleId);
+            if (permission == null || permission.Details == null || permission.Details.Count == 0)
+            {
+                toastNotification.AddErrorToastMessage("ليس لديك الصلاحيات الكافية", new ToastrOptions { Title = "" });
+                return Redirect(Request.Headers["Referer"].ToString());
+            }
+
+
             var results = await new AppBackgroundServiceRepo(db).GetBackgroundServicesAsync(new AppBackgroundServiceRepo.BackgroundServiceListParam
             {
                 Id = model.Id,
@@ -56,7 +74,7 @@ namespace Yvtu.Web.Controllers
                 Source = model.Source,
                 Status = model.Status,
                 Name = model.Name
-            });
+            }, permission, currentId, currentAccount);
             model.Results = results;
             var sources = new CommonCodeRepo(db).GetCodesByType("bg_service_source");
             var statuses = new CommonCodeRepo(db).GetCodesByType("bg_service_status");
@@ -77,7 +95,10 @@ namespace Yvtu.Web.Controllers
                 });
                 return Redirect(Request.Headers["Referer"].ToString());
             }
+
             var model = new CreateBackgroundServiceDto();
+            model.StartDate = DateTime.Now.AddDays(-30);
+            model.EndDate = DateTime.Now;
             var sources = new CommonCodeRepo(db).GetCodesByType("bg_service_source");
             model.Sources = sources;
             return View(model);
@@ -96,18 +117,52 @@ namespace Yvtu.Web.Controllers
             else if (ModelState.IsValid)
             {
                 var currentRoleId = partnerManager.GetCurrentUserRole(this.HttpContext);
+                var currentId = partnerManager.GetCurrentUserId(this.HttpContext);
                 var permission = partnerActivity.GetPartAct("BgService.Create", currentRoleId);
                 if (permission == null)
                 {
                     toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    //return Redirect(Request.Headers["Referer"].ToString());
+                } else if (permission.Details == null || permission.Details.Count == 0)
+                {
+                    toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية", new ToastrOptions { Title = "" });
+                    //return Redirect(Request.Headers["Referer"].ToString());
                 }
-                if (model.StartDate != null && model.EndDate != null && model.StartDate > model.EndDate)
+                else if (model.StartDate != null && model.EndDate != null && model.StartDate > model.EndDate)
                 {
                     ModelState.AddModelError("EndDate", "تاريخ النهاية اقل من تاريخ البداية");
                 }
+                else if (string.IsNullOrEmpty(model.PartnerId) || model.PartnerAccount <= 0)
+                {
+                    toastNotification.AddErrorToastMessage("يجب تحديد الجهة المطلوب بياناتها", new ToastrOptions { Title = "" });
+                    //return Redirect(Request.Headers["Referer"].ToString());
+                }
                 else
                 {
+                    var targetPartner = partnerManager.GetPartnerByAccount(model.PartnerAccount);
+                    if (targetPartner == null)
+                    {
+                        toastNotification.AddErrorToastMessage("الجهة المراد بياناتها غير موجودة", new ToastrOptions { Title = "" });
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
+                    if (!permission.Details.Exists(m => m.ToRole.Id == targetPartner.Role.Id))
+                    {
+                        toastNotification.AddErrorToastMessage("ليس لديك الصلاحية الكافية لطلب بيانات لهذه الجهة", new ToastrOptions { Title = "" });
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
+
+                    if (permission.Scope.Id == "CurOpOnly" && targetPartner.Id != currentId)
+                    {
+                        toastNotification.AddErrorToastMessage("صلاحيتك محدودة لطلب بيانات لرقمك فقط", new ToastrOptions { Title = "" });
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
+
+                    if (permission.Scope.Id == "Exclusive" && targetPartner.RefPartner.Id != currentId)
+                    {
+                        toastNotification.AddErrorToastMessage("صلاحيتك محدودة لطلب بيانات للجهات التابعة لك فقط", new ToastrOptions { Title = "" });
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
+
                     var createdObj = new AppBackgroundService();
                     createdObj.CreatedBy.Id = partnerManager.GetCurrentUserId(this.HttpContext);
                     createdObj.CreatedBy.Account = partnerManager.GetCurrentUserAccount(this.HttpContext);
